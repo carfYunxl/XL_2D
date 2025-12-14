@@ -14,6 +14,7 @@ struct WindowProp
 namespace XL
 {
     class Renderer;
+    class GlFrameBuffer;
 }
 
 class OpenglRender
@@ -36,6 +37,7 @@ private:
     HGLRC                               m_hRC;
     WindowProp                          m_WinProp;
     std::unique_ptr<XL::Renderer>       m_Renderer;
+    std::unique_ptr<XL::GlFrameBuffer>  m_FrameBuffer;
 };
 
 #endif // __OPENGL_RENDERER_HPP__

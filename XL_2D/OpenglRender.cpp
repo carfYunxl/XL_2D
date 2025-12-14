@@ -1,5 +1,6 @@
 #include "OpenglRender.hpp"
 #include "Renderer.hpp"
+#include "FrameBuffer.hpp"
 #include <windows.h>
 #include <gl/wglext.h>
 #include <gl/gl.h>
@@ -98,6 +99,11 @@ bool OpenglRender::Init()
     m_Renderer->Init();
     m_Renderer->Resize(m_WinProp.Width, m_WinProp.Height);
 
+    XL::FramebufferSpecification fbSpec;
+    fbSpec.Width = m_WinProp.Width;
+    fbSpec.Height = m_WinProp.Height;
+    m_FrameBuffer = std::make_unique<XL::GlFrameBuffer>(fbSpec);
+
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     return true;
@@ -129,11 +135,15 @@ void OpenglRender::OnSize(int cx, int cy)
 
         m_WinProp.Width = cx;
         m_WinProp.Height = cy;
+
+		m_FrameBuffer->Resize(cx, cy);
     }
 }
 
 void OpenglRender::OnPaint()
 {
+    m_FrameBuffer->Bind();
+
     m_Renderer->ClearScene();
     m_Renderer->UpdateCamera();
     /*  Core Draw Functions Here */
@@ -187,6 +197,7 @@ void OpenglRender::OnPaint()
         z += 0.015f;
     }
     ///////////////////////////////////////////
+    m_FrameBuffer->Unbind();
 
     SwapBuffers(m_hDC);
 }

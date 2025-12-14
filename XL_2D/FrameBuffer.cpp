@@ -56,6 +56,17 @@ _NAMESPACE_BEGIN
 
 	void GlFrameBuffer::Unbind()
 	{
+		// 把 FBO 的颜色缓冲 blit 到默认帧缓冲
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+		// 注意 Y 方向：MFC/GL 的窗口坐标通常与 OpenGL framebuffer 原点一致（下方为 0）
+		glBlitFramebuffer(
+			0, 0, m_Specification.Width, m_Specification.Height,
+			0, 0, m_Specification.Width, m_Specification.Height,
+			GL_COLOR_BUFFER_BIT, GL_NEAREST
+		);
+
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
