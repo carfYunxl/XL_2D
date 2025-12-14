@@ -9,7 +9,7 @@ _NAMESPACE_BEGIN
 	{
 		uint32_t Width, Height;
 		// FramebufferFormat Format = 
-		uint32_t Samples = 1;
+		uint32_t Samples = 8;
 
 		bool SwapChainTarget = false;
 	};

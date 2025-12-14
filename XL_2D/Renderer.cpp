@@ -23,9 +23,6 @@ _NAMESPACE_BEGIN
 
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_BLEND);
-        glEnable(GL_LINE_SMOOTH);
-        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-        glLineWidth(2.0f);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // 非预乘 alpha（常用）
         glBlendEquation(GL_FUNC_ADD); // 默认即可
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
