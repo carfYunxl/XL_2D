@@ -5,37 +5,37 @@
 
 _NAMESPACE_BEGIN
 
-    class VertexBuffer;
-    class IndexBuffer;
+class VertexBuffer;
+class IndexBuffer;
 
-    class VertexArray
-    {
-    public:
-        VertexArray(
-            float* vertices = nullptr,
-            unsigned int vertexSize = 0,
-            unsigned int* indices = nullptr,
-            unsigned int indexCount = 0
-        );
-        ~VertexArray();
+class VertexArray
+{
+public:
+    VertexArray(
+        float* vertices = nullptr,
+        unsigned int vertexSize = 0,
+        unsigned int* indices = nullptr,
+        unsigned int indexCount = 0
+    );
+    ~VertexArray();
 
-        void Bind();
-        void UnBind();
+    void Bind();
+    void UnBind();
 
-        void Reset(float* vertices, unsigned int vertexSize);
-    private:
-        void Init(
-            float* vertices = nullptr,
-            unsigned int vertexSize = 0,
-            unsigned int* indices = nullptr,
-            unsigned int indexCount = 0
-        );
-    private:
-        unsigned int VAO;
+    void Reset(float* vertices, unsigned int vertexSize);
+private:
+    void Init(
+        float* vertices = nullptr,
+        unsigned int vertexSize = 0,
+        unsigned int* indices = nullptr,
+        unsigned int indexCount = 0
+    );
+private:
+    unsigned int VAO;
 
-        std::unique_ptr<VertexBuffer> m_VertexBuffer;
-        std::unique_ptr<IndexBuffer> m_IndexBuffer;
-    };
+    std::unique_ptr<VertexBuffer> m_VertexBuffer;
+    std::unique_ptr<IndexBuffer> m_IndexBuffer;
+};
 
 _NAMESPACE_END
 
