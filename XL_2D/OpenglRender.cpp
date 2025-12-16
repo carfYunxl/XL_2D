@@ -102,7 +102,7 @@ bool OpenglRender::Init()
     XL::FramebufferSpecification fbSpec;
     fbSpec.Width = m_WinProp.Width;
     fbSpec.Height = m_WinProp.Height;
-    m_FrameBuffer = std::make_unique<XL::GlFrameBuffer>(fbSpec);
+    m_FrameBuffer = std::make_unique<XL::FrameBuffer>(fbSpec);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 

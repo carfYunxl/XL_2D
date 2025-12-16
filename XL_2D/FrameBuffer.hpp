@@ -14,11 +14,11 @@ _NAMESPACE_BEGIN
 		bool SwapChainTarget = false;
 	};
 
-    class GlFrameBuffer
+    class FrameBuffer
 	{
 	public:
-		GlFrameBuffer(const FramebufferSpecification& spec);
-		virtual ~GlFrameBuffer();
+		FrameBuffer(const FramebufferSpecification& spec);
+		virtual ~FrameBuffer();
 
 		void Invalidate();
 

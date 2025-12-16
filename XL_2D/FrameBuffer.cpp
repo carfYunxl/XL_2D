@@ -3,7 +3,7 @@
 
 _NAMESPACE_BEGIN
 
-GlFrameBuffer::GlFrameBuffer(const FramebufferSpecification& spec)
+FrameBuffer::FrameBuffer(const FramebufferSpecification& spec)
 	: m_Specification(spec)
 	, m_RendererID(0)
 	, m_ColorAttachment(0)
@@ -12,14 +12,14 @@ GlFrameBuffer::GlFrameBuffer(const FramebufferSpecification& spec)
 	Invalidate();
 }
 
-GlFrameBuffer::~GlFrameBuffer()
+FrameBuffer::~FrameBuffer()
 {
 	if (m_RendererID)      glDeleteFramebuffers(1, &m_RendererID);
 	if (m_ColorAttachment) glDeleteTextures(1, &m_ColorAttachment);
 	if (m_DepthAttachment) glDeleteTextures(1, &m_DepthAttachment);
 }
 
-void GlFrameBuffer::Invalidate()
+void FrameBuffer::Invalidate()
 {
 	// 清理旧资源
 	if (m_RendererID)
@@ -84,14 +84,14 @@ void GlFrameBuffer::Invalidate()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GlFrameBuffer::Bind()
+void FrameBuffer::Bind()
 {
 	glBindFramebuffer(GL_FRAMEBUFFER, m_RendererID);
 	//glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, static_cast<GLsizei>(m_Specification.Width), static_cast<GLsizei>(m_Specification.Height));
 }
 
-void GlFrameBuffer::Unbind()
+void FrameBuffer::Unbind()
 {
 	// 将 FBO 的颜色缓冲 blit 到默认帧缓冲（如果是多重采样 glBlit 会执行 resolve）
 	glBindFramebuffer(GL_READ_FRAMEBUFFER, m_RendererID);
@@ -109,7 +109,7 @@ void GlFrameBuffer::Unbind()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void GlFrameBuffer::Resize(uint32_t width, uint32_t height)
+void FrameBuffer::Resize(uint32_t width, uint32_t height)
 {
 	if (width == 0 || height == 0)
 		return;
