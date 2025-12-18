@@ -18,6 +18,12 @@
 #define WGL_CONTEXT_CORE_PROFILE_BIT_ARB 0x00000001
 #endif
 
+using GLAD_PROC = void(*)(void);
+
+static GLAD_PROC glad_wgl_get_proc(void* userptr, const char* name) {
+    return GLAD_PROC(wglGetProcAddress(name));
+}
+
 OpenglRender::OpenglRender(HWND hWnd, const WindowProp& prop)
     : m_hWnd{ hWnd }
     , m_hDC { NULL }
@@ -96,15 +102,13 @@ bool OpenglRender::Init()
     }
 
     m_Renderer = std::make_unique<XL::Renderer>();
-    m_Renderer->Init();
+    m_Renderer->Init(glad_wgl_get_proc);
     m_Renderer->Resize(m_WinProp.Width, m_WinProp.Height);
 
     XL::FramebufferSpecification fbSpec;
     fbSpec.Width = m_WinProp.Width;
     fbSpec.Height = m_WinProp.Height;
     m_FrameBuffer = std::make_unique<XL::FrameBuffer>(fbSpec);
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     return true;
 }
@@ -149,10 +153,10 @@ void OpenglRender::OnPaint()
     /*  Core Draw Functions Here */
     ///////////////////////////////////////////
     m_Renderer->DrawTriangle(
-        XL::DrawPlane::XY,
+        XL::DrawPlane::YZ,
         glm::vec3(0.5f, 0.5f, 1.0f), 	// translate
         glm::vec3(0.0f, 0.0f, 0.0f),	// rotate
-        glm::vec3(1.0f, 1.0f, 1.0f), 	// scales
+        glm::vec3(5.0f, 5.0f, 1.0f), 	// scales
         glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)		// color
     );
 

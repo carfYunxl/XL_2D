@@ -1,5 +1,5 @@
 #include "Renderer.hpp"
-#include <windows.h>
+#include "XL_ShaderSource.hpp"
 
 _NAMESPACE_BEGIN
 
@@ -16,9 +16,9 @@ void Renderer::UpdateCamera()
     m_Camera->OnUpdate();
 }
 
-bool Renderer::Init()
+bool Renderer::Init(pfnGladLoader loader)
 {
-    int gladLoaded = GladLoadWithRetry(5, 10);
+    int gladLoaded = GladLoadWithRetry(loader, 5, 10);
     if (!gladLoaded)
         return false;
 
@@ -27,6 +27,7 @@ bool Renderer::Init()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); // 非预乘 alpha（常用）
     glBlendEquation(GL_FUNC_ADD); // 默认即可
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     // XY Plane
     m_RectangleVertices.vertices[0] = {-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f};
@@ -127,9 +128,7 @@ bool Renderer::Init()
     );
 
     m_Shader = std::make_unique<Shader>();
-    std::filesystem::path path = std::filesystem::current_path();
-    std::filesystem::path shader_path = path / "assets" / "Shader" / "FlatColor.glsl";
-    m_Shader->LoadShader(shader_path.string().c_str());
+    m_Shader->LoadShader(g_sVertexShader, g_sFragShader);
     m_Shader->UnBind();
 
     m_Camera =  std::make_unique<Camera>(10.0f / 9.0f);
@@ -285,23 +284,17 @@ void Renderer::DrawLine(
     m_Shader->UnBind();
 }
 
-// Call gladLoadGLUserPtr with a small retry loop and short sleep between attempts.
-// Some drivers/platforms may need a tiny delay after making a context current.
-
-static GLADapiproc glad_wgl_get_proc(void* userptr, const char* name) {
-    return (GLADapiproc)wglGetProcAddress(name);
-}
-int Renderer::GladLoadWithRetry(int maxAttempts, int delayMs)
+int Renderer::GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs)
 {
     for (int attempt = 1; attempt <= maxAttempts; ++attempt)
     {
-        int ok = gladLoadGLUserPtr(glad_wgl_get_proc, NULL);
+        int ok = gladLoadGLUserPtr(loader, NULL);
 
         if (ok)
             return ok;
 
         if (attempt < maxAttempts)
-            Sleep(delayMs);
+            XL_mSleep(delayMs);
     }
 
     return 0;

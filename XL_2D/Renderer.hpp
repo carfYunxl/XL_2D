@@ -7,6 +7,9 @@
 
 _NAMESPACE_BEGIN
 
+using GLAD_PROC = void(*)();
+using pfnGladLoader = GLAD_PROC (*)(void* userptr, const char* name);
+
 struct TriangleVertex
 {
     std::array<std::array<float, 6>, 3> vertices;
@@ -88,7 +91,7 @@ public:
     void Resize(int nWidth, int nHeight);
     void UpdateCamera();
     void ClearScene() { glClearColor(0.2f, 0.3f, 0.3f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
-    bool Init();
+    bool Init(pfnGladLoader loader);
 
     void OnKeyDown(uint32_t nChar, uint32_t nRepCnt);
     void OnMouseWheel(int yOffset);
@@ -122,7 +125,7 @@ public:
         const glm::vec4& color
     );
 private:
-    int  GladLoadWithRetry(int maxAttempts, int delayMs);
+    int  GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs);
 };
 
 _NAMESPACE_END

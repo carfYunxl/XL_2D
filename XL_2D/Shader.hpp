@@ -18,6 +18,7 @@ public:
     ~Shader();
 
     void LoadShader(const char* shader_source);
+    void LoadShader(const char* vertex_shader_source, const char* frag_shader_source);
 
     void Bind();
     void UnBind();

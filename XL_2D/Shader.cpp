@@ -27,6 +27,21 @@ void Shader::LoadShader(const char* shader_source)
     }
 }
 
+void Shader::LoadShader(const char* vertex_shader_source, const char* frag_shader_source)
+{
+    try
+    {
+        unsigned int vShader = Compile(vertex_shader_source, GL_VERTEX_SHADER);
+        unsigned int fShader = Compile(frag_shader_source, GL_FRAGMENT_SHADER);
+
+        Link(vShader, fShader);
+    }
+    catch (const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+}
+
 void Shader::Bind()
 {
     glUseProgram(m_nProgramID);
