@@ -217,6 +217,16 @@ void OpenglRender::OnPaint()
         z += 0.015f;
     }
 
+    m_Renderer->DrawCircle(
+        XL::DrawPlane::XY,
+        glm::vec3(0.0f, 0.0f, -0.0f), 	// translate
+        glm::vec3(0.0f, 0.0f, 0.0f),	// rotate
+        3.0f,
+        glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),	// color
+        true,
+        72
+    );
+
     ///////////////////////////////////////////
 	m_Renderer->Flush();
     m_FrameBuffer->Unbind();

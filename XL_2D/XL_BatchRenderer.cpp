@@ -183,6 +183,90 @@ void BatchRenderer::DrawLine(
         Flush();
 }
 
+void BatchRenderer::DrawCircle(
+    DrawPlane plane,
+    const glm::vec3& pos,
+    const glm::vec3& rotate,
+    float radius,
+    const glm::vec4& color,
+    bool filled,
+    int segments
+)
+{
+    if (radius <= 0.0f)
+        return;
+
+    if (segments < 3) segments = 3;
+
+    // build model: translate -> rotateX/Y/Z -> scale(radius)
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), pos)
+        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.x), glm::vec3(1, 0, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.y), glm::vec3(0, 1, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.z), glm::vec3(0, 0, 1))
+        * glm::scale(glm::mat4(1.0f), glm::vec3(radius, radius, radius));
+
+    // 生成圆周点（局部单位圆）
+    std::vector<glm::vec3> pts;
+    pts.reserve(segments + 1);
+    const float TWO_PI = glm::two_pi<float>();
+    for (int i = 0; i <= segments; ++i) // <= 用于闭合（最后一个等于第一个）
+    {
+        float t = (float)i / (float)segments;
+        float ang = t * TWO_PI;
+        glm::vec3 p;
+        switch (plane)
+        {
+        case DrawPlane::XY:
+            p = glm::vec3(std::cos(ang), std::sin(ang), 0.0f);
+            break;
+        case DrawPlane::XZ:
+            p = glm::vec3(std::cos(ang), 0.0f, std::sin(ang));
+            break;
+        case DrawPlane::YZ:
+            p = glm::vec3(0.0f, std::cos(ang), std::sin(ang));
+            break;
+        default:
+            p = glm::vec3(std::cos(ang), std::sin(ang), 0.0f);
+            break;
+        }
+        pts.push_back(TransformPos(p, model));
+    }
+
+    if (filled)
+    {
+        // triangle fan: center + (p_i, p_{i+1})
+        // 预计添加 vertices = segments * 3
+        if (m_TriangleBatchVertices.size() + (size_t)segments * 3 > MaxBatchVertices)
+            Flush();
+
+        glm::vec3 center = TransformPos(glm::vec3(0.0f), model);
+        for (int i = 0; i < segments; ++i)
+        {
+            BatchRenderVertex c{ center, color };
+            BatchRenderVertex a{ pts[i], color };
+            BatchRenderVertex b{ pts[i + 1], color };
+
+            m_TriangleBatchVertices.push_back(c);
+            m_TriangleBatchVertices.push_back(a);
+            m_TriangleBatchVertices.push_back(b);
+        }
+    }
+    else
+    {
+        // 绘制轮廓：把相邻点作为线段加入 m_LineBatchVertices
+        if (m_LineBatchVertices.size() + (size_t)segments * 2 > MaxBatchVertices)
+            Flush();
+
+        for (int i = 0; i < segments; ++i)
+        {
+            BatchRenderVertex v0{ pts[i], color };
+            BatchRenderVertex v1{ pts[i + 1], color };
+            m_LineBatchVertices.push_back(v0);
+            m_LineBatchVertices.push_back(v1);
+        }
+    }
+}
+
 int BatchRenderer::GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs)
 {
     for (int attempt = 1; attempt <= maxAttempts; ++attempt)

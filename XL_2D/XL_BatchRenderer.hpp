@@ -67,6 +67,16 @@ public:
         const glm::vec4& color
     );
 
+    void DrawCircle(
+        DrawPlane plane,
+        const glm::vec3& pos,
+        const glm::vec3& rotate,
+        float radius,
+        const glm::vec4& color,
+        bool filled = true,
+        int segments = 36
+    );
+
 private:
     int  GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs);
 };
