@@ -27,16 +27,7 @@
     <ClCompile Include="XL_IndexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XL_Renderer.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="XL_Shader.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="XL_VertexArray.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="XL_VertexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="glad\glad.c">
@@ -45,13 +36,13 @@
     <ClCompile Include="glm\detail\glm.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XL_BatchVertexArray.cpp">
+    <ClCompile Include="XL_VertexArray.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XL_BatchVertexBuffer.cpp">
+    <ClCompile Include="XL_VertexBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XL_BatchRenderer.cpp">
+    <ClCompile Include="XL_Renderer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -68,16 +59,7 @@
     <ClInclude Include="XL_IndexBuffer.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_Renderer.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="XL_Shader.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="XL_VertexArray.hpp">
-      <Filter>头文件</Filter>
-    </ClInclude>
-    <ClInclude Include="XL_VertexBuffer.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="XL_Core.hpp">
@@ -959,13 +941,13 @@
     <ClInclude Include="XL_Data.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_BatchVertexArray.hpp">
+    <ClInclude Include="XL_VertexArray.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_BatchVertexBuffer.hpp">
+    <ClInclude Include="XL_VertexBuffer.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_BatchRenderer.hpp">
+    <ClInclude Include="XL_Renderer.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

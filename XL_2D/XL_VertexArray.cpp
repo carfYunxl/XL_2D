@@ -1,62 +1,40 @@
 #include "XL_VertexArray.hpp"
-#include "XL_VertexBuffer.hpp"
-#include "XL_IndexBuffer.hpp"
 
 _NAMESPACE_BEGIN
 
-VertexArray::VertexArray(
-    float* vertices,
-    unsigned int vertexSize,
-    unsigned int* indices,
-    unsigned int indexCount
-)
-{
-    Init(vertices, vertexSize, indices, indexCount);
-}
-VertexArray::~VertexArray()
-{
-    glDeleteVertexArrays(1, &VAO);
-}
-
-void VertexArray::Bind()
-{
-    glBindVertexArray(VAO);
-}
-
-void VertexArray::UnBind()
-{
-    glBindVertexArray(0);
-}
-
-void VertexArray::Init(
-    float* vertices,
-    unsigned int vertexSize,
-    unsigned int* indices,
-    unsigned int indexCount
-)
+BatchVertexArray::BatchVertexArray()
 {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
-    m_VertexBuffer = std::make_unique<VertexBuffer>(vertices, vertexSize);
-	m_IndexBuffer = std::make_unique<IndexBuffer>(indices, indexCount * sizeof(unsigned int));
+	m_BatchVertexBuffer = std::make_unique<BatchVertexBuffer>();
+	m_BatchVertexBuffer->Bind();
 
-	m_VertexBuffer->Bind();
-	m_IndexBuffer->Bind();
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(BatchRenderVertex), (void*)offsetof(BatchRenderVertex, position));
+    glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(BatchRenderVertex), (void*)offsetof(BatchRenderVertex, color));
+    glEnableVertexAttribArray(1);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-	glEnableVertexAttribArray(1);
-
-	m_VertexBuffer->UnBind();
     glBindVertexArray(0);
 }
-
-void VertexArray::Reset(float* vertices, unsigned int vertexSize)
+BatchVertexArray::~BatchVertexArray()
 {
-    m_VertexBuffer->Reset(vertices, vertexSize);
+    glDeleteVertexArrays(1, &VAO);
+}
+
+void BatchVertexArray::Bind(const std::vector<BatchRenderVertex>& batch_data)
+{
+    glBindVertexArray(VAO);
+    m_BatchVertexBuffer->Bind();
+    //glBufferData(GL_ARRAY_BUFFER, batch_data.size() * sizeof(BatchRenderVertex), batch_data.data(), GL_DYNAMIC_DRAW);
+    //glBufferSubData(GL_ARRAY_BUFFER, 0, batch_data.size() * sizeof(BatchRenderVertex), (float*)batch_data.data());
+    glBufferSubData(GL_ARRAY_BUFFER, 0, batch_data.size() * sizeof(BatchRenderVertex), static_cast<const void*>(batch_data.data()));
+}
+
+void BatchVertexArray::UnBind()
+{
+    glBindVertexArray(0);
 }
 
 _NAMESPACE_END

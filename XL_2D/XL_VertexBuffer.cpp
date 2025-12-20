@@ -2,34 +2,28 @@
 
 _NAMESPACE_BEGIN
 
-VertexBuffer::VertexBuffer(float* buffer, unsigned int size)
-    : m_Buffer(buffer), m_Size(size)
+BatchVertexBuffer::BatchVertexBuffer()
 {
     glGenBuffers(1, &m_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
+    glBufferData(GL_ARRAY_BUFFER, 65536 * sizeof(BatchRenderVertex), nullptr, GL_DYNAMIC_DRAW);
 }
 
-VertexBuffer::~VertexBuffer()
+BatchVertexBuffer::~BatchVertexBuffer()
 {
     glDeleteBuffers(1, &m_VBO);
 }
 
-void VertexBuffer::Bind()
+void BatchVertexBuffer::Bind()
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_Size, m_Buffer, GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, 65536 * sizeof(BatchRenderVertex), nullptr, GL_STATIC_DRAW);
+    //glBufferData(GL_ARRAY_BUFFER, 65536 * sizeof(BatchRenderVertex), nullptr, GL_STATIC_DRAW);
 }
 
-void VertexBuffer::UnBind()
+void BatchVertexBuffer::UnBind()
 {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
-void VertexBuffer::Reset(float* buffer, unsigned int size)
-{
-    m_Size = size;
-    m_Buffer = buffer;
-    glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, m_Size, m_Buffer, GL_STATIC_DRAW);
 }
 
 _NAMESPACE_END

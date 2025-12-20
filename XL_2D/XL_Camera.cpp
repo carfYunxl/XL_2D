@@ -76,13 +76,13 @@ void Camera::OnKeyDown(uint32_t nChar, uint32_t nRepCnt)
         // 左右（基于右向量）
     case 'a':
     case 'A':
-        m_cPos -= move_velocity * glm::normalize(glm::cross(m_cFront, m_cUp));
+        m_cPos += move_velocity * glm::normalize(glm::cross(m_cFront, m_cUp));
         Update();
         break;
 
     case 'd':
     case 'D':
-        m_cPos += move_velocity * glm::normalize(glm::cross(m_cFront, m_cUp));
+        m_cPos -= move_velocity * glm::normalize(glm::cross(m_cFront, m_cUp));
         Update();
         break;
 

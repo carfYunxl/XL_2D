@@ -1,5 +1,5 @@
 #include "XL_OpenglRender.hpp"
-#include "XL_BatchRenderer.hpp"
+#include "XL_Renderer.hpp"
 #include "XL_FrameBuffer.hpp"
 #include <windows.h>
 #include <gl/wglext.h>
@@ -224,7 +224,7 @@ void OpenglRender::OnPaint()
         3.0f,
         glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),	// color
         true,
-        72
+        128
     );
 
     m_Renderer->DrawCircle_Pixel(
@@ -234,7 +234,7 @@ void OpenglRender::OnPaint()
         300.0f,
         glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),	// color
         true,
-        72
+        128
     );
 
     ///////////////////////////////////////////
