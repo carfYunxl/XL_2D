@@ -1,4 +1,4 @@
-#include "Camera.hpp"
+#include "XL_Camera.hpp"
 
 _NAMESPACE_BEGIN
 

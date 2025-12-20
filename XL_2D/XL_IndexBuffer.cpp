@@ -1,4 +1,4 @@
-#include "IndexBuffer.hpp"
+#include "XL_IndexBuffer.hpp"
 
 _NAMESPACE_BEGIN
 

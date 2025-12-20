@@ -19,23 +19,29 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="FrameBuffer.cpp" />
+    <ClCompile Include="XL_BatchRenderer.cpp" />
+    <ClCompile Include="XL_BatchVertexArray.cpp" />
+    <ClCompile Include="XL_BatchVertexBuffer.cpp" />
+    <ClCompile Include="XL_Camera.cpp" />
+    <ClCompile Include="XL_FrameBuffer.cpp" />
     <ClCompile Include="glad\glad.c" />
-    <ClCompile Include="OpenglRender.cpp" />
+    <ClCompile Include="XL_OpenglRender.cpp" />
     <ClCompile Include="glm\detail\glm.cpp" />
-    <ClCompile Include="IndexBuffer.cpp" />
-    <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="Shader.cpp" />
-    <ClCompile Include="VertexArray.cpp" />
-    <ClCompile Include="VertexBuffer.cpp" />
+    <ClCompile Include="XL_IndexBuffer.cpp" />
+    <ClCompile Include="XL_Renderer.cpp" />
+    <ClCompile Include="XL_Shader.cpp" />
+    <ClCompile Include="XL_VertexArray.cpp" />
+    <ClCompile Include="XL_VertexBuffer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.hpp" />
-    <ClInclude Include="FrameBuffer.hpp" />
+    <ClInclude Include="XL_BatchRenderer.hpp" />
+    <ClInclude Include="XL_BatchVertexArray.hpp" />
+    <ClInclude Include="XL_BatchVertexBuffer.hpp" />
+    <ClInclude Include="XL_Camera.hpp" />
+    <ClInclude Include="XL_FrameBuffer.hpp" />
     <ClInclude Include="glad\glad.h" />
     <ClInclude Include="glad\KHR\khrplatform.h" />
-    <ClInclude Include="OpenglRender.hpp" />
+    <ClInclude Include="XL_OpenglRender.hpp" />
     <ClInclude Include="glm\common.hpp" />
     <ClInclude Include="glm\detail\compute_common.hpp" />
     <ClInclude Include="glm\detail\compute_vector_decl.hpp" />
@@ -325,13 +331,13 @@
     <ClInclude Include="glm\vec3.hpp" />
     <ClInclude Include="glm\vec4.hpp" />
     <ClInclude Include="glm\vector_relational.hpp" />
-    <ClInclude Include="IndexBuffer.hpp" />
-    <ClInclude Include="Renderer.hpp" />
-    <ClInclude Include="Shader.hpp" />
-    <ClInclude Include="VertexArray.hpp" />
-    <ClInclude Include="VertexBuffer.hpp" />
+    <ClInclude Include="XL_IndexBuffer.hpp" />
+    <ClInclude Include="XL_Renderer.hpp" />
+    <ClInclude Include="XL_Shader.hpp" />
+    <ClInclude Include="XL_VertexArray.hpp" />
+    <ClInclude Include="XL_VertexBuffer.hpp" />
     <ClInclude Include="XL_Core.hpp" />
-    <ClInclude Include="XL_ShaderSource.hpp" />
+    <ClInclude Include="XL_Data.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="glm\detail\func_common.inl" />
@@ -559,7 +565,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D;$(SolutionDir)\XL_2D\glad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -579,7 +585,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D;$(SolutionDir)\XL_2D\glad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -599,7 +605,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D;$(SolutionDir)\XL_2D\glad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -619,7 +625,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D;$(SolutionDir)\XL_2D\glad;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <LanguageStandard>stdcpp17</LanguageStandard>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

@@ -1,4 +1,4 @@
-#include "VertexBuffer.hpp"
+#include "XL_VertexBuffer.hpp"
 
 _NAMESPACE_BEGIN
 

@@ -13,7 +13,7 @@ struct WindowProp
 
 namespace XL
 {
-    class Renderer;
+    class BatchRenderer;
     class FrameBuffer;
 }
 
@@ -36,8 +36,8 @@ private:
     HDC                                 m_hDC;
     HGLRC                               m_hRC;
     WindowProp                          m_WinProp;
-    std::unique_ptr<XL::Renderer>       m_Renderer;
-    std::unique_ptr<XL::FrameBuffer>  m_FrameBuffer;
+    std::unique_ptr<XL::BatchRenderer>   m_Renderer;
+    std::unique_ptr<XL::FrameBuffer>    m_FrameBuffer;
 };
 
 #endif // __OPENGL_RENDERER_HPP__

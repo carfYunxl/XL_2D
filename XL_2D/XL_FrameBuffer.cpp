@@ -1,4 +1,4 @@
-#include "FrameBuffer.hpp"
+#include "XL_FrameBuffer.hpp"
 #include <algorithm>
 
 _NAMESPACE_BEGIN

@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "OpenglRender.hpp"
+#include "XL_OpenglRender.hpp"
 #include <memory>
 
 class CChildView : public CWnd

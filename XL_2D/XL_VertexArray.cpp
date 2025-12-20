@@ -1,6 +1,6 @@
-#include "VertexArray.hpp"
-#include "VertexBuffer.hpp"
-#include "IndexBuffer.hpp"
+#include "XL_VertexArray.hpp"
+#include "XL_VertexBuffer.hpp"
+#include "XL_IndexBuffer.hpp"
 
 _NAMESPACE_BEGIN
 

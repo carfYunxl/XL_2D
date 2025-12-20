@@ -1,6 +1,6 @@
-#include "OpenglRender.hpp"
-#include "Renderer.hpp"
-#include "FrameBuffer.hpp"
+#include "XL_OpenglRender.hpp"
+#include "XL_BatchRenderer.hpp"
+#include "XL_FrameBuffer.hpp"
 #include <windows.h>
 #include <gl/wglext.h>
 #include <gl/gl.h>
@@ -101,7 +101,7 @@ bool OpenglRender::Init()
         m_hRC = tempContext;
     }
 
-    m_Renderer = std::make_unique<XL::Renderer>();
+    m_Renderer = std::make_unique<XL::BatchRenderer>();
     m_Renderer->Init(glad_wgl_get_proc);
     m_Renderer->Resize(m_WinProp.Width, m_WinProp.Height);
 
@@ -152,12 +152,28 @@ void OpenglRender::OnPaint()
     m_Renderer->UpdateCamera();
     /*  Core Draw Functions Here */
     ///////////////////////////////////////////
-    m_Renderer->DrawTriangle(
-        XL::DrawPlane::YZ,
-        glm::vec3(0.5f, 0.5f, 1.0f), 	// translate
-        glm::vec3(0.0f, 0.0f, 0.0f),	// rotate
-        glm::vec3(5.0f, 5.0f, 1.0f), 	// scales
-        glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)		// color
+    //m_Renderer->DrawTriangle(
+    //    XL::DrawPlane::XY,
+    //    glm::vec3(-0.5f, -0.5f, 1.0f), 	    // translate
+    //    glm::vec3(0.0f, 0.0f, 30.0f),	    // rotate°¡
+    //    glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
+    //    glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)	// color
+    //);
+
+    //m_Renderer->DrawTriangle(
+    //    XL::DrawPlane::XY,
+    //    glm::vec3(0.5f, 0.5f, 1.0f), 	    // translate
+    //    glm::vec3(0.0f, 0.0f, 0.0f),	    // rotate
+    //    glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
+    //    glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)	// color
+    //);
+
+    m_Renderer->DrawRectangle(
+        XL::DrawPlane::XY,
+        glm::vec3(-0.5f, -0.5f, 1.0f), 	    // translate
+        glm::vec3(0.0f, 30.0f, 0.0f),	    // rotate
+        glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
+        glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)	// color
     );
 
     m_Renderer->DrawCube(
@@ -200,7 +216,9 @@ void OpenglRender::OnPaint()
         prevPoint = newPoint;
         z += 0.015f;
     }
+
     ///////////////////////////////////////////
+	m_Renderer->Flush();
     m_FrameBuffer->Unbind();
 
     SwapBuffers(m_hDC);

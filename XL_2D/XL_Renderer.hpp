@@ -1,61 +1,19 @@
 #ifndef __RENDERER_H__
 #define __RENDERER_H__
 #include "XL_Core.hpp"
-#include "Camera.hpp"
-#include "VertexArray.hpp"
-#include "Shader.hpp"
+#include "XL_Camera.hpp"
+#include "XL_VertexArray.hpp"
+#include "XL_Shader.hpp"
+#include "XL_Data.hpp"
+#include "XL_BatchVertexArray.hpp"
+#include "XL_BatchVertexBuffer.hpp"
 
 _NAMESPACE_BEGIN
 
-using GLAD_PROC = void(*)();
-using pfnGladLoader = GLAD_PROC (*)(void* userptr, const char* name);
-
-struct TriangleVertex
-{
-    std::array<std::array<float, 6>, 3> vertices;
-    std::array<unsigned int, 3> indices{
-        0, 1, 2
-    };
-};
-
-struct RectangleVertex
-{
-    std::array<std::array<float, 6>, 4> vertices;
-    std::array<unsigned int, 6> indices{
-        0, 1, 2, 2, 3, 0
-    };
-};
-
-struct CubeVertex
-{
-    std::array<std::array<float, 6>, 8> vertices;
-    std::array<unsigned int, 36> indices{
-        0,1,2, 2,3,0,
-        4,5,6, 6,7,4,
-        0,1,5, 5,4,0,
-        2,3,7, 7,6,2,
-        0,3,7, 7,4,0,
-        1,2,6, 6,5,1
-    };
-};
-
-struct LineVertex
-{
-    std::array<std::array<float, 6>, 2> vertices;
-    std::array<unsigned int, 2> indices{
-        0, 1
-    };
-};
-
-enum class DrawPlane
-{
-    XY = 0,
-    XZ = 1,
-    YZ = 2
-};
-
 class Renderer
 {
+    using GLAD_PROC = void(*)();
+    using pfnGladLoader = GLAD_PROC(*)(void* userptr, const char* name);
 private:
     // XY Plane 
     TriangleVertex  m_TriangleVertices;

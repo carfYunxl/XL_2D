@@ -34,5 +34,11 @@ static void XL_mSleep(int mSec)
 {
 	XL_uSleep(mSec * 1000);
 }
+
+struct BatchRenderVertex
+{
+	glm::vec3 position;
+	glm::vec4 color;
+};
 _NAMESPACE_END
 #endif//__XL_CORE_HPP__

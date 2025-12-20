@@ -1,5 +1,5 @@
-#include "Renderer.hpp"
-#include "XL_ShaderSource.hpp"
+#include "XL_Renderer.hpp"
+#include "XL_Data.hpp"
 
 _NAMESPACE_BEGIN
 
@@ -29,55 +29,13 @@ bool Renderer::Init(pfnGladLoader loader)
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    // XY Plane
-    m_RectangleVertices.vertices[0] = {-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f};
-    m_RectangleVertices.vertices[1] = { 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f};
-    m_RectangleVertices.vertices[2] = { 0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f};
-    m_RectangleVertices.vertices[3] = {-0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f};
-
-    m_TriangleVertices.vertices[0] = {-0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f};
-    m_TriangleVertices.vertices[1] = { 0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f};
-    m_TriangleVertices.vertices[2] = { 0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f};
-
-    // XZ Plane
-    m_RectangleVertices_XZ.vertices[0] = {-0.5f, 0.0f, -0.5f, 1.0f, 0.0f, 0.0f};
-    m_RectangleVertices_XZ.vertices[1] = { 0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f};
-    m_RectangleVertices_XZ.vertices[2] = { 0.5f, 0.0f,  0.5f, 0.0f, 0.0f, 1.0f};
-    m_RectangleVertices_XZ.vertices[3] = {-0.5f, 0.0f,  0.5f, 1.0f, 1.0f, 0.0f};
-
-    m_TriangleVertices_XZ.vertices[0] = {-0.5f, 0.0f, -0.5f, 1.0f, 0.0f, 0.0f};
-    m_TriangleVertices_XZ.vertices[1] = { 0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f};
-    m_TriangleVertices_XZ.vertices[2] = { 0.0f, 0.0f,  0.5f, 0.0f, 0.0f, 1.0f};
-
-    // YZ Plane
-    m_RectangleVertices_YZ.vertices[0] = {0.0f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f};
-    m_RectangleVertices_YZ.vertices[1] = {0.0f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
-    m_RectangleVertices_YZ.vertices[2] = {0.0f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f};
-    m_RectangleVertices_YZ.vertices[3] = {0.0f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f};
-
-    m_TriangleVertices_YZ.vertices[0] = {0.0f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f};
-    m_TriangleVertices_YZ.vertices[1] = {0.0f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
-    m_TriangleVertices_YZ.vertices[2] = {0.0f,  0.0f,  0.5f, 0.0f, 0.0f, 1.0f};
-
-    m_CubeVertices.vertices[0] = {-0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f};
-    m_CubeVertices.vertices[1] = { 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.0f};
-    m_CubeVertices.vertices[2] = { 0.5f,  0.5f, -0.5f, 0.0f, 0.0f, 1.0f};
-    m_CubeVertices.vertices[3] = {-0.5f,  0.5f, -0.5f, 1.0f, 1.0f, 0.0f};
-    m_CubeVertices.vertices[4] = {-0.5f, -0.5f,  0.5f, 1.0f, 0.0f, 1.0f};
-    m_CubeVertices.vertices[5] = { 0.5f, -0.5f,  0.5f, 0.0f, 1.0f, 1.0f};
-    m_CubeVertices.vertices[6] = { 0.5f,  0.5f,  0.5f, 1.0f, 1.0f, 1.0f};
-    m_CubeVertices.vertices[7] = {-0.5f,  0.5f,  0.5f, 0.5f, 0.5f, 0.5f};
-
-    m_LineVertices.vertices[0] = { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f };
-    m_LineVertices.vertices[1] = { 1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f };
-
     m_VertexArray_Line = std::make_unique<VertexArray>(
         m_LineVertices.vertices[0].data(),
         sizeof(m_LineVertices),
         m_LineVertices.indices.data(),
         sizeof(m_LineVertices.indices) / sizeof(unsigned int)
     );
-
+#if 0
     m_VertexArray_Rectangle = std::make_unique<VertexArray>(
     m_RectangleVertices.vertices[0].data(),
     sizeof(m_RectangleVertices),
@@ -126,9 +84,9 @@ bool Renderer::Init(pfnGladLoader loader)
         m_CubeVertices.indices.data(),
         sizeof(m_CubeVertices.indices) / sizeof(unsigned int)
     );
-
+#endif
     m_Shader = std::make_unique<Shader>();
-    m_Shader->LoadShader(g_sVertexShader, g_sFragShader);
+    m_Shader->LoadShader(batch_vs, batch_fs);
     m_Shader->UnBind();
 
     m_Camera =  std::make_unique<Camera>(10.0f / 9.0f);
