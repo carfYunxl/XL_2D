@@ -22,6 +22,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_CHAR()
 	ON_WM_MOUSEWHEEL()
 	ON_WM_MOUSEMOVE()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
@@ -111,4 +112,9 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 	}
 
 	CWnd::OnMouseMove(nFlags, point);
+}
+
+BOOL CChildView::OnEraseBkgnd(CDC* pDC)
+{
+	return FALSE;
 }

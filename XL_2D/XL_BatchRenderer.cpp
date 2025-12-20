@@ -267,6 +267,110 @@ void BatchRenderer::DrawCircle(
     }
 }
 
+void BatchRenderer::DrawCircle_Pixel(
+    DrawPlane plane,
+    const glm::vec3& pos,
+    const glm::vec3& rotate,
+    float radius_pixels,
+    const glm::vec4& color,
+    bool filled,
+    int segments
+)
+{
+    if (radius_pixels <= 0.0f || segments < 3)
+        return;
+
+    // build model without scale (we'll apply radius in world units computed from pixels)
+    glm::mat4 modelBase = glm::translate(glm::mat4(1.0f), pos)
+        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.x), glm::vec3(1, 0, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.y), glm::vec3(0, 1, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.z), glm::vec3(0, 0, 1));
+    // no scale here
+
+// center in world space
+    glm::vec3 centerWorld = TransformPos(glm::vec3(0.0f), modelBase);
+
+    // get viewport
+    GLint vp[4]{ 0,0,0,0 };
+    glGetIntegerv(GL_VIEWPORT, vp);
+    glm::vec4 viewport = glm::vec4((float)vp[0], (float)vp[1], (float)vp[2], (float)vp[3]);
+    if (viewport.z <= 0.0f || viewport.w <= 0.0f)
+        return;
+
+    // project center to window coords
+    glm::vec3 centerWin = glm::project(centerWorld, m_Camera->GetView(), m_Camera->GetProjection(), viewport);
+
+    // construct a window-space point offset by radius_pixels along +X
+    glm::vec3 offsetWin = centerWin;
+    offsetWin.x += radius_pixels;
+
+    // unproject both to world to compute world-space radius length
+    glm::vec3 offsetWorld = glm::unProject(offsetWin, m_Camera->GetView(), m_Camera->GetProjection(), viewport);
+
+    float worldRadius = glm::length(offsetWorld - centerWorld);
+    if (worldRadius <= std::numeric_limits<float>::epsilon())
+        return;
+
+    // build circle points in local unit circle scaled by worldRadius, then apply rotation+translation (modelBase)
+    std::vector<glm::vec3> pts;
+    pts.reserve(segments + 1);
+    const float TWO_PI = glm::two_pi<float>();
+    for (int i = 0; i <= segments; ++i)
+    {
+        float t = (float)i / (float)segments;
+        float ang = t * TWO_PI;
+        glm::vec3 pLocal;
+        switch (plane)
+        {
+        case DrawPlane::XY:
+            pLocal = glm::vec3(std::cos(ang) * worldRadius, std::sin(ang) * worldRadius, 0.0f);
+            break;
+        case DrawPlane::XZ:
+            pLocal = glm::vec3(std::cos(ang) * worldRadius, 0.0f, std::sin(ang) * worldRadius);
+            break;
+        case DrawPlane::YZ:
+            pLocal = glm::vec3(0.0f, std::cos(ang) * worldRadius, std::sin(ang) * worldRadius);
+            break;
+        default:
+            pLocal = glm::vec3(std::cos(ang) * worldRadius, std::sin(ang) * worldRadius, 0.0f);
+            break;
+        }
+        pts.push_back(TransformPos(pLocal, modelBase));
+    }
+
+    if (filled)
+    {
+        // triangle fan: center + (p_i, p_{i+1})
+        if (m_TriangleBatchVertices.size() + (size_t)segments * 3 > MaxBatchVertices)
+            Flush();
+
+        for (int i = 0; i < segments; ++i)
+        {
+            BatchRenderVertex c{ centerWorld, color };
+            BatchRenderVertex a{ pts[i], color };
+            BatchRenderVertex b{ pts[i + 1], color };
+
+            m_TriangleBatchVertices.push_back(c);
+            m_TriangleBatchVertices.push_back(a);
+            m_TriangleBatchVertices.push_back(b);
+        }
+    }
+    else
+    {
+        // outline: adjacent points as line segments
+        if (m_LineBatchVertices.size() + (size_t)segments * 2 > MaxBatchVertices)
+            Flush();
+
+        for (int i = 0; i < segments; ++i)
+        {
+            BatchRenderVertex v0{ pts[i], color };
+            BatchRenderVertex v1{ pts[i + 1], color };
+            m_LineBatchVertices.push_back(v0);
+            m_LineBatchVertices.push_back(v1);
+        }
+    }
+}
+
 int BatchRenderer::GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs)
 {
     for (int attempt = 1; attempt <= maxAttempts; ++attempt)

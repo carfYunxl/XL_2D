@@ -77,6 +77,16 @@ public:
         int segments = 36
     );
 
+    void DrawCircle_Pixel(
+        DrawPlane plane,
+        const glm::vec3& pos,
+        const glm::vec3& rotate,
+        float radius_pixels,
+        const glm::vec4& color,
+        bool filled = true,
+        int segments = 36
+    );
+
 private:
     int  GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs);
 };

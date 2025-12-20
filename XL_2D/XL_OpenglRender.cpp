@@ -152,21 +152,21 @@ void OpenglRender::OnPaint()
     m_Renderer->UpdateCamera();
     /*  Core Draw Functions Here */
     ///////////////////////////////////////////
-    //m_Renderer->DrawTriangle(
-    //    XL::DrawPlane::XY,
-    //    glm::vec3(-0.5f, -0.5f, 1.0f), 	    // translate
-    //    glm::vec3(0.0f, 0.0f, 30.0f),	    // rotate°¡
-    //    glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
-    //    glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)	// color
-    //);
+    m_Renderer->DrawTriangle(
+        XL::DrawPlane::XY,
+        glm::vec3(-0.5f, -0.5f, 1.0f), 	    // translate
+        glm::vec3(0.0f, 0.0f, 30.0f),	    // rotate°¡
+        glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
+        glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)	// color
+    );
 
-    //m_Renderer->DrawTriangle(
-    //    XL::DrawPlane::XY,
-    //    glm::vec3(0.5f, 0.5f, 1.0f), 	    // translate
-    //    glm::vec3(0.0f, 0.0f, 0.0f),	    // rotate
-    //    glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
-    //    glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)	// color
-    //);
+    m_Renderer->DrawTriangle(
+        XL::DrawPlane::XY,
+        glm::vec3(0.5f, 0.5f, 1.0f), 	    // translate
+        glm::vec3(0.0f, 0.0f, 0.0f),	    // rotate
+        glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
+        glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)	// color
+    );
 
     m_Renderer->DrawRectangle(
         XL::DrawPlane::XY,
@@ -223,6 +223,16 @@ void OpenglRender::OnPaint()
         glm::vec3(0.0f, 0.0f, 0.0f),	// rotate
         3.0f,
         glm::vec4(0.0f, 0.0f, 1.0f, 1.0f),	// color
+        true,
+        72
+    );
+
+    m_Renderer->DrawCircle_Pixel(
+        XL::DrawPlane::XY,
+        glm::vec3(0.0f, 0.0f, -0.0f), 	// translate
+        glm::vec3(0.0f, 0.0f, 0.0f),	// rotate
+        300.0f,
+        glm::vec4(0.0f, 1.0f, 0.0f, 1.0f),	// color
         true,
         72
     );
