@@ -1,5 +1,5 @@
-#ifndef BATCH_VERTEX_BUFFER_H_
-#define BATCH_VERTEX_BUFFER_H_
+#ifndef XL_BATCH_VERTEX_BUFFER_H_
+#define XL_BATCH_VERTEX_BUFFER_H_
 
 #include "XL_Core.hpp"
 
@@ -18,4 +18,4 @@ private:
 };
 _NAMESPACE_END
 
-#endif//BATCH_VERTEX_BUFFER_H_
+#endif//XL_BATCH_VERTEX_BUFFER_H_

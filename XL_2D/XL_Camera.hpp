@@ -1,5 +1,5 @@
-#ifndef CAMERA_H_
-#define CAMERA_H_
+#ifndef XL_CAMERA_H_
+#define XL_CAMERA_H_
 
 #include "XL_Core.hpp"
 
@@ -78,11 +78,11 @@ private:
     float       m_LastY;
     // projection
     enum class ProjectionType { Perspective = 0, Orthographic = 1 };
-    ProjectionType m_ProjectionType{ ProjectionType::Perspective };
+    ProjectionType m_ProjectionType{ ProjectionType::Orthographic };
     float m_OrthoSize{ 10.0f };
     bool m_ToggleKeyPrevState{ false };
 };
 
 _NAMESPACE_END
 
-#endif //CAMERA_H_
+#endif //XL_CAMERA_H_

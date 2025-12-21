@@ -1,5 +1,5 @@
-#ifndef OPENGL_FRAME_BUFFER_H_
-#define OPENGL_FRAME_BUFFER_H_
+#ifndef XL_FRAME_BUFFER_H_
+#define XL_FRAME_BUFFER_H_
 
 #include "XL_Core.hpp"
 
@@ -36,4 +36,4 @@ private:
 
 _NAMESPACE_END
 
-#endif //OPENGL_FRAME_BUFFER_H_
+#endif //XL_FRAME_BUFFER_H_

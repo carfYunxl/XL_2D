@@ -1,5 +1,5 @@
-#ifndef __OPENGL_RENDERER_HPP__
-#define __OPENGL_RENDERER_HPP__
+#ifndef XL_OPENGL_RENDERER_HPP_
+#define XL_OPENGL_RENDERER_HPP_
 
 #include <cstdint>
 #include <wtypes.h>
@@ -40,4 +40,4 @@ private:
     std::unique_ptr<XL::FrameBuffer>    m_FrameBuffer;
 };
 
-#endif // __OPENGL_RENDERER_HPP__
+#endif // XL_OPENGL_RENDERER_HPP_

@@ -1,5 +1,5 @@
-#ifndef SHADER_H_
-#define SHADER_H_
+#ifndef XL_SHADER_H_
+#define XL_SHADER_H_
 
 #include "XL_Core.hpp"
 
@@ -43,4 +43,4 @@ private:
 _NAMESPACE_END
 
 
-#endif //SHADER_H_
+#endif //XL_SHADER_H_

@@ -60,19 +60,6 @@ void Camera::OnKeyDown(uint32_t nChar, uint32_t nRepCnt)
 
     switch (nChar)
     {
-        // 前后
-    case 'w':
-    case 'W':
-        m_cPos += move_velocity * m_cFront;
-        Update();
-        break;
-
-    case 's':
-    case 'S':
-        m_cPos -= move_velocity * m_cFront;
-        Update();
-        break;
-
         // 左右（基于右向量）
     case 'a':
     case 'A':
@@ -87,15 +74,15 @@ void Camera::OnKeyDown(uint32_t nChar, uint32_t nRepCnt)
         break;
 
         // 上下（沿相机上向量）
-    case 'q':
-    case 'Q':
-        m_cPos += move_velocity * m_cUp;
+    case 'w':
+    case 'W':
+        m_cPos -= move_velocity * m_cUp;
         Update();
         break;
 
-    case 'e':
-    case 'E':
-        m_cPos -= move_velocity * m_cUp;
+    case 's':
+    case 'S':
+        m_cPos += move_velocity * m_cUp;
         Update();
         break;
 

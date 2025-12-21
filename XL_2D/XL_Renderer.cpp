@@ -3,11 +3,17 @@
 
 _NAMESPACE_BEGIN
 
+BatchRenderer::BatchRenderer()
+	: mViewportWidth{ 1920 }, mViewportHeight{ 1080 } {
+}
+
 void BatchRenderer::Resize(int nWidth, int nHeight)
 {
-    glViewport(0, 0, nWidth, nHeight);
+	mViewportWidth = nWidth;
+	mViewportHeight = nHeight;
+    glViewport(0, 0, mViewportWidth, mViewportHeight);
 
-    if (nWidth > 0 && nHeight > 0)
+    if (mViewportWidth > 0 && mViewportHeight > 0)
         m_Camera->OnResize((float)nWidth, (float)nHeight);
 }
 
@@ -34,9 +40,9 @@ bool BatchRenderer::Init(pfnGladLoader loader)
     m_Shader->UnBind();
 
 	m_TriangleBatchVertex = std::make_unique<BatchVertexArray>();
-	m_TriangleBatchVertex->Bind(m_TriangleBatchVertices);
+	m_TriangleBatchVertex->Bind( m_TriangleBatchVertices, m_TriangleVertexCount );
 	m_LineBatchVertex = std::make_unique<BatchVertexArray>();
-	m_LineBatchVertex->Bind(m_LineBatchVertices);
+	m_LineBatchVertex->Bind( m_LineBatchVertices, m_LineVertexCount );
 
     m_Camera = std::make_unique<Camera>(10.0f / 9.0f);
 
@@ -58,7 +64,7 @@ void BatchRenderer::OnMouseMove(int xOffset, int yOffset)
     m_Camera->OnMouseMove(xOffset, yOffset);
 }
 
-static glm::vec3 TransformPos(const glm::vec3& in, const glm::mat4& model)
+glm::vec3 BatchRenderer::TransformPos(const glm::vec3& in, const glm::mat4& model)
 {
     glm::vec4 p = model * glm::vec4(in, 1.0f);
     return glm::vec3(p.x, p.y, p.z);
@@ -66,85 +72,190 @@ static glm::vec3 TransformPos(const glm::vec3& in, const glm::mat4& model)
 
 void BatchRenderer::DrawTriangle(
     DrawPlane plane,
-    const glm::vec3& pos,
-    const glm::vec3& rotate,
-    const glm::vec3& scale,
+    const TransFormData& trans,
     const glm::vec4& color
 )
 {
     // build model
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), pos)
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.x), glm::vec3(1, 0, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.y), glm::vec3(0, 1, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.z), glm::vec3(0, 0, 1))
-        * glm::scale(glm::mat4(1.0f), scale);
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), trans.position)
+        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.x), glm::vec3(1, 0, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.y), glm::vec3(0, 1, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.z), glm::vec3(0, 0, 1))
+        * glm::scale(glm::mat4(1.0f), trans.scale);
 
-    const auto* srcVerts = &g_sTriangleVertices.vertices_XY[0];
-    if (plane == DrawPlane::XZ) srcVerts = &g_sTriangleVertices.vertices_XZ[0];
-    if (plane == DrawPlane::YZ) srcVerts = &g_sTriangleVertices.vertices_YZ[0];
-
-    // 每个三角形三顶点加入 batch
-    for (int i = 0; i < 3; ++i)
+    switch (plane)
     {
-        BatchRenderVertex v;
-        glm::vec3 local{ (srcVerts[i])[0], (srcVerts[i])[1], (srcVerts[i])[2] };
-        v.position = TransformPos(local, model);
-        v.color = color;
-        m_TriangleBatchVertices.push_back(v);
+        case XL::DrawPlane::XY:
+        {
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_LT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RB, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+            break;
+        }
+        case XL::DrawPlane::XZ:
+        {
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_LT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RB, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+            break;
+        }
+        case XL::DrawPlane::YZ:
+        {
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_LT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RB, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+            break;
+        }
+        default:
+            break;
     }
 
     // 如果超限则 flush
-    if (m_TriangleBatchVertices.size() + 3 > MaxBatchVertices)
+    if (m_TriangleVertexCount + 3U > MaxBatchVertices)
         Flush();
 }
 
 void BatchRenderer::DrawRectangle(
     DrawPlane plane,
-    const glm::vec3& pos,
-    const glm::vec3& rotate,
-    const glm::vec3& scale,
+    const TransFormData& trans,
     const glm::vec4& color
 )
 {
     // 使用批处理方式：把矩形索引展开为两个三角形（6 顶点），加入 m_TriangleBatchVertices
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), pos)
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.x), glm::vec3(1, 0, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.y), glm::vec3(0, 1, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.z), glm::vec3(0, 0, 1))
-        * glm::scale(glm::mat4(1.0f), scale);
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), trans.position)
+        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.x), glm::vec3(1, 0, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.y), glm::vec3(0, 1, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.z), glm::vec3(0, 0, 1))
+        * glm::scale(glm::mat4(1.0f), trans.scale);
 
-    const auto* srcVerts = &g_sRectangleVertices.vertices_XY[0];
-    const auto& indices = g_sRectangleVertices.indices;
-    if (plane == DrawPlane::XZ) srcVerts = &g_sRectangleVertices.vertices_XZ[0];
-    if (plane == DrawPlane::YZ) srcVerts = &g_sRectangleVertices.vertices_YZ[0];
-
-    // indices 有 6 个元素：0,1,2,2,3,0 -> 展开为 6 个顶点
-    for (size_t i = 0; i < indices.size(); ++i)
+    switch (plane)
     {
-        unsigned int idx = indices[i];
-        BatchRenderVertex v;
-        glm::vec3 local{ (srcVerts[idx])[0], (srcVerts[idx])[1], (srcVerts[idx])[2] };
-        v.position = TransformPos(local, model);
-        v.color = color;
-        m_TriangleBatchVertices.push_back(v);
+    case XL::DrawPlane::XY:
+    {
+        // 0
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //1
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //2
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //2
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //3
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_LB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //0
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        break;
+    }
+    case XL::DrawPlane::XZ:
+    {
+        // 0
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //1
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //2
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //2
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //3
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_LB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //0
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        break;
+    }
+    case XL::DrawPlane::YZ:
+    {
+        // 0
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //1
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //2
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //2
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //3
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_LB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        //0
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
+        break;
+    }
+    default:
+        break;
     }
 
-    if (m_TriangleBatchVertices.size() + 6 > MaxBatchVertices)
+    if (m_TriangleVertexCount + 6 > MaxBatchVertices)
         Flush();
 }
 
 void BatchRenderer::DrawCube(
-    const glm::vec3& pos,
-    const glm::vec3& rotate,
-    const glm::vec3& scale,
+    const TransFormData& trans,
     const glm::vec4& color
 )
 {
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), pos)
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.x), glm::vec3(1, 0, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.y), glm::vec3(0, 1, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.z), glm::vec3(0, 0, 1))
-        * glm::scale(glm::mat4(1.0f), scale);
+    glm::mat4 model = glm::translate(glm::mat4(1.0f), trans.position)
+        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.x), glm::vec3(1, 0, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.y), glm::vec3(0, 1, 0))
+        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.z), glm::vec3(0, 0, 1))
+        * glm::scale(glm::mat4(1.0f), trans.scale);
 
     const auto* srcVerts = &g_sCubeVertices.vertices[0];
     const auto& indices = g_sCubeVertices.indices; // 36 个索引
@@ -152,14 +263,14 @@ void BatchRenderer::DrawCube(
     for (size_t i = 0; i < indices.size(); ++i)
     {
         unsigned int idx = indices[i];
-        BatchRenderVertex v;
         glm::vec3 local{ (srcVerts[idx])[0], (srcVerts[idx])[1], (srcVerts[idx])[2] };
-        v.position = TransformPos(local, model);
-        v.color = color;
-        m_TriangleBatchVertices.push_back(v);
+
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(local, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+        m_TriangleVertexCount++;
     }
 
-    if (m_TriangleBatchVertices.size() + 36 > MaxBatchVertices)
+    if (m_TriangleVertexCount + 36 > MaxBatchVertices)
         Flush();
 }
 
@@ -176,10 +287,14 @@ void BatchRenderer::DrawLine(
     v1.position = end;
     v1.color = color;
 
-    m_LineBatchVertices.push_back(v0);
-    m_LineBatchVertices.push_back(v1);
+	m_LineBatchVertices[m_LineVertexCount].position = start;
+	m_LineBatchVertices[m_LineVertexCount].color = color;
+    m_LineVertexCount++;
+    m_LineBatchVertices[m_LineVertexCount].position = end;
+    m_LineBatchVertices[m_LineVertexCount].color = color;
+    m_LineVertexCount++;
 
-    if (m_LineBatchVertices.size() + 2 > MaxBatchVertices)
+    if (m_LineVertexCount + 2 > MaxBatchVertices)
         Flush();
 }
 
@@ -236,33 +351,40 @@ void BatchRenderer::DrawCircle(
     {
         // triangle fan: center + (p_i, p_{i+1})
         // 预计添加 vertices = segments * 3
-        if (m_TriangleBatchVertices.size() + (size_t)segments * 3 > MaxBatchVertices)
+        if (m_TriangleVertexCount + (size_t)segments * 3 > MaxBatchVertices)
             Flush();
 
         glm::vec3 center = TransformPos(glm::vec3(0.0f), model);
         for (int i = 0; i < segments; ++i)
         {
-            BatchRenderVertex c{ center, color };
-            BatchRenderVertex a{ pts[i], color };
-            BatchRenderVertex b{ pts[i + 1], color };
+			m_TriangleBatchVertices[m_TriangleVertexCount].position = center;
+			m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
 
-            m_TriangleBatchVertices.push_back(c);
-            m_TriangleBatchVertices.push_back(a);
-            m_TriangleBatchVertices.push_back(b);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i];
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i + 1];
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
         }
     }
     else
     {
         // 绘制轮廓：把相邻点作为线段加入 m_LineBatchVertices
-        if (m_LineBatchVertices.size() + (size_t)segments * 2 > MaxBatchVertices)
+        if (m_TriangleVertexCount + (size_t)segments * 2 > MaxBatchVertices)
             Flush();
 
         for (int i = 0; i < segments; ++i)
         {
-            BatchRenderVertex v0{ pts[i], color };
-            BatchRenderVertex v1{ pts[i + 1], color };
-            m_LineBatchVertices.push_back(v0);
-            m_LineBatchVertices.push_back(v1);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i];
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i + 1];
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
         }
     }
 }
@@ -341,32 +463,39 @@ void BatchRenderer::DrawCircle_Pixel(
     if (filled)
     {
         // triangle fan: center + (p_i, p_{i+1})
-        if (m_TriangleBatchVertices.size() + (size_t)segments * 3 > MaxBatchVertices)
+        if (m_TriangleVertexCount + (size_t)segments * 3 > MaxBatchVertices)
             Flush();
 
         for (int i = 0; i < segments; ++i)
         {
-            BatchRenderVertex c{ centerWorld, color };
-            BatchRenderVertex a{ pts[i], color };
-            BatchRenderVertex b{ pts[i + 1], color };
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = centerWorld;
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
 
-            m_TriangleBatchVertices.push_back(c);
-            m_TriangleBatchVertices.push_back(a);
-            m_TriangleBatchVertices.push_back(b);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i];
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i + 1];
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
         }
     }
     else
     {
         // outline: adjacent points as line segments
-        if (m_LineBatchVertices.size() + (size_t)segments * 2 > MaxBatchVertices)
+        if (m_TriangleVertexCount + (size_t)segments * 2 > MaxBatchVertices)
             Flush();
 
         for (int i = 0; i < segments; ++i)
         {
-            BatchRenderVertex v0{ pts[i], color };
-            BatchRenderVertex v1{ pts[i + 1], color };
-            m_LineBatchVertices.push_back(v0);
-            m_LineBatchVertices.push_back(v1);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i];
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
+
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i + 1];
+            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
+            m_TriangleVertexCount++;
         }
     }
 }
@@ -389,38 +518,34 @@ int BatchRenderer::GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int 
 
 void BatchRenderer::Flush()
 {
-    // Draw triangles (filled)
-    if (!m_TriangleBatchVertices.empty())
+    if ( m_TriangleVertexCount > 0 )
     {
         m_Shader->Bind();
         m_Shader->SetMat4("u_View", m_Camera->GetView());
         m_Shader->SetMat4("u_Projection", m_Camera->GetProjection());
 
-		m_TriangleBatchVertex->Bind(m_TriangleBatchVertices);
+		m_TriangleBatchVertex->Bind(m_TriangleBatchVertices, m_TriangleVertexCount);
 
-        glDrawArrays(GL_TRIANGLES, 0, m_TriangleBatchVertices.size());
+        glDrawArrays(GL_TRIANGLES, 0, m_TriangleVertexCount);
 
 		m_TriangleBatchVertex->UnBind();
         m_Shader->UnBind();
 
-        m_TriangleBatchVertices.clear();
+        m_TriangleVertexCount = 0;
     }
 
-    // Draw lines
-    if (!m_LineBatchVertices.empty())
+    if ( m_LineVertexCount > 0 )
     {
         m_Shader->Bind();
         m_Shader->SetMat4("u_View", m_Camera->GetView());
         m_Shader->SetMat4("u_Projection", m_Camera->GetProjection());
 
-		m_LineBatchVertex->Bind(m_LineBatchVertices);
-        //glDisable(GL_DEPTH_TEST); // lines often drawn on top; keep choice to user — adjust if needed
-        glDrawArrays(GL_LINES, 0, (GLsizei)m_LineBatchVertices.size());
-        //glEnable(GL_DEPTH_TEST);
+		m_LineBatchVertex->Bind(m_LineBatchVertices, m_LineVertexCount);
+        glDrawArrays(GL_LINES, 0, m_LineVertexCount);
 		m_LineBatchVertex->UnBind();
         m_Shader->UnBind();
 
-        m_LineBatchVertices.clear();
+        m_LineVertexCount = 0;
     }
 }
 

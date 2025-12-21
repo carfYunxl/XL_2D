@@ -1,5 +1,5 @@
-#ifndef INDEX_BUFFER_H
-#define INDEX_BUFFER_H
+#ifndef XL_INDEX_BUFFER_H_
+#define XL_INDEX_BUFFER_H_
 
 #include "XL_Core.hpp"
 
@@ -20,4 +20,4 @@ private:
 };
 
 _NAMESPACE_END
-#endif //INDEX_BUFFER_H
+#endif //XL_INDEX_BUFFER_H_

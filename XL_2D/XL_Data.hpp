@@ -1,5 +1,5 @@
-#ifndef __XL_SHADER_SOURCE_HPP__
-#define __XL_SHADER_SOURCE_HPP__
+#ifndef XL_DATA_HPP_
+#define XL_DATA_HPP_
 
 #include "XL_Core.hpp"
 
@@ -25,6 +25,7 @@ void main()
 static const char* batch_fs = R"glsl(
 #version 330 core
 in vec4 v_Color;
+
 out vec4 FragColor;
 void main()
 {
@@ -32,65 +33,26 @@ void main()
 }
 )glsl";
 
-enum class DrawPlane
-{
+enum class DrawPlane : uint8_t {
     XY = 0,
     XZ = 1,
     YZ = 2
 };
 
-struct TriangleVertex
-{
-    std::array<std::array<float, 6>, 3> vertices_XY{
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f ,
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f ,
-         0.0f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f
-    };
+const static glm::vec3 XY_VERTICES_LT{ -0.5f,  0.5f,  0.0f };
+const static glm::vec3 XY_VERTICES_RT{  0.5f,  0.5f,  0.0f };
+const static glm::vec3 XY_VERTICES_RB{  0.5f, -0.5f,  0.0f };
+const static glm::vec3 XY_VERTICES_LB{ -0.5f, -0.5f,  0.0f };
 
-    std::array<std::array<float, 6>, 3> vertices_XZ{
-        -0.5f, 0.0f, -0.5f, 1.0f, 0.0f, 0.0f ,
-         0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f ,
-         0.0f, 0.0f,  0.5f, 0.0f, 0.0f, 1.0f
-    };
+const static glm::vec3 XZ_VERTICES_LT{ -0.5f,  0.0f,  0.5f };
+const static glm::vec3 XZ_VERTICES_RT{  0.5f,  0.0f,  0.5f };
+const static glm::vec3 XZ_VERTICES_RB{  0.5f,  0.0f, -0.5f };
+const static glm::vec3 XZ_VERTICES_LB{ -0.5f,  0.0f, -0.5f };
 
-    std::array<std::array<float, 6>, 3> vertices_YZ{
-         0.0f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f ,
-         0.0f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f ,
-         0.0f,  0.0f,  0.5f, 0.0f, 0.0f, 1.0f
-    };
-
-    std::array<unsigned int, 3> indices{
-        0, 1, 2
-    };
-};
-
-struct RectangleVertex
-{
-    std::array<std::array<float, 6>, 4> vertices_XY{
-        -0.5f, -0.5f, 0.0f, 1.0f, 0.0f, 0.0f,
-         0.5f, -0.5f, 0.0f, 0.0f, 1.0f, 0.0f,
-         0.5f,  0.5f, 0.0f, 0.0f, 0.0f, 1.0f,
-        -0.5f,  0.5f, 0.0f, 1.0f, 1.0f, 0.0f
-    };
-
-    std::array<std::array<float, 6>, 4> vertices_XZ{
-        -0.5f, 0.0f, -0.5f, 1.0f, 0.0f, 0.0f,
-         0.5f, 0.0f, -0.5f, 0.0f, 1.0f, 0.0f,
-         0.5f, 0.0f,  0.5f, 0.0f, 0.0f, 1.0f,
-        -0.5f, 0.0f,  0.5f, 1.0f, 1.0f, 0.0f
-    };
-
-    std::array<std::array<float, 6>, 4> vertices_YZ{
-         0.0f, -0.5f, -0.5f, 1.0f, 0.0f, 0.0f,
-         0.0f,  0.5f, -0.5f, 0.0f, 1.0f, 0.0f,
-         0.0f,  0.5f,  0.5f, 0.0f, 0.0f, 1.0f,
-         0.0f, -0.5f,  0.5f, 1.0f, 1.0f, 0.0f
-    };
-
-    std::array<unsigned int, 6> indices{
-        0, 1, 2, 2, 3, 0
-    };
-};
+const static glm::vec3 YZ_VERTICES_LT{  0.0f, -0.5f,  0.5f };
+const static glm::vec3 YZ_VERTICES_RT{  0.0f,  0.5f,  0.5f };
+const static glm::vec3 YZ_VERTICES_RB{  0.0f,  0.5f, -0.5f };
+const static glm::vec3 YZ_VERTICES_LB{  0.0f, -0.5f, -0.5f };
 
 struct CubeVertex
 {
@@ -125,8 +87,6 @@ struct LineVertex
     };
 };
 
-const static TriangleVertex  g_sTriangleVertices;
-const static RectangleVertex g_sRectangleVertices;
 const static CubeVertex      g_sCubeVertices;
 const static LineVertex      g_sLineVertices;
 
@@ -134,4 +94,4 @@ _NAMESPACE_END
 
 
 
-#endif //__XL_SHADER_SOURCE_HPP__
+#endif //XL_DATA_HPP_

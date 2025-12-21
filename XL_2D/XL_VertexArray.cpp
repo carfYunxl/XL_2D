@@ -23,13 +23,11 @@ BatchVertexArray::~BatchVertexArray()
     glDeleteVertexArrays(1, &VAO);
 }
 
-void BatchVertexArray::Bind(const std::vector<BatchRenderVertex>& batch_data)
+void BatchVertexArray::Bind(const BatchRenderVertex * const batch_data, uint32_t batch_data_size)
 {
     glBindVertexArray(VAO);
     m_BatchVertexBuffer->Bind();
-    //glBufferData(GL_ARRAY_BUFFER, batch_data.size() * sizeof(BatchRenderVertex), batch_data.data(), GL_DYNAMIC_DRAW);
-    //glBufferSubData(GL_ARRAY_BUFFER, 0, batch_data.size() * sizeof(BatchRenderVertex), (float*)batch_data.data());
-    glBufferSubData(GL_ARRAY_BUFFER, 0, batch_data.size() * sizeof(BatchRenderVertex), static_cast<const void*>(batch_data.data()));
+    glBufferSubData(GL_ARRAY_BUFFER, 0, batch_data_size * sizeof(BatchRenderVertex), static_cast<const void*>(batch_data));
 }
 
 void BatchVertexArray::UnBind()

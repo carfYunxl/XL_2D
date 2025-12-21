@@ -102,7 +102,8 @@ bool OpenglRender::Init()
     }
 
     m_Renderer = std::make_unique<XL::BatchRenderer>();
-    m_Renderer->Init(glad_wgl_get_proc);
+    if (!m_Renderer->Init(glad_wgl_get_proc))
+        return false;
     m_Renderer->Resize(m_WinProp.Width, m_WinProp.Height);
 
     XL::FramebufferSpecification fbSpec;
@@ -141,6 +142,8 @@ void OpenglRender::OnSize(int cx, int cy)
         m_WinProp.Height = cy;
 
 		m_FrameBuffer->Resize(cx, cy);
+
+		OnPaint();
     }
 }
 
@@ -149,39 +152,29 @@ void OpenglRender::OnPaint()
     m_FrameBuffer->Bind();
 
     m_Renderer->ClearScene();
-    m_Renderer->UpdateCamera();
+    //m_Renderer->UpdateCamera();
     /*  Core Draw Functions Here */
     ///////////////////////////////////////////
-    m_Renderer->DrawTriangle(
-        XL::DrawPlane::XY,
-        glm::vec3(-0.5f, -0.5f, 1.0f), 	    // translate
-        glm::vec3(0.0f, 0.0f, 30.0f),	    // rotate°¡
-        glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
-        glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)	// color
-    );
+    XL::TransFormData data;
+	data.position = glm::vec3(-0.5f, -0.5f, 1.0f);
+	data.rotate = glm::vec3(0.0f, 0.0f, 30.0f);
+	data.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    m_Renderer->DrawTriangle( XL::DrawPlane::XY, data, glm::vec4(1.0f, 0.0f, 1.0f, 1.0f) );
 
-    m_Renderer->DrawTriangle(
-        XL::DrawPlane::XY,
-        glm::vec3(0.5f, 0.5f, 1.0f), 	    // translate
-        glm::vec3(0.0f, 0.0f, 0.0f),	    // rotate
-        glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
-        glm::vec4(1.0f, 0.0f, 1.0f, 1.0f)	// color
-    );
+    data.position = glm::vec3(0.5f, 0.5f, 1.0f);
+    data.rotate = glm::vec3(0.0f, 0.0f, 30.0f);
+    data.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    m_Renderer->DrawTriangle( XL::DrawPlane::XY, data, glm::vec4(1.0f, 0.0f, 1.0f, 1.0f) );
 
-    m_Renderer->DrawRectangle(
-        XL::DrawPlane::XY,
-        glm::vec3(-0.5f, -0.5f, 1.0f), 	    // translate
-        glm::vec3(0.0f, 30.0f, 0.0f),	    // rotate
-        glm::vec3(1.0f, 1.0f, 1.0f), 	    // scales
-        glm::vec4(1.0f, 0.0f, 0.0f, 1.0f)	// color
-    );
+    data.position = glm::vec3(-0.5f, -0.5f, 1.0f);
+    data.rotate = glm::vec3(0.0f, 30.0f, 0.0f);
+    data.scale = glm::vec3(1.0f, 1.0f, 1.0f);
+    m_Renderer->DrawRectangle( XL::DrawPlane::XY, data, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f) );
 
-    m_Renderer->DrawCube(
-        glm::vec3(0.0f, 0.0f, -0.0f), 	// translate
-        glm::vec3(0.0f, 0.0f, 0.0f),	// rotate
-        glm::vec3(2.5f, 2.5f, 2.5f), 	// scales
-        glm::vec4(0.0f, 0.0f, 1.0f, 1.0f)		// color
-    );
+    data.position = glm::vec3(0.0f, 0.0f, -0.0f);
+    data.rotate = glm::vec3(0.0f, 0.0f, 0.0f);
+    data.scale = glm::vec3(2.5f, 2.5f, 2.5f);
+    m_Renderer->DrawCube( data, glm::vec4(0.0f, 0.0f, 1.0f, 1.0f) );
 
     constexpr float F_SIZE = 6.0f;
     constexpr float F_STEP = 1.0f;
@@ -247,14 +240,17 @@ void OpenglRender::OnPaint()
 void OpenglRender::OnKeyDown(UINT nChar, UINT nRepCnt)
 {
     m_Renderer->OnKeyDown(nChar, nRepCnt);
+    OnPaint();
 }
 
 void OpenglRender::OnMouseWheel(int yOffset)
 {
 	m_Renderer->OnMouseWheel(yOffset);
+    OnPaint();
 }
 
 void OpenglRender::OnMouseMove(int xOffset, int yOffset)
 {
     m_Renderer->OnMouseMove(xOffset,yOffset);
+    OnPaint();
 }

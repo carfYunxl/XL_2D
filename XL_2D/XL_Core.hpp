@@ -1,5 +1,5 @@
-#ifndef __XL_CORE_HPP__
-#define __XL_CORE_HPP__
+#ifndef XL_CORE_HPP_
+#define XL_CORE_HPP_
 
 #include "glad/glad.h"
 #include "glm/glm.hpp"
@@ -41,4 +41,4 @@ struct BatchRenderVertex
 	glm::vec4 color;
 };
 _NAMESPACE_END
-#endif//__XL_CORE_HPP__
+#endif//XL_CORE_HPP_

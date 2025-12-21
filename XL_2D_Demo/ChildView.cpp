@@ -41,14 +41,6 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 void CChildView::OnPaint() 
 {
 	CPaintDC dc(this);
-	
-	auto now = std::chrono::system_clock::now();
-	if(m_Renderer)
-		m_Renderer->OnPaint();
-
-	auto end = std::chrono::system_clock::now();
-	auto time_span = std::chrono::duration_cast<std::chrono::milliseconds>(end-now).count();
-	TRACE("FPS: %.2f\n", 1000.0f / (float)time_span);
 }
 
 int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -84,10 +76,7 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 void CChildView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
 	if (m_Renderer)
-	{
 		m_Renderer->OnKeyDown(nChar, nRepCnt);
-		m_Renderer->OnPaint();
-	}
 
 	CWnd::OnChar(nChar, nRepCnt, nFlags);
 }
@@ -95,10 +84,7 @@ void CChildView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 BOOL CChildView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
 	if (m_Renderer)
-	{
 		m_Renderer->OnMouseWheel(zDelta);
-		m_Renderer->OnPaint();
-	}
 
 	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
 }
@@ -106,10 +92,7 @@ BOOL CChildView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	if (m_Renderer)
-	{
 		m_Renderer->OnMouseMove(point.x, point.y);
-		m_Renderer->OnPaint();
-	}
 
 	CWnd::OnMouseMove(nFlags, point);
 }
