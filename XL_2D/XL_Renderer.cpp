@@ -44,7 +44,7 @@ bool BatchRenderer::Init(pfnGladLoader loader)
 	m_LineBatchVertex = std::make_unique<BatchVertexArray>();
 	m_LineBatchVertex->Bind( m_LineBatchVertices, m_LineVertexCount );
 
-    m_Camera = std::make_unique<Camera>(10.0f / 9.0f);
+    m_Camera = std::make_unique<Camera>(16.0f / 9.0f);
 
     return true;
 }
@@ -56,12 +56,12 @@ void BatchRenderer::OnKeyDown(uint32_t nChar, uint32_t nRepCnt)
 
 void BatchRenderer::OnMouseWheel(int yOffset)
 {
-    m_Camera->OnMouseWheel(yOffset);
+    //m_Camera->OnMouseWheel(yOffset);
 }
 
 void BatchRenderer::OnMouseMove(int xOffset, int yOffset)
 {
-    m_Camera->OnMouseMove(xOffset, yOffset);
+   // m_Camera->OnMouseMove(xOffset, yOffset);
 }
 
 glm::vec3 BatchRenderer::TransformPos(const glm::vec3& in, const glm::mat4& model)
@@ -71,61 +71,59 @@ glm::vec3 BatchRenderer::TransformPos(const glm::vec3& in, const glm::mat4& mode
 }
 
 void BatchRenderer::DrawTriangle(
-    DrawPlane plane,
-    const TransFormData& trans,
+    DrawPlane plane, 
+    float x0, 
+    float y0, 
+    float x1, 
+    float y1, 
+    float x2, 
+    float y2,
     const glm::vec4& color
 )
 {
-    // build model
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), trans.position)
-        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.x), glm::vec3(1, 0, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.y), glm::vec3(0, 1, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.z), glm::vec3(0, 0, 1))
-        * glm::scale(glm::mat4(1.0f), trans.scale);
-
     switch (plane)
     {
         case XL::DrawPlane::XY:
         {
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_LT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3{ x0, y0, 0.0 };
             m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
             m_TriangleVertexCount++;
 
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3{ x1, y1, 0.0 };
             m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
             m_TriangleVertexCount++;
 
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RB, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3{ x2, y2, 0.0 };
             m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
             m_TriangleVertexCount++;
             break;
         }
         case XL::DrawPlane::XZ:
         {
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_LT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3{ x0, 0.0, y0 };
             m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
             m_TriangleVertexCount++;
 
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3{ x1, 0.0, y1 };
             m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
             m_TriangleVertexCount++;
 
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RB, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3{ x2, 0.0, y2 };
             m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
             m_TriangleVertexCount++;
             break;
         }
         case XL::DrawPlane::YZ:
         {
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_LT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3{ 0.0, x0, y0 };
             m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
             m_TriangleVertexCount++;
 
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RT, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3{ 0.0, x1, y1 };
             m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
             m_TriangleVertexCount++;
 
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RB, model);
+            m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3{ 0.0, x2, y2 };
             m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
             m_TriangleVertexCount++;
             break;
@@ -141,43 +139,36 @@ void BatchRenderer::DrawTriangle(
 
 void BatchRenderer::DrawRectangle(
     DrawPlane plane,
-    const TransFormData& trans,
+    float l, float t, float r, float b,
     const glm::vec4& color
 )
 {
-    // 使用批处理方式：把矩形索引展开为两个三角形（6 顶点），加入 m_TriangleBatchVertices
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), trans.position)
-        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.x), glm::vec3(1, 0, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.y), glm::vec3(0, 1, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.z), glm::vec3(0, 0, 1))
-        * glm::scale(glm::mat4(1.0f), trans.scale);
-
     switch (plane)
     {
     case XL::DrawPlane::XY:
     {
         // 0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_LT, model);
+		m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3( l, t, 0.0f );
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //1
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, t, 0.0f);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, b, 0.0f);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, b, 0.0f);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //3
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_LB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, b, 0.0f);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XY_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, t, 0.0f);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         break;
@@ -185,27 +176,27 @@ void BatchRenderer::DrawRectangle(
     case XL::DrawPlane::XZ:
     {
         // 0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, 0.0f, t);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //1
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, 0.0f, t);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, 0.0f, b);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, 0.0f, b);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //3
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_LB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, 0.0f, b);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(XZ_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, 0.0f, t);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         break;
@@ -213,27 +204,27 @@ void BatchRenderer::DrawRectangle(
     case XL::DrawPlane::YZ:
     {
         // 0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, l, t);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //1
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, r, t);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, r, b);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_RB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, r, b);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //3
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_LB, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, l, b);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(YZ_VERTICES_LT, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, l, t);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         break;
@@ -521,8 +512,6 @@ void BatchRenderer::Flush()
     if ( m_TriangleVertexCount > 0 )
     {
         m_Shader->Bind();
-        m_Shader->SetMat4("u_View", m_Camera->GetView());
-        m_Shader->SetMat4("u_Projection", m_Camera->GetProjection());
 
 		m_TriangleBatchVertex->Bind(m_TriangleBatchVertices, m_TriangleVertexCount);
 
@@ -532,13 +521,12 @@ void BatchRenderer::Flush()
         m_Shader->UnBind();
 
         m_TriangleVertexCount = 0;
+        m_DrawCall += 1;
     }
 
     if ( m_LineVertexCount > 0 )
     {
         m_Shader->Bind();
-        m_Shader->SetMat4("u_View", m_Camera->GetView());
-        m_Shader->SetMat4("u_Projection", m_Camera->GetProjection());
 
 		m_LineBatchVertex->Bind(m_LineBatchVertices, m_LineVertexCount);
         glDrawArrays(GL_LINES, 0, m_LineVertexCount);
@@ -546,6 +534,7 @@ void BatchRenderer::Flush()
         m_Shader->UnBind();
 
         m_LineVertexCount = 0;
+        m_DrawCall += 1;
     }
 }
 

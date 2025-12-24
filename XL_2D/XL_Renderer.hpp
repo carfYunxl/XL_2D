@@ -27,15 +27,15 @@ public:
 
     void Resize(int nWidth, int nHeight);
     void UpdateCamera();
-    void ClearScene() { glClearColor(0.2f, 0.3f, 0.3f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
+    void ClearScene() { glClearColor(1.0f, 1.0f, 1.0f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
     bool Init(pfnGladLoader loader);
 
     void OnKeyDown(uint32_t nChar, uint32_t nRepCnt);
     void OnMouseWheel(int yOffset);
     void OnMouseMove(int xOffset, int yOffset);
 
-    void DrawTriangle( DrawPlane plane, const TransFormData& trans, const glm::vec4& color );
-    void DrawRectangle( DrawPlane plane, const TransFormData& trans, const glm::vec4& color );
+    void DrawTriangle( DrawPlane plane, float x0, float y0, float x1, float y1, float x2, float y2, const glm::vec4& color );
+    void DrawRectangle( DrawPlane plane, float l, float t, float r, float b, const glm::vec4& color );
     void DrawCube( const TransFormData& trans, const glm::vec4& color );
 
     void DrawLine(
@@ -65,6 +65,7 @@ public:
     );
 
     void Flush();
+	void ResetDrawCall() { m_DrawCall = -1; }   
 private:
     int  GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs);
     glm::vec3 TransformPos(const glm::vec3& in, const glm::mat4& model);
@@ -80,6 +81,8 @@ private:
 
 	uint32_t							m_TriangleVertexCount = 0;
     uint32_t                            m_LineVertexCount = 0;
+
+	int                 m_DrawCall = -1;
 };
 
 _NAMESPACE_END

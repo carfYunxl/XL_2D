@@ -4,12 +4,7 @@
 #include <cstdint>
 #include <wtypes.h>
 #include <memory>
-
-struct WindowProp
-{
-    uint32_t Width;
-    uint32_t Height;
-};
+#include "glm/glm.hpp"
 
 namespace XL
 {
@@ -17,26 +12,60 @@ namespace XL
     class FrameBuffer;
 }
 
+struct XL_RectF
+{
+    float l;
+    float t;
+    float r;
+    float b;
+};
+
+struct XL_ColorF
+{
+    float r;
+    float g;
+    float b;
+    float a;
+};
+
+struct XL_PointF
+{
+    float x;
+	float y;
+};
+
+struct XL_TriangleF
+{
+    XL_PointF p0;
+    XL_PointF p1;
+    XL_PointF p2;
+};
+
 class OpenglRender
 {
 public:
-    OpenglRender(HWND hWnd, const WindowProp& prop);
+    OpenglRender(HWND hWnd, uint32_t Width, uint32_t Height);
     ~OpenglRender();
 
     void OnSize(int cx, int cy);
     bool Init();
     void OnPaint();
-	void OnKeyDown(UINT nChar, UINT nRepCnt);
-    void OnMouseWheel(int yOffset);
-    void OnMouseMove(int xOffset,int yOffset);
+
+	void FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color);
+	void DrawRectangle(const XL_RectF& rect, const XL_ColorF& border_color, float border_width);
+    void FillTriangle(const XL_TriangleF& riangle, const XL_ColorF& bg_color);
+	void FillCircle(const XL_PointF& center, float radius, const XL_ColorF& fill_color);
 private:
-    bool SetupPixelFormat(HDC hdc);
+    bool        SetupPixelFormat(HDC hdc);
+	XL_PointF   ScreenToWorld(const XL_PointF& screenPos);
+    glm::vec4   ToColorF(const XL_ColorF& color) { return glm::vec4{color.r, color.g, color.b, color.a}; }
 private:
     HWND                                m_hWnd;
     HDC                                 m_hDC;
     HGLRC                               m_hRC;
-    WindowProp                          m_WinProp;
-    std::unique_ptr<XL::BatchRenderer>   m_Renderer;
+	uint32_t                            m_WindowWidth;
+	uint32_t							m_WindowHeight;
+    std::unique_ptr<XL::BatchRenderer>  m_Renderer;
     std::unique_ptr<XL::FrameBuffer>    m_FrameBuffer;
 };
 

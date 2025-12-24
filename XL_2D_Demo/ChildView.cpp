@@ -3,15 +3,18 @@
 #include "XL_2D_Demo.h"
 #include "ChildView.h"
 #include <chrono>
+#include "XL_2D.hpp"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 CChildView::CChildView(){
+	
 }
 
 CChildView::~CChildView(){
+	XL_2D_ReleaseRenderer();
 }
 
 BEGIN_MESSAGE_MAP(CChildView, CWnd)
@@ -23,6 +26,7 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_MOUSEWHEEL()
 	ON_WM_MOUSEMOVE()
 	ON_WM_ERASEBKGND()
+	ON_COMMAND(ID_DRAW_FOLLOW_HEART, &CChildView::OnDrawFollowHeart)
 END_MESSAGE_MAP()
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
@@ -41,6 +45,8 @@ BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs)
 void CChildView::OnPaint() 
 {
 	CPaintDC dc(this);
+	//m_Renderer->OnPaint();
+	XL_2D_OnPaint();
 }
 
 int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -50,12 +56,9 @@ int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	CRect rect;
 	GetClientRect(&rect);
-
-	WindowProp prop;
-	prop.Width = rect.Width();
-	prop.Height = rect.Height();
-	m_Renderer = std::make_unique<OpenglRender>(m_hWnd, prop);
-	m_Renderer->Init();
+	//m_Renderer = std::make_unique<OpenglRender>(m_hWnd, rect.Width(), rect.Height());
+	//m_Renderer->Init();
+	XL_2D_CreateRenderer(m_hWnd, rect.Width(), rect.Height());
 
 	return 0;
 }
@@ -64,8 +67,9 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 {
 	CWnd::OnSize(nType, cx, cy);
 
-	if (m_Renderer)
-		m_Renderer->OnSize(cx,cy);
+	/*if (m_Renderer)
+		m_Renderer->OnSize(cx,cy);*/
+	XL_2D_OnSize(cx, cy);
 }
 
 void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -75,29 +79,25 @@ void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void CChildView::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (m_Renderer)
-		m_Renderer->OnKeyDown(nChar, nRepCnt);
-
 	CWnd::OnChar(nChar, nRepCnt, nFlags);
 }
 
 BOOL CChildView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-	if (m_Renderer)
-		m_Renderer->OnMouseWheel(zDelta);
-
 	return CWnd::OnMouseWheel(nFlags, zDelta, pt);
 }
 
 void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 {
-	if (m_Renderer)
-		m_Renderer->OnMouseMove(point.x, point.y);
-
 	CWnd::OnMouseMove(nFlags, point);
 }
 
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 {
 	return FALSE;
+}
+
+void CChildView::OnDrawFollowHeart()
+{
+	
 }

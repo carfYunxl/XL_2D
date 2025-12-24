@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="XL_2D.cpp" />
     <ClCompile Include="XL_Renderer.cpp" />
     <ClCompile Include="XL_VertexArray.cpp" />
     <ClCompile Include="XL_VertexBuffer.cpp" />
@@ -31,6 +32,7 @@
     <ClCompile Include="XL_Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="XL_2D.hpp" />
     <ClInclude Include="XL_Renderer.hpp" />
     <ClInclude Include="XL_VertexArray.hpp" />
     <ClInclude Include="XL_VertexBuffer.hpp" />

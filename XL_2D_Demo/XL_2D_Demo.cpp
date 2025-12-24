@@ -140,6 +140,8 @@ protected:
 // 实现
 protected:
 	DECLARE_MESSAGE_MAP()
+public:
+	afx_msg void OnDrawFollowHeart();
 };
 
 CAboutDlg::CAboutDlg() noexcept : CDialogEx(IDD_ABOUTBOX)
