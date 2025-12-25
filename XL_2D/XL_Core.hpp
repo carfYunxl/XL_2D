@@ -24,6 +24,7 @@
 #endif
 
 _NAMESPACE_BEGIN
+static constexpr size_t MaxBatchVertices = 131072;
 static void XL_uSleep(int uSec)
 {
 	auto start = std::chrono::system_clock::now();

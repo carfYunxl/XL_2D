@@ -6,7 +6,7 @@ BatchVertexBuffer::BatchVertexBuffer()
 {
     glGenBuffers(1, &m_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, 65536 * sizeof(BatchRenderVertex), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, MaxBatchVertices * sizeof(BatchRenderVertex), nullptr, GL_DYNAMIC_DRAW);
 }
 
 BatchVertexBuffer::~BatchVertexBuffer()

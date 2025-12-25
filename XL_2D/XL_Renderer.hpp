@@ -20,7 +20,6 @@ class BatchRenderer
 {
     using GLAD_PROC = void(*)();
     using pfnGladLoader = GLAD_PROC(*)(void* userptr, const char* name);
-    static constexpr size_t MaxBatchVertices = 65536;
 public:
     BatchRenderer();
     ~BatchRenderer() {}
