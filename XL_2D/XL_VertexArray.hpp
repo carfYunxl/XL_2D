@@ -3,6 +3,7 @@
 
 #include "XL_Core.hpp"
 #include "XL_VertexBuffer.hpp"
+#include "XL_IndexBuffer.hpp"
 
 _NAMESPACE_BEGIN
 
@@ -17,6 +18,7 @@ public:
 private:
     unsigned int VAO;
 
+    std::unique_ptr<IndexBuffer>       m_BatchIndexBuffer;
 	std::unique_ptr<BatchVertexBuffer> m_BatchVertexBuffer;
 };
 

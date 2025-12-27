@@ -148,7 +148,7 @@ void BatchRenderer::DrawRectangle(
     case XL::DrawPlane::XY:
     {
         // 0
-		m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3( l, t, 0.0f );
+		m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, t, 0.0f);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         //1
@@ -159,16 +159,8 @@ void BatchRenderer::DrawRectangle(
         m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, b, 0.0f);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
-        //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, b, 0.0f);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
         //3
         m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, b, 0.0f);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
-        //0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, t, 0.0f);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         break;
@@ -187,16 +179,8 @@ void BatchRenderer::DrawRectangle(
         m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, 0.0f, b);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
-        //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, 0.0f, b);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
         //3
         m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, 0.0f, b);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
-        //0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, 0.0f, t);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         break;
@@ -215,16 +199,8 @@ void BatchRenderer::DrawRectangle(
         m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, r, b);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
-        //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, r, b);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
         //3
         m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, l, b);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
-        //0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, l, t);
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
         break;
@@ -233,7 +209,7 @@ void BatchRenderer::DrawRectangle(
         break;
     }
 
-    if (m_TriangleVertexCount + 6 > MaxBatchVertices)
+    if (m_TriangleVertexCount + 4 > MaxBatchVertices)
         Flush();
 }
 
@@ -513,13 +489,10 @@ void BatchRenderer::Flush()
     {
         m_Shader->Bind();
 
-		m_TriangleBatchVertex->Bind(m_TriangleBatchVertices, m_TriangleVertexCount);
-
-        glDrawArrays(GL_TRIANGLES, 0, m_TriangleVertexCount);
-
-		m_TriangleBatchVertex->UnBind();
+        m_TriangleBatchVertex->Bind(m_TriangleBatchVertices, m_TriangleVertexCount);
+        glDrawElements(GL_TRIANGLES, (GLsizei)(m_TriangleVertexCount * 6u), GL_UNSIGNED_INT, 0);
+        m_TriangleBatchVertex->UnBind();
         m_Shader->UnBind();
-
         m_TriangleVertexCount = 0;
         m_DrawCall += 1;
     }
@@ -528,9 +501,10 @@ void BatchRenderer::Flush()
     {
         m_Shader->Bind();
 
-		m_LineBatchVertex->Bind(m_LineBatchVertices, m_LineVertexCount);
-        glDrawArrays(GL_LINES, 0, m_LineVertexCount);
-		m_LineBatchVertex->UnBind();
+        m_LineBatchVertex->Bind(m_LineBatchVertices, m_LineVertexCount);
+        glDrawElements(GL_LINES, (GLsizei)m_LineVertexCount, GL_UNSIGNED_INT, 0);
+
+        m_LineBatchVertex->UnBind();
         m_Shader->UnBind();
 
         m_LineVertexCount = 0;

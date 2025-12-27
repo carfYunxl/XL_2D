@@ -17,8 +17,6 @@ BatchVertexBuffer::~BatchVertexBuffer()
 void BatchVertexBuffer::Bind()
 {
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    //glBufferData(GL_ARRAY_BUFFER, 65536 * sizeof(BatchRenderVertex), nullptr, GL_STATIC_DRAW);
-    //glBufferData(GL_ARRAY_BUFFER, 65536 * sizeof(BatchRenderVertex), nullptr, GL_STATIC_DRAW);
 }
 
 void BatchVertexBuffer::UnBind()
