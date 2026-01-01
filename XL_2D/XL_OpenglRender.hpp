@@ -54,7 +54,12 @@ public:
 	void FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color);
 	void DrawRectangle(const XL_RectF& rect, const XL_ColorF& border_color, float border_width);
     void FillTriangle(const XL_TriangleF& riangle, const XL_ColorF& bg_color);
-	void FillCircle(const XL_PointF& center, float radius, const XL_ColorF& fill_color);
+
+	void FillEllipse(const XL_PointF& center, float pixelX, float pixelY, const XL_ColorF& fill_color);
+	void DrawEllipse(const XL_PointF& center, float pixelX, float pixelY, const XL_ColorF& border_color);
+
+	void FillCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& fill_color);
+	void DrawCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& border_color, float border_width);
 private:
     bool        SetupPixelFormat(HDC hdc);
 	XL_PointF   ScreenToWorld(const XL_PointF& screenPos);

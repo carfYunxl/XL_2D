@@ -36,10 +36,12 @@ static void XL_mSleep(int mSec)
 	XL_uSleep(mSec * 1000);
 }
 
-struct BatchRenderVertex
+enum class VertexType
 {
-	glm::vec3 position;
-	glm::vec4 color;
+	None = 0,
+	BatchQuadVertex,
+	BatchCircleVertex,
+	BatchLineVertex
 };
 _NAMESPACE_END
 #endif//XL_CORE_HPP_

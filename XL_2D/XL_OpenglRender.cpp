@@ -161,6 +161,9 @@ void OpenglRender::OnSize(int cx, int cy)
 
 void OpenglRender::OnPaint()
 {
+    if (m_WindowWidth == 0 && m_WindowHeight == 0)
+        return;
+
     auto start = std::chrono::system_clock::now();
     m_FrameBuffer->Bind();
 
@@ -169,30 +172,29 @@ void OpenglRender::OnPaint()
     //m_Renderer->UpdateCamera();
     /*  Core Draw Functions Here */
     ///////////////////////////////////////////
-    constexpr float W = 2;
-	constexpr float H = 1;
-	constexpr float G = 0.2;
+    constexpr float W = 15;
+	constexpr float H = 7;
+	constexpr float G = 2;
 	int nCX = static_cast<int>(m_WindowWidth / (W + G));
 	int nCY = static_cast<int>(m_WindowHeight / (H + G));
     for (float i = 0;i < nCX; i++)
     {
         for (float j = 0; j < nCY; j++)
         {
-            FillRectangle(XL_RectF{ i * (W + G) ,j * (H + G),i * (W + G) + W, j * (H + G) + H }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f });
+            FillRectangle(XL_RectF{ i * (W + G) ,j * (H + G),i * (W + G) + W, j * (H + G) + H }, XL_ColorF{ (int(i * j) % 255) / 255.0f,(int(i + j) % 255) / 255.0f,(int(pow(i, j)) % 255) / 255.0f,1.0f });
         }
     }
-    //FillRectangle(XL_RectF{ 100,100,200,200 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f });
+    /*FillRectangle(XL_RectF{ 100,100,105,105 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f });
+    FillRectangle(XL_RectF{ 100,110,300,310 }, XL_ColorF{ 1.0f,0.0f,1.0f,1.0f });
+
+    FillEllipse(XL_PointF{500,500}, 100,200, XL_ColorF{ 1.0f, 0.0f, 1.0f, 1.0f });
+    DrawEllipse(XL_PointF{500,550}, 100,100, XL_ColorF{ 0.3f, 0.0f, 0.0f, 1.0f });
+
+    FillCircle(XL_PointF{ 800,800 }, 5, XL_ColorF{ 1.0f, 0.0f, 1.0f, 1.0f });
+    DrawCircle(XL_PointF{ 900,900 }, 5, XL_ColorF{ 1.0f, 0.0f, 0.0f, 1.0f }, 0.1f);*/
     //FillRectangle(XL_RectF{ 300,300,400,400 }, XL_ColorF{ 1.0f,0.0f,1.0f,1.0f });
     //DrawRectangle(XL_RectF{ 500,500,800,600 }, XL_ColorF{ 1.0f,0.0f,1.0f,1.0f }, 5.0f);
 
-    //FillTriangle(
-    //    XL_TriangleF{
-    //        XL_PointF{ 600,100 },
-    //        XL_PointF{ 700,300 },
-    //        XL_PointF{ 500,300 }
-    //    },
-    //    XL_ColorF{ 0.0f,1.0f,0.0f,1.0f }
-    //);
     ///////////////////////////////////////////
 	m_Renderer->Flush();
     m_FrameBuffer->Unbind();
@@ -271,7 +273,43 @@ void OpenglRender::FillTriangle(const XL_TriangleF& riangle, const XL_ColorF& bg
 	);
 }
 
-void OpenglRender::FillCircle(const XL_PointF& center, float radius, const XL_ColorF& fill_color)
+void OpenglRender::FillEllipse(const XL_PointF& center, float pixelX, float pixelY, const XL_ColorF& fill_color)
 {
+    auto pCenter = ScreenToWorld(center);
 
+    float radiusX = pixelX * 2.0f / m_WindowWidth;
+    float radiusY = pixelY * 2.0f / m_WindowHeight;
+
+    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(fill_color), 1.0f, 0.01f);
+}
+
+void OpenglRender::DrawEllipse(const XL_PointF& center, float pixelX, float pixelY, const XL_ColorF& border_color)
+{
+    auto pCenter = ScreenToWorld(center);
+
+    float radiusX = pixelX * 2.0f / m_WindowWidth;
+    float radiusY = pixelY * 2.0f / m_WindowHeight;
+
+    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(border_color), 0.1f, 0.01f);
+}
+
+void OpenglRender::FillCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& fill_color)
+{
+    auto pCenter = ScreenToWorld(center);
+
+    float radiusX = pixel_radius * 2.0f / m_WindowWidth;
+    float radiusY = pixel_radius * 2.0f / m_WindowHeight;
+
+    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(fill_color), 1.0f, 0.01f);
+    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(XL_ColorF{0.0f, 0.0f, 0.0f, 1.0f}), 0.01f, 0.01f);
+}
+
+void OpenglRender::DrawCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& border_color, float border_width)
+{
+    auto pCenter = ScreenToWorld(center);
+
+    float radiusX = pixel_radius * 2.0f / m_WindowWidth;
+    float radiusY = pixel_radius * 2.0f / m_WindowHeight;
+
+    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(border_color), 1.0f, 0.01f);
 }

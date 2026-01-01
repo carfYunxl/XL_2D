@@ -9,11 +9,26 @@
 
 _NAMESPACE_BEGIN
 
-struct TransFormData
+struct BatchBase
 {
-    glm::vec3 position;
-    glm::vec3 rotate;
-    glm::vec3 scale;
+    std::unique_ptr<Shader>             m_Shader;
+    std::unique_ptr<BatchVertexArray>   m_Vertex;
+    uint32_t							m_VertexCount{ 0 };
+};
+
+struct QuadBatch : BatchBase
+{
+    RenderVertexQuad                    m_Vertices[MaxBatchVertices];
+};
+
+struct CircleBatch : BatchBase
+{
+    RenderVertexCircle                  m_Vertices[MaxBatchVertices];
+};
+
+struct LineBatch : BatchBase
+{
+    RenderVertexLine                    m_Vertices[MaxBatchVertices];
 };
 
 class BatchRenderer
@@ -35,7 +50,7 @@ public:
 
     void DrawTriangle( DrawPlane plane, float x0, float y0, float x1, float y1, float x2, float y2, const glm::vec4& color );
     void DrawRectangle( DrawPlane plane, float l, float t, float r, float b, const glm::vec4& color );
-    void DrawCube( const TransFormData& trans, const glm::vec4& color );
+    void DrawCube( const glm::vec4& color );
 
     void DrawLine(
         const glm::vec3& start,
@@ -45,23 +60,13 @@ public:
 
     void DrawCircle(
         DrawPlane plane,
-        const glm::vec3& pos,
-        const glm::vec3& rotate,
-        float radius,
-        const glm::vec4& color,
-        bool filled = true,
-        int segments = 36
-    );
-
-    void DrawCircle_Pixel(
-        DrawPlane plane,
-        const glm::vec3& pos,
-        const glm::vec3& rotate,
-        float radius_pixels,
-        const glm::vec4& color,
-        bool filled = true,
-        int segments = 36
-    );
+        float x,
+        float y,
+        float radiusX,
+        float radiusY,
+        const glm::vec4& color, 
+        float thickness /*= 1.0f*/, 
+        float fade /*= 0.005f*/ );
 
     void Flush();
 	void ResetDrawCall() { m_DrawCall = -1; }   
@@ -69,19 +74,15 @@ private:
     int  GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs);
     glm::vec3 TransformPos(const glm::vec3& in, const glm::mat4& model);
 private:
-    std::unique_ptr<Shader>             m_Shader;
-    std::unique_ptr<Camera>             m_Camera;
-    int                                 mViewportWidth;
-    int                                 mViewportHeight;
-    std::unique_ptr<BatchVertexArray>   m_TriangleBatchVertex;
-    std::unique_ptr<BatchVertexArray>   m_LineBatchVertex;
-    BatchRenderVertex                   m_TriangleBatchVertices[MaxBatchVertices];
-    BatchRenderVertex                   m_LineBatchVertices[MaxBatchVertices];
+    std::unique_ptr<Camera>   m_Camera;
+    int                       mViewportWidth;
+    int                       mViewportHeight;
 
-	uint32_t							m_TriangleVertexCount = 0;
-    uint32_t                            m_LineVertexCount = 0;
+	QuadBatch                 m_QuadBatch;
+	CircleBatch			      m_CircleBatch;
+	LineBatch                 m_LineBatch;
 
-	int                 m_DrawCall = -1;
+	int                       m_DrawCall = -1;
 };
 
 _NAMESPACE_END

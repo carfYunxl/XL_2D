@@ -2,11 +2,11 @@
 
 _NAMESPACE_BEGIN
 
-BatchVertexBuffer::BatchVertexBuffer()
+BatchVertexBuffer::BatchVertexBuffer(uint32_t size)
 {
     glGenBuffers(1, &m_VBO);
     glBindBuffer(GL_ARRAY_BUFFER, m_VBO);
-    glBufferData(GL_ARRAY_BUFFER, MaxBatchVertices * sizeof(BatchRenderVertex), nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, MaxBatchVertices * size, nullptr, GL_DYNAMIC_DRAW);
 }
 
 BatchVertexBuffer::~BatchVertexBuffer()

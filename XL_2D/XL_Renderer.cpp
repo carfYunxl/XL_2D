@@ -28,21 +28,34 @@ bool BatchRenderer::Init(pfnGladLoader loader)
     if (!gladLoaded)
         return false;
 
-    glEnable(GL_DEPTH_TEST);
+    //glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBlendEquation(GL_FUNC_ADD);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-    m_Shader = std::make_unique<Shader>();
-    m_Shader->LoadShader(batch_vs, batch_fs);
-    m_Shader->UnBind();
+    m_QuadBatch.m_Shader = std::make_unique<Shader>();
+    m_QuadBatch.m_Shader->LoadShader(QUAD_DATA::quad_vs, QUAD_DATA::quad_fs);
+    m_QuadBatch.m_Shader->UnBind();
 
-	m_TriangleBatchVertex = std::make_unique<BatchVertexArray>();
-	m_TriangleBatchVertex->Bind( m_TriangleBatchVertices, m_TriangleVertexCount );
-	m_LineBatchVertex = std::make_unique<BatchVertexArray>();
-	m_LineBatchVertex->Bind( m_LineBatchVertices, m_LineVertexCount );
+	m_QuadBatch.m_Vertex = std::make_unique<BatchVertexArray>(VertexType::BatchQuadVertex);
+    m_QuadBatch.m_Vertex->Bind(m_QuadBatch.m_Vertices, m_QuadBatch.m_VertexCount);
+	m_QuadBatch.m_VertexCount = 0;
+
+    m_CircleBatch.m_Shader = std::make_unique<Shader>();
+    m_CircleBatch.m_Shader->LoadShader(CIRCLE_DATA::circle_vs, CIRCLE_DATA::circle_fs);
+    m_CircleBatch.m_Shader->UnBind();
+    m_CircleBatch.m_Vertex = std::make_unique<BatchVertexArray>(VertexType::BatchCircleVertex);
+    m_CircleBatch.m_Vertex->Bind(m_QuadBatch.m_Vertices, m_QuadBatch.m_VertexCount);
+    m_CircleBatch.m_VertexCount = 0;
+
+    m_LineBatch.m_Shader = std::make_unique<Shader>();
+    m_LineBatch.m_Shader->LoadShader(LINE_DATA::line_vs, LINE_DATA::line_fs);
+    m_LineBatch.m_Shader->UnBind();
+    m_LineBatch.m_Vertex = std::make_unique<BatchVertexArray>(VertexType::BatchLineVertex);
+    m_LineBatch.m_Vertex->Bind(m_QuadBatch.m_Vertices, m_QuadBatch.m_VertexCount);
+    m_LineBatch.m_VertexCount = 0;
 
     m_Camera = std::make_unique<Camera>(16.0f / 9.0f);
 
@@ -81,6 +94,7 @@ void BatchRenderer::DrawTriangle(
     const glm::vec4& color
 )
 {
+#if 0
     switch (plane)
     {
         case XL::DrawPlane::XY:
@@ -135,6 +149,7 @@ void BatchRenderer::DrawTriangle(
     // 如果超限则 flush
     if (m_TriangleVertexCount + 3U > MaxBatchVertices)
         Flush();
+#endif
 }
 
 void BatchRenderer::DrawRectangle(
@@ -148,82 +163,74 @@ void BatchRenderer::DrawRectangle(
     case XL::DrawPlane::XY:
     {
         // 0
-		m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, t, 0.0f);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, t, 0.0f);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         //1
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, t, 0.0f);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, t, 0.0f);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, b, 0.0f);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, b, 0.0f);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         //3
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, b, 0.0f);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, b, 0.0f);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         break;
     }
     case XL::DrawPlane::XZ:
     {
         // 0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, 0.0f, t);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, 0.0f, t);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         //1
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, 0.0f, t);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, 0.0f, t);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(r, 0.0f, b);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, 0.0f, b);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         //3
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(l, 0.0f, b);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, 0.0f, b);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         break;
     }
     case XL::DrawPlane::YZ:
     {
         // 0
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, l, t);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, l, t);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         //1
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, r, t);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, r, t);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         //2
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, r, b);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, r, b);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         //3
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = glm::vec3(0.0f, l, b);
-        m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-        m_TriangleVertexCount++;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, l, b);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_VertexCount++;
         break;
     }
     default:
         break;
     }
 
-    if (m_TriangleVertexCount + 4 > MaxBatchVertices)
+    if (m_QuadBatch.m_VertexCount + 4 > MaxBatchVertices)
         Flush();
 }
 
-void BatchRenderer::DrawCube(
-    const TransFormData& trans,
-    const glm::vec4& color
-)
+void BatchRenderer::DrawCube(const glm::vec4& color)
 {
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), trans.position)
-        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.x), glm::vec3(1, 0, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.y), glm::vec3(0, 1, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(trans.rotate.z), glm::vec3(0, 0, 1))
-        * glm::scale(glm::mat4(1.0f), trans.scale);
-
+#if 0
     const auto* srcVerts = &g_sCubeVertices.vertices[0];
     const auto& indices = g_sCubeVertices.indices; // 36 个索引
 
@@ -232,13 +239,14 @@ void BatchRenderer::DrawCube(
         unsigned int idx = indices[i];
         glm::vec3 local{ (srcVerts[idx])[0], (srcVerts[idx])[1], (srcVerts[idx])[2] };
 
-        m_TriangleBatchVertices[m_TriangleVertexCount].position = TransformPos(local, model);
+        m_TriangleBatchVertices[m_TriangleVertexCount].position = local;
         m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
         m_TriangleVertexCount++;
     }
 
     if (m_TriangleVertexCount + 36 > MaxBatchVertices)
         Flush();
+#endif
 }
 
 void BatchRenderer::DrawLine(
@@ -247,6 +255,7 @@ void BatchRenderer::DrawLine(
     const glm::vec4& color
 )
 {
+#if 0
     BatchRenderVertex v0;
     v0.position = start;
     v0.color = color;
@@ -263,208 +272,55 @@ void BatchRenderer::DrawLine(
 
     if (m_LineVertexCount + 2 > MaxBatchVertices)
         Flush();
+#endif
 }
 
 void BatchRenderer::DrawCircle(
     DrawPlane plane,
-    const glm::vec3& pos,
-    const glm::vec3& rotate,
-    float radius,
-    const glm::vec4& color,
-    bool filled,
-    int segments
+    float x,
+    float y,
+    float radiusX,
+    float radiusY,
+    const glm::vec4& color, 
+    float thickness /*= 1.0f*/,
+    float fade /*= 0.005f*/
 )
 {
-    if (radius <= 0.0f)
-        return;
+    // 计算四边形在“世界/NDC”空间的边界
+    float l = x - radiusX;
+    float t = y + radiusY;
+    float r = x + radiusX;
+    float b = y - radiusY;
 
-    if (segments < 3) segments = 3;
+    glm::vec3 center = glm::vec3(x, y, 0.0f);
 
-    // build model: translate -> rotateX/Y/Z -> scale(radius)
-    glm::mat4 model = glm::translate(glm::mat4(1.0f), pos)
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.x), glm::vec3(1, 0, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.y), glm::vec3(0, 1, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.z), glm::vec3(0, 0, 1))
-        * glm::scale(glm::mat4(1.0f), glm::vec3(radius, radius, radius));
+    // 四角世界坐标
+    const glm::vec3 worldPts[4] = {
+        glm::vec3(l, t, 0.0f),
+        glm::vec3(r, t, 0.0f),
+        glm::vec3(r, b, 0.0f),
+        glm::vec3(l, b, 0.0f)
+    };
 
-    // 生成圆周点（局部单位圆）
-    std::vector<glm::vec3> pts;
-    pts.reserve(segments + 1);
-    const float TWO_PI = glm::two_pi<float>();
-    for (int i = 0; i <= segments; ++i) // <= 用于闭合（最后一个等于第一个）
+    // 对应的归一化局部坐标 (相对于中心、按 radiusX/radiusY 缩放)
+    for (int i = 0; i < 4; ++i)
     {
-        float t = (float)i / (float)segments;
-        float ang = t * TWO_PI;
-        glm::vec3 p;
-        switch (plane)
-        {
-        case DrawPlane::XY:
-            p = glm::vec3(std::cos(ang), std::sin(ang), 0.0f);
-            break;
-        case DrawPlane::XZ:
-            p = glm::vec3(std::cos(ang), 0.0f, std::sin(ang));
-            break;
-        case DrawPlane::YZ:
-            p = glm::vec3(0.0f, std::cos(ang), std::sin(ang));
-            break;
-        default:
-            p = glm::vec3(std::cos(ang), std::sin(ang), 0.0f);
-            break;
-        }
-        pts.push_back(TransformPos(p, model));
+        glm::vec3 local;
+        local.x = (worldPts[i].x - center.x) / radiusX; // -1..1
+        local.y = (worldPts[i].y - center.y) / radiusY; // -1..1
+        local.z = 0.0f;
+
+        auto& v = m_CircleBatch.m_Vertices[m_CircleBatch.m_VertexCount];
+        v.worldPosition = worldPts[i];
+        v.localPosition = local;
+        v.color = color;
+        v.thickness = thickness;
+        v.fade = fade;
+        m_CircleBatch.m_VertexCount++;
     }
 
-    if (filled)
-    {
-        // triangle fan: center + (p_i, p_{i+1})
-        // 预计添加 vertices = segments * 3
-        if (m_TriangleVertexCount + (size_t)segments * 3 > MaxBatchVertices)
-            Flush();
-
-        glm::vec3 center = TransformPos(glm::vec3(0.0f), model);
-        for (int i = 0; i < segments; ++i)
-        {
-			m_TriangleBatchVertices[m_TriangleVertexCount].position = center;
-			m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i];
-            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i + 1];
-            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-        }
-    }
-    else
-    {
-        // 绘制轮廓：把相邻点作为线段加入 m_LineBatchVertices
-        if (m_TriangleVertexCount + (size_t)segments * 2 > MaxBatchVertices)
-            Flush();
-
-        for (int i = 0; i < segments; ++i)
-        {
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i];
-            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i + 1];
-            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-        }
-    }
-}
-
-void BatchRenderer::DrawCircle_Pixel(
-    DrawPlane plane,
-    const glm::vec3& pos,
-    const glm::vec3& rotate,
-    float radius_pixels,
-    const glm::vec4& color,
-    bool filled,
-    int segments
-)
-{
-    if (radius_pixels <= 0.0f || segments < 3)
-        return;
-
-    // build model without scale (we'll apply radius in world units computed from pixels)
-    glm::mat4 modelBase = glm::translate(glm::mat4(1.0f), pos)
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.x), glm::vec3(1, 0, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.y), glm::vec3(0, 1, 0))
-        * glm::rotate(glm::mat4(1.0f), glm::radians(rotate.z), glm::vec3(0, 0, 1));
-    // no scale here
-
-// center in world space
-    glm::vec3 centerWorld = TransformPos(glm::vec3(0.0f), modelBase);
-
-    // get viewport
-    GLint vp[4]{ 0,0,0,0 };
-    glGetIntegerv(GL_VIEWPORT, vp);
-    glm::vec4 viewport = glm::vec4((float)vp[0], (float)vp[1], (float)vp[2], (float)vp[3]);
-    if (viewport.z <= 0.0f || viewport.w <= 0.0f)
-        return;
-
-    // project center to window coords
-    glm::vec3 centerWin = glm::project(centerWorld, m_Camera->GetView(), m_Camera->GetProjection(), viewport);
-
-    // construct a window-space point offset by radius_pixels along +X
-    glm::vec3 offsetWin = centerWin;
-    offsetWin.x += radius_pixels;
-
-    // unproject both to world to compute world-space radius length
-    glm::vec3 offsetWorld = glm::unProject(offsetWin, m_Camera->GetView(), m_Camera->GetProjection(), viewport);
-
-    float worldRadius = glm::length(offsetWorld - centerWorld);
-    if (worldRadius <= std::numeric_limits<float>::epsilon())
-        return;
-
-    // build circle points in local unit circle scaled by worldRadius, then apply rotation+translation (modelBase)
-    std::vector<glm::vec3> pts;
-    pts.reserve(segments + 1);
-    const float TWO_PI = glm::two_pi<float>();
-    for (int i = 0; i <= segments; ++i)
-    {
-        float t = (float)i / (float)segments;
-        float ang = t * TWO_PI;
-        glm::vec3 pLocal;
-        switch (plane)
-        {
-        case DrawPlane::XY:
-            pLocal = glm::vec3(std::cos(ang) * worldRadius, std::sin(ang) * worldRadius, 0.0f);
-            break;
-        case DrawPlane::XZ:
-            pLocal = glm::vec3(std::cos(ang) * worldRadius, 0.0f, std::sin(ang) * worldRadius);
-            break;
-        case DrawPlane::YZ:
-            pLocal = glm::vec3(0.0f, std::cos(ang) * worldRadius, std::sin(ang) * worldRadius);
-            break;
-        default:
-            pLocal = glm::vec3(std::cos(ang) * worldRadius, std::sin(ang) * worldRadius, 0.0f);
-            break;
-        }
-        pts.push_back(TransformPos(pLocal, modelBase));
-    }
-
-    if (filled)
-    {
-        // triangle fan: center + (p_i, p_{i+1})
-        if (m_TriangleVertexCount + (size_t)segments * 3 > MaxBatchVertices)
-            Flush();
-
-        for (int i = 0; i < segments; ++i)
-        {
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = centerWorld;
-            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i];
-            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i + 1];
-            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-        }
-    }
-    else
-    {
-        // outline: adjacent points as line segments
-        if (m_TriangleVertexCount + (size_t)segments * 2 > MaxBatchVertices)
-            Flush();
-
-        for (int i = 0; i < segments; ++i)
-        {
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i];
-            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-
-            m_TriangleBatchVertices[m_TriangleVertexCount].position = pts[i + 1];
-            m_TriangleBatchVertices[m_TriangleVertexCount].color = color;
-            m_TriangleVertexCount++;
-        }
-    }
+    if (m_CircleBatch.m_VertexCount + 4 > MaxBatchVertices)
+        Flush();
 }
 
 int BatchRenderer::GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs)
@@ -485,29 +341,29 @@ int BatchRenderer::GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int 
 
 void BatchRenderer::Flush()
 {
-    if ( m_TriangleVertexCount > 0 )
+    if (m_QuadBatch.m_VertexCount > 0)
     {
-        m_Shader->Bind();
+        m_QuadBatch.m_Shader->Bind();
 
-        m_TriangleBatchVertex->Bind(m_TriangleBatchVertices, m_TriangleVertexCount);
-        glDrawElements(GL_TRIANGLES, (GLsizei)(m_TriangleVertexCount * 6u), GL_UNSIGNED_INT, 0);
-        m_TriangleBatchVertex->UnBind();
-        m_Shader->UnBind();
-        m_TriangleVertexCount = 0;
+        m_QuadBatch.m_Vertex->Bind(m_QuadBatch.m_Vertices, m_QuadBatch.m_VertexCount);
+        glDrawElements(GL_TRIANGLES, (GLsizei)(m_QuadBatch.m_VertexCount * 6u / 4u ), GL_UNSIGNED_INT, 0);
+        m_QuadBatch.m_Vertex->UnBind();
+
+        m_QuadBatch.m_Shader->UnBind();
+        m_QuadBatch.m_VertexCount = 0;
         m_DrawCall += 1;
     }
 
-    if ( m_LineVertexCount > 0 )
+    if (m_CircleBatch.m_VertexCount > 0)
     {
-        m_Shader->Bind();
+        m_CircleBatch.m_Shader->Bind();
 
-        m_LineBatchVertex->Bind(m_LineBatchVertices, m_LineVertexCount);
-        glDrawElements(GL_LINES, (GLsizei)m_LineVertexCount, GL_UNSIGNED_INT, 0);
+        m_CircleBatch.m_Vertex->Bind(m_CircleBatch.m_Vertices, m_CircleBatch.m_VertexCount);
+        glDrawElements(GL_TRIANGLES, (GLsizei)(m_CircleBatch.m_VertexCount * 6u / 4u ), GL_UNSIGNED_INT, 0);
+        m_CircleBatch.m_Vertex->UnBind();
 
-        m_LineBatchVertex->UnBind();
-        m_Shader->UnBind();
-
-        m_LineVertexCount = 0;
+        m_CircleBatch.m_Shader->UnBind();
+        m_CircleBatch.m_VertexCount = 0;
         m_DrawCall += 1;
     }
 }

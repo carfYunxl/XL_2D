@@ -956,6 +956,9 @@
     <ClInclude Include="XL_2D.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="XL_BufferLayout.hpp">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="glm\detail\func_common.inl">

@@ -33,6 +33,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="XL_2D.hpp" />
+    <ClInclude Include="XL_BufferLayout.hpp" />
     <ClInclude Include="XL_Renderer.hpp" />
     <ClInclude Include="XL_VertexArray.hpp" />
     <ClInclude Include="XL_VertexBuffer.hpp" />

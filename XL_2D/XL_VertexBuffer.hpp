@@ -7,7 +7,7 @@ _NAMESPACE_BEGIN
 class BatchVertexBuffer
 {
 public:
-    BatchVertexBuffer();
+    explicit BatchVertexBuffer(uint32_t size);
     ~BatchVertexBuffer();
 
     void Bind();

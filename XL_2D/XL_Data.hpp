@@ -5,30 +5,137 @@
 
 _NAMESPACE_BEGIN
 
-static const char* batch_vs = R"glsl(
-#version 330 core
-layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec4 aColor;
+namespace QUAD_DATA {
+    static const char* quad_vs = R"glsl(
+    #version 450 core
+    layout(location = 0) in float a_Dummy;
+    layout(location = 1) in vec3 aPos;
+    layout(location = 2) in vec4 aColor;
 
-out vec4 v_Color;
+    out vec4 v_Color;
 
-void main()
-{
-    v_Color = aColor;
-    gl_Position = vec4(aPos, 1.0);
+    void main()
+    {
+        v_Color = aColor;
+        gl_Position = vec4(aPos, 1.0);
+    }
+    )glsl";
+
+    static const char* quad_fs = R"glsl(
+    #version 450 core
+    in vec4 v_Color;
+
+    out vec4 FragColor;
+    void main()
+    {
+        FragColor = v_Color;
+    }
+    )glsl";
 }
-)glsl";
 
-static const char* batch_fs = R"glsl(
-#version 330 core
-in vec4 v_Color;
+namespace CIRCLE_DATA {
+    static const char* circle_vs = R"glsl(
+    #version 450 core
+    layout(location = 0) in float a_Dummy;
+    layout(location = 1) in vec3 a_WorldPosition;
+    layout(location = 2) in vec3 a_LocalPosition;
+    layout(location = 3) in vec4 a_Color;
+    layout(location = 4) in float a_Thickness;
+    layout(location = 5) in float a_Fade;
 
-out vec4 FragColor;
-void main()
-{
-    FragColor = v_Color;
+    struct VertexOutput
+    {
+	    vec3 LocalPosition;
+	    vec4 Color;
+	    float Thickness;
+	    float Fade;
+    };
+
+    layout (location = 0) out VertexOutput Output;
+
+    void main()
+    {
+	    Output.LocalPosition = a_LocalPosition;
+	    Output.Color = a_Color;
+	    Output.Thickness = a_Thickness;
+	    Output.Fade = a_Fade;
+
+	    gl_Position = vec4(a_WorldPosition, 1.0);
+    }
+    )glsl";
+
+    static const char* circle_fs = R"glsl(
+    #version 450 core
+
+    layout(location = 0) out vec4 o_Color;
+    struct VertexOutput
+    {
+	    vec3 LocalPosition;
+	    vec4 Color;
+	    float Thickness;
+	    float Fade;
+    };
+
+    layout (location = 0) in VertexOutput Input;
+
+    void main()
+    {
+        // Calculate distance and fill circle with white
+        float distance = 1.0 - length(Input.LocalPosition);
+        float circle = smoothstep(0.0, Input.Fade, distance);
+        circle *= smoothstep(Input.Thickness + Input.Fade, Input.Thickness, distance);
+
+        // Set output color
+        //o_Color = Input.Color;
+	    //o_Color.a *= circle;
+        o_Color = vec4( Input.Color.rgb, Input.Color.a * circle );
+    }
+    )glsl";
 }
-)glsl";
+
+//if (circle == 0.0)
+//discard;
+
+namespace LINE_DATA {
+    static const char* line_vs = R"glsl(
+    #version 450 core
+
+    layout(location = 0) in vec3 a_Position;
+    layout(location = 1) in vec4 a_Color;
+
+    struct VertexOutput
+    {
+	    vec4 Color;
+    };
+
+    layout (location = 0) out VertexOutput Output;
+
+    void main()
+    {
+	    Output.Color = a_Color;
+
+	    gl_Position = vec4(a_Position, 1.0);
+    }
+    )glsl";
+
+    static const char* line_fs = R"glsl(
+    #version 450 core
+
+    layout(location = 0) out vec4 o_Color;
+
+    struct VertexOutput
+    {
+	    vec4 Color;
+    };
+
+    layout (location = 0) in VertexOutput Input;
+
+    void main()
+    {
+	    o_Color = Input.Color;
+    }
+    )glsl";
+}
 
 enum class DrawPlane : uint8_t {
     XY = 0,
