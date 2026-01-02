@@ -32,7 +32,7 @@ bool BatchRenderer::Init(pfnGladLoader loader)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBlendEquation(GL_FUNC_ADD);
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     m_QuadBatch.m_Shader = std::make_unique<Shader>();
@@ -75,12 +75,6 @@ void BatchRenderer::OnMouseWheel(int yOffset)
 void BatchRenderer::OnMouseMove(int xOffset, int yOffset)
 {
    // m_Camera->OnMouseMove(xOffset, yOffset);
-}
-
-glm::vec3 BatchRenderer::TransformPos(const glm::vec3& in, const glm::mat4& model)
-{
-    glm::vec4 p = model * glm::vec4(in, 1.0f);
-    return glm::vec3(p.x, p.y, p.z);
 }
 
 void BatchRenderer::DrawTriangle(
@@ -252,27 +246,19 @@ void BatchRenderer::DrawCube(const glm::vec4& color)
 void BatchRenderer::DrawLine(
     const glm::vec3& start,
     const glm::vec3& end,
-    const glm::vec4& color
+    const glm::vec4& color,
+    float line_width /*= 1.0f*/
 )
 {
-#if 0
-    BatchRenderVertex v0;
-    v0.position = start;
-    v0.color = color;
-    BatchRenderVertex v1;
-    v1.position = end;
-    v1.color = color;
+	m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount].position = start;
+	m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount].color = color;
+    m_LineBatch.m_VertexCount++;
+	m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount].position = end;
+	m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount].color = color;
+    m_LineBatch.m_VertexCount++;
 
-	m_LineBatchVertices[m_LineVertexCount].position = start;
-	m_LineBatchVertices[m_LineVertexCount].color = color;
-    m_LineVertexCount++;
-    m_LineBatchVertices[m_LineVertexCount].position = end;
-    m_LineBatchVertices[m_LineVertexCount].color = color;
-    m_LineVertexCount++;
-
-    if (m_LineVertexCount + 2 > MaxBatchVertices)
+    if (m_LineBatch.m_VertexCount + 2 > MaxBatchVertices)
         Flush();
-#endif
 }
 
 void BatchRenderer::DrawCircle(
@@ -365,6 +351,17 @@ void BatchRenderer::Flush()
         m_CircleBatch.m_Shader->UnBind();
         m_CircleBatch.m_VertexCount = 0;
         m_DrawCall += 1;
+    }
+
+    if (m_LineBatch.m_VertexCount > 0)
+    {
+        m_LineBatch.m_Shader->Bind();
+        m_LineBatch.m_Vertex->Bind(m_LineBatch.m_Vertices, m_LineBatch.m_VertexCount);
+        glDrawArrays(GL_LINES, 0, (GLsizei)(m_LineBatch.m_VertexCount));
+        m_LineBatch.m_Vertex->UnBind();
+        m_LineBatch.m_Shader->UnBind();
+        m_LineBatch.m_VertexCount = 0;
+		m_DrawCall += 1;
     }
 }
 

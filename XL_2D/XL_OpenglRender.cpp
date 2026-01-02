@@ -177,13 +177,18 @@ void OpenglRender::OnPaint()
 	constexpr float G = 2;
 	int nCX = static_cast<int>(m_WindowWidth / (W + G));
 	int nCY = static_cast<int>(m_WindowHeight / (H + G));
-    for (float i = 0;i < nCX; i++)
+    /*for (float i = 0;i < nCX; i++)
     {
         for (float j = 0; j < nCY; j++)
         {
             FillRectangle(XL_RectF{ i * (W + G) ,j * (H + G),i * (W + G) + W, j * (H + G) + H }, XL_ColorF{ (int(i * j) % 255) / 255.0f,(int(i + j) % 255) / 255.0f,(int(pow(i, j)) % 255) / 255.0f,1.0f });
         }
+    }*/
+    for (float j = 0.; j < 2.0; j+=0.1)
+    {
+        m_Renderer->DrawLine(glm::vec3{ -1.0 + j, -0.8, 0.0 }, glm::vec3{ -1.0 + j, 0.8, 0.0 }, glm::vec4{ 1.0f,0.0f,0.0f,1.0f }, 1.0f);
     }
+
     /*FillRectangle(XL_RectF{ 100,100,105,105 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f });
     FillRectangle(XL_RectF{ 100,110,300,310 }, XL_ColorF{ 1.0f,0.0f,1.0f,1.0f });
 

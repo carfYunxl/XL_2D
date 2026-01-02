@@ -41,7 +41,7 @@ public:
 
     void Resize(int nWidth, int nHeight);
     void UpdateCamera();
-    void ClearScene() { glClearColor(1.0f, 1.0f, 1.0f, 1.0f); glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
+    void ClearScene() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
     bool Init(pfnGladLoader loader);
 
     void OnKeyDown(uint32_t nChar, uint32_t nRepCnt);
@@ -55,7 +55,8 @@ public:
     void DrawLine(
         const glm::vec3& start,
         const glm::vec3& end,
-        const glm::vec4& color
+        const glm::vec4& color, 
+		float line_width /*= 1.0f*/
     );
 
     void DrawCircle(
@@ -72,7 +73,6 @@ public:
 	void ResetDrawCall() { m_DrawCall = -1; }   
 private:
     int  GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs);
-    glm::vec3 TransformPos(const glm::vec3& in, const glm::mat4& model);
 private:
     std::unique_ptr<Camera>   m_Camera;
     int                       mViewportWidth;
