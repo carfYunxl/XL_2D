@@ -36,6 +36,18 @@ static void XL_mSleep(int mSec)
 	XL_uSleep(mSec * 1000);
 }
 
+template<typename T>
+size_t GetVertexSize(const T& v)
+{
+	return v.GetVertexSize();
+}
+
+template<typename T>
+void EnableVertexAttribPointer(const T& v)
+{
+	v.EnableVertexAttribPointer();
+}
+
 enum class VertexType
 {
 	None = 0,

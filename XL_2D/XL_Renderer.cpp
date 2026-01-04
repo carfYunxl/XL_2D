@@ -162,82 +162,103 @@ void BatchRenderer::DrawRectangle(
         // 并且 local 值按象限设置： LT(-1,1) RT(1,1) RB(1,-1) LB(-1,-1)
 
         // left-top
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, t, 0.0f);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, 1.0f);
-		m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].tessLevel = tess_level;
+        auto& vert_lt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+
+        vert_lt.position = glm::vec3(l, t, 0.0f);
+        vert_lt.color = color;
+        vert_lt.local = glm::vec2(-1.0f, 1.0f);
+        vert_lt.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
         // right-top
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, t, 0.0f);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, 1.0f);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].tessLevel = tess_level;
+        auto& vert_rt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_rt.position = glm::vec3(r, t, 0.0f);
+        vert_rt.color = color;
+        vert_rt.local = glm::vec2(1.0f, 1.0f);
+        vert_rt.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
         // right-bottom
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, b, 0.0f);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, -1.0f);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].tessLevel = tess_level;
+        auto& vert_rb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_rb.position = glm::vec3(r, b, 0.0f);
+        vert_rb.color = color;
+        vert_rb.local = glm::vec2(1.0f, -1.0f);
+        vert_rb.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
         // left-bottom
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, b, 0.0f);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, -1.0f);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].tessLevel = tess_level;
+        auto& vert_lb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_lb.position = glm::vec3(l, b, 0.0f);
+        vert_lb.color = color;
+        vert_lb.local = glm::vec2(-1.0f, -1.0f);
+        vert_lb.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
         break;
     }
     case XL::DrawPlane::XZ:
     {
         // left-top (LT) maps to (l, 0, t)
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, 0.0f, t);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, 1.0f);
+        auto& vert_lt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_lt.position = glm::vec3(l, 0.0f, t);
+        vert_lt.color = color;
+        vert_lt.local = glm::vec2(-1.0f, 1.0f);
+        vert_lt.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
         // right-top
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, 0.0f, t);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, 1.0f);
+        auto& vert_rt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_rt.position = glm::vec3(r, 0.0f, t);
+        vert_rt.color = color;
+        vert_rt.local = glm::vec2(1.0f, 1.0f);
+        vert_rt.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
         // right-bottom
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, 0.0f, b);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, -1.0f);
+        auto& vert_rb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_rb.position = glm::vec3(r, 0.0f, b);
+        vert_rb.color = color;
+        vert_rb.local = glm::vec2(1.0f, -1.0f);
+        vert_rb.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
         // left-bottom
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, 0.0f, b);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, -1.0f);
+        auto& vert_lb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_lb.position = glm::vec3(l, 0.0f, b);
+        vert_lb.color = color;
+        vert_lb.local = glm::vec2(-1.0f, -1.0f);
+        vert_lb.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
         break;
     }
     case XL::DrawPlane::YZ:
     {
         // left-top -> (0, l, t) 这里 local.x 用于行方向(local.x 对应 second axis)
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, l, t);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, 1.0f);
+        auto& vert_lt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_lt.position = glm::vec3(0.0f, l, t);
+        vert_lt.color = color;
+        vert_lt.local = glm::vec2(-1.0f, 1.0f);
+        vert_lt.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, r, t);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, 1.0f);
+        auto& vert_rt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_rt.position = glm::vec3(0.0f, r, t);
+        vert_rt.color = color;
+        vert_rt.local = glm::vec2(1.0f, 1.0f);
+        vert_rt.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, r, b);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, -1.0f);
+        auto& vert_rb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_rb.position = glm::vec3(0.0f, r, b);
+        vert_rb.color = color;
+        vert_rb.local = glm::vec2(1.0f, -1.0f);
+        vert_rb.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, l, b);
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
-        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, -1.0f);
+        auto& vert_lb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
+        vert_lb.position = glm::vec3(0.0f, l, b);
+        vert_lb.color = color;
+        vert_lb.local = glm::vec2(-1.0f, -1.0f);
+        vert_lb.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
         break;
     }
@@ -277,11 +298,14 @@ void BatchRenderer::DrawLine(
     float line_width /*= 1.0f*/
 )
 {
-	m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount].position = start;
-	m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount].color = color;
+	auto& vert_start = m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount];
+    vert_start.position = start;
+    vert_start.color = color;
     m_LineBatch.m_VertexCount++;
-	m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount].position = end;
-	m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount].color = color;
+
+    auto& vert_end = m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount];
+    vert_end.position = end;
+    vert_end.color = color;
     m_LineBatch.m_VertexCount++;
 
     if (m_LineBatch.m_VertexCount + 2 > MaxBatchVertices)

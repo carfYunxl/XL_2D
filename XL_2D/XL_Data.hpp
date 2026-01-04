@@ -8,7 +8,6 @@ _NAMESPACE_BEGIN
 namespace QUAD_DATA {
     static const char* quad_vs = R"glsl(
     #version 450 core
-    layout(location = 0) in float a_Dummy;
     layout(location = 1) in vec3 aPos;
     layout(location = 2) in vec4 aColor;
     layout(location = 3) in vec2 aLocal;
@@ -37,11 +36,10 @@ namespace QUAD_DATA {
 #type vertex
 #version 450 core
 // 顶点布局与 C++ 的 attribute 位置一致：0=pos,1=color,2=local
-layout(location = 0) in float a_Dummy;
-layout(location = 1) in vec3 aPos;
-layout(location = 2) in vec4 aColor;
-layout(location = 3) in vec2 aLocal;
-layout(location = 4) in float aTessLevel;
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec4 aColor;
+layout(location = 2) in vec2 aLocal;
+layout(location = 3) in float aTessLevel;
 
 out vec4 vColor;
 out vec2 vLocal;
@@ -107,8 +105,6 @@ out vec4 teColor;
 out vec2 teLocal;
 out vec2 teUV;
 out float teLevel;
-
-uniform float u_TessLevel = 3.0;
 
 void main()
 {
@@ -183,12 +179,11 @@ void main()
 namespace CIRCLE_DATA {
     static const char* circle_vs = R"glsl(
     #version 450 core
-    layout(location = 0) in float a_Dummy;
-    layout(location = 1) in vec3 a_WorldPosition;
-    layout(location = 2) in vec3 a_LocalPosition;
-    layout(location = 3) in vec4 a_Color;
-    layout(location = 4) in float a_Thickness;
-    layout(location = 5) in float a_Fade;
+    layout(location = 0) in vec3 a_WorldPosition;
+    layout(location = 1) in vec3 a_LocalPosition;
+    layout(location = 2) in vec4 a_Color;
+    layout(location = 3) in float a_Thickness;
+    layout(location = 4) in float a_Fade;
 
     struct VertexOutput
     {

@@ -3,6 +3,7 @@
 _NAMESPACE_BEGIN
 
 BatchVertexArray::BatchVertexArray(VertexType type)
+    : m_Type(type)
 {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -29,20 +30,24 @@ BatchVertexArray::BatchVertexArray(VertexType type)
     switch (type)
     {
     case VertexType::BatchQuadVertex:
-		m_RenderVertex = std::make_unique<RenderVertexQuad>();
+        m_RenderVertexQuad = std::make_unique<RenderVertexQuad>();
+        m_BatchVertexBuffer = std::make_unique<BatchVertexBuffer>(GetVertexSize(*m_RenderVertexQuad));
+        m_BatchVertexBuffer->Bind();
+        EnableVertexAttribPointer(*m_RenderVertexQuad);
         break;
     case VertexType::BatchCircleVertex:
-        m_RenderVertex = std::make_unique<RenderVertexCircle>();
+        m_RenderVertexCircle = std::make_unique<RenderVertexCircle>();
+        m_BatchVertexBuffer = std::make_unique<BatchVertexBuffer>(GetVertexSize(*m_RenderVertexCircle));
+        m_BatchVertexBuffer->Bind();
+        EnableVertexAttribPointer(*m_RenderVertexCircle);
         break;
     case VertexType::BatchLineVertex:
-		m_RenderVertex = std::make_unique<RenderVertexLine>();
+        m_RenderVertexLine = std::make_unique<RenderVertexLine>();
+        m_BatchVertexBuffer = std::make_unique<BatchVertexBuffer>(GetVertexSize(*m_RenderVertexLine));
+        m_BatchVertexBuffer->Bind();
+        EnableVertexAttribPointer(*m_RenderVertexLine);
         break;
     }
-
-    m_BatchVertexBuffer = std::make_unique<BatchVertexBuffer>(m_RenderVertex->GetVertexSize());
-    m_BatchVertexBuffer->Bind();
-
-	m_RenderVertex->EnableVertexAttribPointer();
 
     glBindVertexArray(0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -59,7 +64,20 @@ void BatchVertexArray::Bind(const void* batch_data, uint32_t batch_data_size)
     m_BatchVertexBuffer->Bind();
     if (batch_data_size > 0 && batch_data != nullptr)
     {
-        glBufferSubData(GL_ARRAY_BUFFER, 0, (GLsizeiptr)batch_data_size * m_RenderVertex->GetVertexSize(), batch_data);
+        size_t size = 0;
+        switch (m_Type)
+        {
+        case VertexType::BatchQuadVertex:
+            size = GetVertexSize(*m_RenderVertexQuad);
+            break;
+        case VertexType::BatchCircleVertex:
+            size = GetVertexSize(*m_RenderVertexCircle);
+            break;
+        case VertexType::BatchLineVertex:
+            size = GetVertexSize(*m_RenderVertexLine);
+            break;
+        }
+        glBufferSubData(GL_ARRAY_BUFFER, 0, (GLsizeiptr)batch_data_size * size, batch_data);
     }
 }
 
