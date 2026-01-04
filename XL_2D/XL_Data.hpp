@@ -11,6 +11,7 @@ namespace QUAD_DATA {
     layout(location = 0) in float a_Dummy;
     layout(location = 1) in vec3 aPos;
     layout(location = 2) in vec4 aColor;
+    layout(location = 3) in vec2 aLocal;
 
     out vec4 v_Color;
 
@@ -31,6 +32,152 @@ namespace QUAD_DATA {
         FragColor = v_Color;
     }
     )glsl";
+
+    static const char* quad_tess = R"glsl(
+#type vertex
+#version 450 core
+// 顶点布局与 C++ 的 attribute 位置一致：0=pos,1=color,2=local
+layout(location = 0) in float a_Dummy;
+layout(location = 1) in vec3 aPos;
+layout(location = 2) in vec4 aColor;
+layout(location = 3) in vec2 aLocal;
+layout(location = 4) in float aTessLevel;
+
+out vec4 vColor;
+out vec2 vLocal;
+out vec2 vPos;
+out float vTessLevel;
+
+void main()
+{
+    vColor = aColor;
+    vLocal = aLocal;
+    vPos = aPos.xy;
+    vTessLevel = aTessLevel;
+    gl_Position = vec4(aPos, 1.0);
+}
+
+#type tess_control
+#version 450 core
+layout(vertices = 4) out;
+
+in vec4 vColor[];
+in vec2 vLocal[];
+in vec2 vPos[];
+in float vTessLevel[];
+
+out vec4 tcColor[];
+out vec2 tcLocal[];
+out vec2 tcPos[];
+out float tcTessLevel[];
+
+void main()
+{
+    // 传递控制点数据到外部
+    tcColor[gl_InvocationID] = vColor[gl_InvocationID];
+    tcLocal[gl_InvocationID] = vLocal[gl_InvocationID];
+    tcPos[gl_InvocationID] = vPos[gl_InvocationID];
+    tcTessLevel[gl_InvocationID] = vTessLevel[gl_InvocationID];
+
+    // 仅第一个 invocation 设置 tess level
+    if (gl_InvocationID == 0)
+    {
+        float lvlf = max(1.0, floor(tcTessLevel[0]));
+        // outer / inner 使用相同级别，得到 lvl x lvl 网格
+        gl_TessLevelOuter[0] = lvlf;
+        gl_TessLevelOuter[1] = lvlf;
+        gl_TessLevelOuter[2] = lvlf;
+        gl_TessLevelOuter[3] = lvlf;
+
+        gl_TessLevelInner[0] = lvlf;
+        gl_TessLevelInner[1] = lvlf;
+    }
+}
+
+#type tess_evaluation
+#version 450 core
+layout(quads, equal_spacing, ccw) in;
+
+in vec4 tcColor[];
+in vec2 tcLocal[];
+in vec2 tcPos[];
+in float tcTessLevel[];
+
+out vec4 teColor;
+out vec2 teLocal;
+out vec2 teUV;
+out float teLevel;
+
+uniform float u_TessLevel = 3.0;
+
+void main()
+{
+    // uv in [0,1] inside the quad
+    vec2 uv = gl_TessCoord.xy;
+
+    // bilinear 插值控制点位置
+    vec2 top = mix(tcPos[0], tcPos[1], uv.x);
+    vec2 bottom = mix(tcPos[3], tcPos[2], uv.x);
+    vec2 pos = mix(top, bottom, uv.y);
+
+    // local / color 同样插值
+    vec2 localTop = mix(tcLocal[0], tcLocal[1], uv.x);
+    vec2 localBottom = mix(tcLocal[3], tcLocal[2], uv.x);
+    teLocal = mix(localTop, localBottom, uv.y);
+
+    vec4 colorTop = mix(tcColor[0], tcColor[1], uv.x);
+    vec4 colorBottom = mix(tcColor[3], tcColor[2], uv.x);
+    teColor = mix(colorTop, colorBottom, uv.y);
+
+    // 传递 uv 与 level 到片段着色器
+    teUV = uv;
+    teLevel = max(1.0, floor(tcTessLevel[0]));
+
+    gl_Position = vec4(pos, 0.0, 1.0);
+}
+
+#type fragment
+#version 450 core
+in vec4 teColor;
+in vec2 teLocal;
+in vec2 teUV;
+in float teLevel;
+
+uniform int u_cX = 1;
+uniform int u_cY = 2;
+
+uniform float u_BorderThickness = 0.04; // 边框厚度：cell UV 单位（0..0.5）
+uniform vec4  u_BorderColor = vec4(0.0, 0.0, 0.0, 1.0); // 边框颜色
+uniform float u_BorderAA = 0.01; // 抗锯齿宽度（smoothstep）
+
+layout(location = 0) out vec4 FragColor;
+
+void main()
+{
+    float lvl = max(1.0, teLevel);
+    // cell 内局部坐标 0..1
+    vec2 cellUV = fract(teUV * lvl);
+
+    // 距离最近边界的距离（0 在边界处，0.5 在中心）
+    float distToEdgeX = min(cellUV.x, 1.0 - cellUV.x);
+    float distToEdgeY = min(cellUV.y, 1.0 - cellUV.y);
+    float distToEdge = min(distToEdgeX, distToEdgeY);
+
+    // thickness 表示边框宽度，以 cell 单位：例如 0.04 表示 cell 宽度的 4%
+    float thickness = clamp(u_BorderThickness, 0.0, 0.5);
+
+    // 使用 smoothstep 做软边界（抗锯齿）
+    float edgeFactor = smoothstep(thickness + u_BorderAA, thickness - u_BorderAA, distToEdge);
+    // edgeFactor: 0 -> 在边框区域，1 -> 在内部（非边框）
+
+    vec3 base = teColor.rgb;
+
+    // 当在边框区域时用边框颜色覆盖或混合
+    vec3 outRgb = mix(u_BorderColor.rgb, base, edgeFactor);
+
+    FragColor = vec4(outRgb, teColor.a);
+}
+)glsl";
 }
 
 namespace CIRCLE_DATA {

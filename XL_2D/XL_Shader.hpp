@@ -19,6 +19,7 @@ public:
 
     void LoadShader(const char* shader_source);
     void LoadShader(const char* vertex_shader_source, const char* frag_shader_source);
+    void LoadShaderStages(const char* combined_shader_source);
 
     void Bind();
     void UnBind();
@@ -34,9 +35,10 @@ public:
 
 private:
     unsigned int    Compile(const char* shader, unsigned int type);
-    void            Link(unsigned int vShader, unsigned int fShader);
+    void            Link(const std::vector<unsigned int>& shaders);
 
     std::pair<std::string, std::string> ParserShaderFile(const char* shader_source);
+    std::unordered_map<std::string, std::string> ParserShaderStagesFromString(const char* source);
 private:
     unsigned int    m_nProgramID;
 };

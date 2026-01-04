@@ -28,21 +28,22 @@ bool BatchRenderer::Init(pfnGladLoader loader)
     if (!gladLoaded)
         return false;
 
-    //glEnable(GL_DEPTH_TEST);
+    glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBlendEquation(GL_FUNC_ADD);
-    glClearColor(0.95f, 0.95f, 0.95f, 1.0f);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
+    // 使用复合 tessellation shader
     m_QuadBatch.m_Shader = std::make_unique<Shader>();
-    m_QuadBatch.m_Shader->LoadShader(QUAD_DATA::quad_vs, QUAD_DATA::quad_fs);
+    m_QuadBatch.m_Shader->LoadShaderStages(QUAD_DATA::quad_tess);
     m_QuadBatch.m_Shader->UnBind();
-
-	m_QuadBatch.m_Vertex = std::make_unique<BatchVertexArray>(VertexType::BatchQuadVertex);
+    m_QuadBatch.m_Vertex = std::make_unique<BatchVertexArray>(VertexType::BatchQuadVertex);
     m_QuadBatch.m_Vertex->Bind(m_QuadBatch.m_Vertices, m_QuadBatch.m_VertexCount);
-	m_QuadBatch.m_VertexCount = 0;
+    m_QuadBatch.m_VertexCount = 0;
 
+    // circle/line 仍使用原有简单 shader
     m_CircleBatch.m_Shader = std::make_unique<Shader>();
     m_CircleBatch.m_Shader->LoadShader(CIRCLE_DATA::circle_vs, CIRCLE_DATA::circle_fs);
     m_CircleBatch.m_Shader->UnBind();
@@ -149,68 +150,94 @@ void BatchRenderer::DrawTriangle(
 void BatchRenderer::DrawRectangle(
     DrawPlane plane,
     float l, float t, float r, float b,
-    const glm::vec4& color
+    const glm::vec4& color,
+    float tess_level
 )
 {
     switch (plane)
     {
     case XL::DrawPlane::XY:
     {
-        // 0
+        // 顶点顺序必须是： left-top, right-top, right-bottom, left-bottom
+        // 并且 local 值按象限设置： LT(-1,1) RT(1,1) RB(1,-1) LB(-1,-1)
+
+        // left-top
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, t, 0.0f);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, 1.0f);
+		m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
-        //1
+
+        // right-top
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, t, 0.0f);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, 1.0f);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
-        //2
+
+        // right-bottom
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, b, 0.0f);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, -1.0f);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
-        //3
+
+        // left-bottom
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, b, 0.0f);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, -1.0f);
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
         break;
     }
     case XL::DrawPlane::XZ:
     {
-        // 0
+        // left-top (LT) maps to (l, 0, t)
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, 0.0f, t);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, 1.0f);
         m_QuadBatch.m_VertexCount++;
-        //1
+
+        // right-top
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, 0.0f, t);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, 1.0f);
         m_QuadBatch.m_VertexCount++;
-        //2
+
+        // right-bottom
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(r, 0.0f, b);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, -1.0f);
         m_QuadBatch.m_VertexCount++;
-        //3
+
+        // left-bottom
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(l, 0.0f, b);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, -1.0f);
         m_QuadBatch.m_VertexCount++;
         break;
     }
     case XL::DrawPlane::YZ:
     {
-        // 0
+        // left-top -> (0, l, t) 这里 local.x 用于行方向(local.x 对应 second axis)
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, l, t);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, 1.0f);
         m_QuadBatch.m_VertexCount++;
-        //1
+
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, r, t);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, 1.0f);
         m_QuadBatch.m_VertexCount++;
-        //2
+
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, r, b);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(1.0f, -1.0f);
         m_QuadBatch.m_VertexCount++;
-        //3
+
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].position = glm::vec3(0.0f, l, b);
         m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].color = color;
+        m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount].local = glm::vec2(-1.0f, -1.0f);
         m_QuadBatch.m_VertexCount++;
         break;
     }
@@ -327,19 +354,32 @@ int BatchRenderer::GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int 
 
 void BatchRenderer::Flush()
 {
+    // 使用补丁绘制四边形以触发 tessellation (每个 patch 4 个控制点)
     if (m_QuadBatch.m_VertexCount > 0)
     {
         m_QuadBatch.m_Shader->Bind();
 
-        m_QuadBatch.m_Vertex->Bind(m_QuadBatch.m_Vertices, m_QuadBatch.m_VertexCount);
-        glDrawElements(GL_TRIANGLES, (GLsizei)(m_QuadBatch.m_VertexCount * 6u / 4u ), GL_UNSIGNED_INT, 0);
-        m_QuadBatch.m_Vertex->UnBind();
+        //m_QuadBatch.m_Shader->SetInt("u_cX", 2);
+        //m_QuadBatch.m_Shader->SetInt("u_cY", 3);
+        m_QuadBatch.m_Shader->SetFloat("u_BorderThickness", 0.02f);
+        m_QuadBatch.m_Shader->Set4f("u_BorderColor", glm::vec4{ 0.0, 0.0, 0.0, 1.0 });
+        m_QuadBatch.m_Shader->SetFloat("u_BorderAA", 0.01f);
 
+        // 上传顶点数据到 GPU
+        m_QuadBatch.m_Vertex->Bind(m_QuadBatch.m_Vertices, m_QuadBatch.m_VertexCount);
+
+        // 设置 patch 顶点数为 4
+        glPatchParameteri(GL_PATCH_VERTICES, 4);
+        // 按连续 control points 绘制 patch（注意：顶点按 4 个一组排列）
+        glDrawArrays(GL_PATCHES, 0, static_cast<GLsizei>(m_QuadBatch.m_VertexCount));
+
+        m_QuadBatch.m_Vertex->UnBind();
         m_QuadBatch.m_Shader->UnBind();
         m_QuadBatch.m_VertexCount = 0;
         m_DrawCall += 1;
     }
 
+    // circle 使用原来的绘制流程
     if (m_CircleBatch.m_VertexCount > 0)
     {
         m_CircleBatch.m_Shader->Bind();

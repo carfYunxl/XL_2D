@@ -184,10 +184,13 @@ void OpenglRender::OnPaint()
             FillRectangle(XL_RectF{ i * (W + G) ,j * (H + G),i * (W + G) + W, j * (H + G) + H }, XL_ColorF{ (int(i * j) % 255) / 255.0f,(int(i + j) % 255) / 255.0f,(int(pow(i, j)) % 255) / 255.0f,1.0f });
         }
     }*/
-    for (float j = 0.; j < 2.0; j+=0.1)
-    {
-        m_Renderer->DrawLine(glm::vec3{ -1.0 + j, -0.8, 0.0 }, glm::vec3{ -1.0 + j, 0.8, 0.0 }, glm::vec4{ 1.0f,0.0f,0.0f,1.0f }, 1.0f);
-    }
+    //for (float j = 0.; j < 2.0; j+=0.1)
+    //{
+    //    m_Renderer->DrawLine(glm::vec3{ -1.0 + j, -0.8, 0.0 }, glm::vec3{ -1.0 + j, 0.8, 0.0 }, glm::vec4{ 1.0f,0.0f,0.0f,1.0f }, 1.0f);
+    //}
+
+    FillRectangle(XL_RectF{ 100,100,300,300 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f }, 3.0f);
+    FillRectangle(XL_RectF{ 400,400,600,600 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f }, 8.0f);
 
     /*FillRectangle(XL_RectF{ 100,100,105,105 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f });
     FillRectangle(XL_RectF{ 100,110,300,310 }, XL_ColorF{ 1.0f,0.0f,1.0f,1.0f });
@@ -212,12 +215,12 @@ void OpenglRender::OnPaint()
     x++;
 }
 
-void OpenglRender::FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color)
+void OpenglRender::FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color, float tess_level)
 {
 	auto lt = ScreenToWorld(XL_PointF{ rect.l, rect.t });
 	auto br = ScreenToWorld(XL_PointF{ rect.r, rect.b });
 
-    m_Renderer->DrawRectangle(XL::DrawPlane::XY, lt.x, lt.y, br.x, br.y, ToColorF(bg_color));
+    m_Renderer->DrawRectangle(XL::DrawPlane::XY, lt.x, lt.y, br.x, br.y, ToColorF(bg_color), tess_level);
 }
 
 void OpenglRender::DrawRectangle(const XL_RectF& rect, const XL_ColorF& border_color, float border_width)

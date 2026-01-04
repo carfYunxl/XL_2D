@@ -25,6 +25,8 @@ struct RenderVertexQuad : public RenderVertexBase
 {
     glm::vec3 position;
     glm::vec4 color;
+    glm::vec2 local; // 新增：局部坐标（用于象限/细分判断）
+	float tessLevel; // 新增：细分等级
 
     virtual size_t GetVertexSize() const override {
         return sizeof(RenderVertexQuad);
@@ -32,12 +34,25 @@ struct RenderVertexQuad : public RenderVertexBase
 
     virtual void EnableVertexAttribPointer() const override
     {
-        glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, int(GetVertexSize()), (void*)0);
+		unsigned int offset = 0;
+        glVertexAttribPointer(0, 1, GL_FLOAT, GL_FALSE, int(GetVertexSize()), (void*)offset);
         glEnableVertexAttribArray(0);
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, int(GetVertexSize()), (void*)(0 + sizeof(float)));
+
+		offset += sizeof(float);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, int(GetVertexSize()), (void*)offset);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, int(GetVertexSize()), (void*)(sizeof(glm::vec3) + sizeof(float)));
+
+        offset += sizeof(glm::vec3);
+        glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, int(GetVertexSize()), (void*)offset);
         glEnableVertexAttribArray(2);
+
+        offset += sizeof(glm::vec4);
+        glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, int(GetVertexSize()), (void*)offset);
+        glEnableVertexAttribArray(3);
+
+        offset += sizeof(glm::vec2);
+		glVertexAttribPointer(4, 1, GL_FLOAT, GL_FALSE, int(GetVertexSize()), (void*)offset);
+        glEnableVertexAttribArray(4);
 	}
 };
 

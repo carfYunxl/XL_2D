@@ -51,7 +51,7 @@ public:
     bool Init();
     void OnPaint();
 
-	void FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color);
+	void FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color, float tess_level);
 	void DrawRectangle(const XL_RectF& rect, const XL_ColorF& border_color, float border_width);
     void FillTriangle(const XL_TriangleF& riangle, const XL_ColorF& bg_color);
 
