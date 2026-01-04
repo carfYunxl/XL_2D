@@ -14,6 +14,8 @@
 #include <array>
 #include <vector>
 
+#include "entt.hpp"
+
 #define _NAMESPACE_BEGIN   namespace XL{
 #define _NAMESPACE_END     }
 

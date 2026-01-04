@@ -5,6 +5,7 @@
 #include <wtypes.h>
 #include <memory>
 #include "glm/glm.hpp"
+#include "XL_Scene.hpp"
 
 namespace XL
 {
@@ -72,6 +73,9 @@ private:
 	uint32_t							m_WindowHeight;
     std::unique_ptr<XL::BatchRenderer>  m_Renderer;
     std::unique_ptr<XL::FrameBuffer>    m_FrameBuffer;
+
+	std::unique_ptr<XL::Scene>          m_Scene;
+	XL::Entity                          m_Entity;
 };
 
 #endif // XL_OPENGL_RENDERER_HPP_

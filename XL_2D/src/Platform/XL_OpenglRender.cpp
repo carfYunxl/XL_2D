@@ -48,6 +48,8 @@ OpenglRender::~OpenglRender()
         ::ReleaseDC(m_hWnd, m_hDC);
         m_hDC = NULL;
     }
+
+    m_Scene->DestroyEntity(m_Entity, true);
 }
 
 bool OpenglRender::Init()
@@ -111,6 +113,9 @@ bool OpenglRender::Init()
     fbSpec.Width = m_WindowWidth;
     fbSpec.Height = m_WindowHeight;
     m_FrameBuffer = std::make_unique<XL::FrameBuffer>(fbSpec);
+
+	m_Scene = std::make_unique<XL::Scene>();
+	m_Entity = m_Scene->CreateEntity(0);
 
     return true;
 }
