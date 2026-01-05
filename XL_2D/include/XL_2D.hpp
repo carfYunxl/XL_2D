@@ -10,6 +10,35 @@
 #include <windows.h>
 #endif
 
+typedef struct _XL_RectF
+{
+    float l;
+    float t;
+    float r;
+    float b;
+}XL_RectF;
+
+typedef struct _XL_ColorF
+{
+    float r;
+    float g;
+    float b;
+    float a;
+}XL_ColorF;
+
+typedef struct _XL_PointF
+{
+    float x;
+    float y;
+}XL_PointF;
+
+typedef struct _XL_TriangleF
+{
+    XL_PointF p0;
+    XL_PointF p1;
+    XL_PointF p2;
+}XL_TriangleF;
+
 #ifdef _cplusplus
 extern "C" {
 #endif
@@ -21,6 +50,14 @@ extern "C" {
 	void XL_2D_OnPaint();
 
 	void XL_2D_OnSize(int width, int height);
+
+	void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float tess_level);
+
+	void XL_2D_OnLButtonDown(int x, int y);
+
+	void XL_2D_OnLButtonUp(int x, int y);
+
+	int  XL_2D_GetFrameRate();
 
 #ifdef _cplusplus
 }

@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\ECS\XL_Entity.cpp" />
-    <ClCompile Include="src\ECS\XL_Scene.cpp" />
+    <ClCompile Include="src\ecs\XL_Entity.cpp" />
+    <ClCompile Include="src\ecs\XL_Scene.cpp" />
     <ClCompile Include="src\XL_2D.cpp" />
     <ClCompile Include="src\XL_Renderer.cpp" />
     <ClCompile Include="src\XL_VertexArray.cpp" />
@@ -28,16 +28,16 @@
     <ClCompile Include="src\XL_Camera.cpp" />
     <ClCompile Include="src\XL_FrameBuffer.cpp" />
     <ClCompile Include="src\glad\glad.c" />
-    <ClCompile Include="src\Platform\XL_OpenglRender.cpp" />
+    <ClCompile Include="src\platform\XL_OpenglRender.cpp" />
     <ClCompile Include="src\glm\detail\glm.cpp" />
     <ClCompile Include="src\XL_IndexBuffer.cpp" />
     <ClCompile Include="src\XL_Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\entt\entt.hpp" />
-    <ClInclude Include="src\ECS\XL_Components.hpp" />
-    <ClInclude Include="src\ECS\XL_Entity.hpp" />
-    <ClInclude Include="src\ECS\XL_Scene.hpp" />
+    <ClInclude Include="src\ecs\XL_Components.hpp" />
+    <ClInclude Include="src\ecs\XL_Entity.hpp" />
+    <ClInclude Include="src\ecs\XL_Scene.hpp" />
     <ClInclude Include="include\XL_2D.hpp" />
     <ClInclude Include="src\XL_BufferLayout.hpp" />
     <ClInclude Include="src\XL_Renderer.hpp" />
@@ -47,7 +47,7 @@
     <ClInclude Include="src\XL_FrameBuffer.hpp" />
     <ClInclude Include="src\glad\glad.h" />
     <ClInclude Include="src\glad\KHR\khrplatform.h" />
-    <ClInclude Include="src\Platform\XL_OpenglRender.hpp" />
+    <ClInclude Include="src\platform\XL_OpenglRender.hpp" />
     <ClInclude Include="src\glm\common.hpp" />
     <ClInclude Include="src\glm\detail\compute_common.hpp" />
     <ClInclude Include="src\glm\detail\compute_vector_decl.hpp" />
@@ -567,7 +567,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;$(SolutionDir)\XL_2D\src\glad;$(SolutionDir)\XL_2D\src\entt;$(SolutionDir)\XL_2D\src;$(SolutionDir)\XL_2D\src\ECS;$(SolutionDir)\XL_2D\src\Platform;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;$(SolutionDir)\XL_2D\src\glad;$(SolutionDir)\XL_2D\src\entt;$(SolutionDir)\XL_2D\src;$(SolutionDir)\XL_2D\src\ecs;$(SolutionDir)\XL_2D\src\platform;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -587,7 +587,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;$(SolutionDir)\XL_2D\src\glad;$(SolutionDir)\XL_2D\src\entt;$(SolutionDir)\XL_2D\src;$(SolutionDir)\XL_2D\src\ECS;$(SolutionDir)\XL_2D\src\Platform;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;$(SolutionDir)\XL_2D\src\glad;$(SolutionDir)\XL_2D\src\entt;$(SolutionDir)\XL_2D\src;$(SolutionDir)\XL_2D\src\ecs;$(SolutionDir)\XL_2D\src\platform;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -607,7 +607,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;$(SolutionDir)\XL_2D\src\glad;$(SolutionDir)\XL_2D\src\entt;$(SolutionDir)\XL_2D\src;$(SolutionDir)\XL_2D\src\ECS;$(SolutionDir)\XL_2D\src\Platform;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;$(SolutionDir)\XL_2D\src\glad;$(SolutionDir)\XL_2D\src\entt;$(SolutionDir)\XL_2D\src;$(SolutionDir)\XL_2D\src\ecs;$(SolutionDir)\XL_2D\src\platform;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -627,7 +627,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;$(SolutionDir)\XL_2D\src\glad;$(SolutionDir)\XL_2D\src\entt;$(SolutionDir)\XL_2D\src;$(SolutionDir)\XL_2D\src\ECS;$(SolutionDir)\XL_2D\src\Platform;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;$(SolutionDir)\XL_2D\src\glad;$(SolutionDir)\XL_2D\src\entt;$(SolutionDir)\XL_2D\src;$(SolutionDir)\XL_2D\src\ecs;$(SolutionDir)\XL_2D\src\platform;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

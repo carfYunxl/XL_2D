@@ -16,7 +16,10 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	DECLARE_MESSAGE_MAP()
 private:
-	//std::unique_ptr<OpenglRender> m_Renderer;
+	bool m_bStartDraw{ false };
+
+	CPoint m_StartPoint;
+	CPoint m_EndPoint;
 public:
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -24,5 +27,9 @@ public:
 	afx_msg void OnMouseMove(UINT nFlags, CPoint point);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg void OnDrawFollowHeart();
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+	afx_msg void OnLButtonUp(UINT nFlags, CPoint point);
+	afx_msg void OnButtonRectangle();
+	afx_msg void OnUpdateButtonRectangle(CCmdUI* pCmdUI);
 };
 

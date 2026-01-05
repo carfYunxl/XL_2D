@@ -1,6 +1,6 @@
 /*****************************************************************//**
- * @file   HF_CtrlLayout.h
- * @brief  HF_CtrlLayout is a simple layout class for MFC UI layout.
+ * @file   XL_CtrlLayout.h
+ * @brief  XL_CtrlLayout is a simple layout class for MFC UI layout.
  *           now it's support simple interface to layout UI And Support DPI changes automatically.
  * 
  *          1 - HOW TO USE IT:
@@ -35,16 +35,16 @@
  * Version v0.1
  *********************************************************************/
 
-#ifndef __HFST_CCTRL_LAYOUT_HPP__
-#define __HFST_CCTRL_LAYOUT_HPP__
+#ifndef __XL_CCTRL_LAYOUT_HPP__
+#define __XL_CCTRL_LAYOUT_HPP__
 
-namespace HFST
+namespace XL
 {
-    class HF_CtrlLayout
+    class CtrlLayout
     {
     public:
-        HF_CtrlLayout();
-        HF_CtrlLayout(const CPoint& start, int CtrlHeight, int Gap);
+        CtrlLayout();
+        CtrlLayout(const CPoint& start, int CtrlHeight, int Gap);
 
         /**
          * @brief Add a ctrl to the layout.

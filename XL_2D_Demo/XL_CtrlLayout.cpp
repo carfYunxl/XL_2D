@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "HF_CtrlLayout.h"
+#include "XL_CtrlLayout.h"
 
-namespace HFST
+namespace XL
 {
-    HF_CtrlLayout::HF_CtrlLayout()
+    CtrlLayout::CtrlLayout()
         : m_ptStart(0)
         , m_ptCurPos(0)
         , m_nHeight{ 0 }
@@ -14,7 +14,7 @@ namespace HFST
         GetSystemScaleFactor();
     }
 
-    HF_CtrlLayout::HF_CtrlLayout(const CPoint& start, int CtrlHeight, int Gap)
+    CtrlLayout::CtrlLayout(const CPoint& start, int CtrlHeight, int Gap)
         : m_ptStart(start)
         , m_nHeight(CtrlHeight)
         , m_nGap(Gap)
@@ -25,7 +25,7 @@ namespace HFST
         GetSystemScaleFactor();
     }
 
-    void HF_CtrlLayout::Add( CWnd& wnd, int nCtrlWidth, UINT nCmdShow )
+    void CtrlLayout::Add( CWnd& wnd, int nCtrlWidth, UINT nCmdShow )
     {
         int nWidth = static_cast<int>(nCtrlWidth * m_DpiScale);
         int nHeight = static_cast<int>(m_nHeight * m_DpiScale);
@@ -35,14 +35,14 @@ namespace HFST
         m_ptCurPos.x += (m_nGap + nWidth);
     }
 
-    void HF_CtrlLayout::Add(CWnd* wnd, int nCtrlWidth, UINT nCmdShow)
+    void CtrlLayout::Add(CWnd* wnd, int nCtrlWidth, UINT nCmdShow)
     {
         ASSERT(wnd);
 
         Add( *wnd, nCtrlWidth, nCmdShow );
     }
 
-    void HF_CtrlLayout::Add( CWnd* parent, UINT id, int nCtrlWidth, UINT nCmdShow)
+    void CtrlLayout::Add( CWnd* parent, UINT id, int nCtrlWidth, UINT nCmdShow)
     {
         ASSERT(parent);
 
@@ -52,7 +52,7 @@ namespace HFST
         Add( *pWnd, nCtrlWidth, nCmdShow );
     }
 
-    void HF_CtrlLayout::NextLine()
+    void CtrlLayout::NextLine()
     {
         int nHeight = static_cast<int>(m_nHeight * m_DpiScale);
 
@@ -60,7 +60,7 @@ namespace HFST
         m_ptCurPos.y += (m_nGap + nHeight);
     }
 
-    void HF_CtrlLayout::GetSystemScaleFactor()
+    void CtrlLayout::GetSystemScaleFactor()
     {
         HDC		hdc;
 

@@ -48,8 +48,6 @@ OpenglRender::~OpenglRender()
         ::ReleaseDC(m_hWnd, m_hDC);
         m_hDC = NULL;
     }
-
-    m_Scene->DestroyEntity(m_Entity, true);
 }
 
 bool OpenglRender::Init()
@@ -114,10 +112,55 @@ bool OpenglRender::Init()
     fbSpec.Height = m_WindowHeight;
     m_FrameBuffer = std::make_unique<XL::FrameBuffer>(fbSpec);
 
-	m_Scene = std::make_unique<XL::Scene>();
-	m_Entity = m_Scene->CreateEntity(0);
-
     return true;
+}
+
+void OpenglRender::OnLButtonDown(int x, int y)
+{
+    std::vector<INNER_RectF*> hitRects;
+
+    for ( auto& rect : m_InnerRects)
+    {
+        if (PtInRect(XL_PointF{(float)x,(float)y}, rect.rect))
+        {
+            hitRects.push_back(&rect);
+        }
+    }
+
+    std::sort(hitRects.begin(), hitRects.end(), [](const INNER_RectF* a, const INNER_RectF* b) {
+        return a->z_order < b->z_order;
+    });
+
+    if (!hitRects.empty())
+    {
+        INNER_RectF& topRect = *hitRects.back();
+		topRect.background_color.r = static_cast<float>((static_cast<int>(topRect.background_color.r * 255) ^ m_nXORKey)) / 255.0f;
+		OnPaint();
+	}
+}
+
+void OpenglRender::OnLButtonUp(int x, int y)
+{
+    std::vector<INNER_RectF*> hitRects;
+
+    for (auto& rect : m_InnerRects)
+    {
+        if (PtInRect(XL_PointF{ (float)x,(float)y }, rect.rect))
+        {
+            hitRects.push_back(&rect);
+        }
+    }
+
+    std::sort(hitRects.begin(), hitRects.end(), [](const INNER_RectF* a, const INNER_RectF* b) {
+        return a->z_order < b->z_order;
+        });
+
+    if (!hitRects.empty())
+    {
+        INNER_RectF& topRect = *hitRects.back();
+        topRect.background_color.r = static_cast<float>((static_cast<int>(topRect.background_color.r * 255) ^ m_nXORKey)) / 255.0f;
+        OnPaint();
+    }
 }
 
 bool OpenglRender::SetupPixelFormat(HDC hdc)
@@ -194,8 +237,17 @@ void OpenglRender::OnPaint()
     //    m_Renderer->DrawLine(glm::vec3{ -1.0 + j, -0.8, 0.0 }, glm::vec3{ -1.0 + j, 0.8, 0.0 }, glm::vec4{ 1.0f,0.0f,0.0f,1.0f }, 1.0f);
     //}
 
-    FillRectangle(XL_RectF{ 100,100,300,300 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f }, 3.0f);
-    FillRectangle(XL_RectF{ 400,400,600,600 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f }, 8.0f);
+    std::sort(m_InnerRects.begin(), m_InnerRects.end(), [](const INNER_RectF& a, const INNER_RectF& b) {
+        return a.z_order > b.z_order;
+		});
+
+    for ( const auto& inner_rect : m_InnerRects)
+    {
+        auto lt = ScreenToWorld(XL_PointF{ inner_rect.rect.l, inner_rect.rect.t });
+        auto br = ScreenToWorld(XL_PointF{ inner_rect.rect.r, inner_rect.rect.b });
+
+        m_Renderer->DrawRectangle(XL::DrawPlane::XY, lt.x, lt.y, br.x, br.y, ToColorF(inner_rect.background_color), inner_rect.tess_level);
+    }
 
     /*FillRectangle(XL_RectF{ 100,100,105,105 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f });
     FillRectangle(XL_RectF{ 100,110,300,310 }, XL_ColorF{ 1.0f,0.0f,1.0f,1.0f });
@@ -214,7 +266,7 @@ void OpenglRender::OnPaint()
 
     SwapBuffers(m_hDC);
     auto end = std::chrono::system_clock::now();
-	auto time_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+    m_nFrameTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
     int x = 1;
     x++;
@@ -222,10 +274,8 @@ void OpenglRender::OnPaint()
 
 void OpenglRender::FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color, float tess_level)
 {
-	auto lt = ScreenToWorld(XL_PointF{ rect.l, rect.t });
-	auto br = ScreenToWorld(XL_PointF{ rect.r, rect.b });
-
-    m_Renderer->DrawRectangle(XL::DrawPlane::XY, lt.x, lt.y, br.x, br.y, ToColorF(bg_color), tess_level);
+    m_ZOrderCounter++;
+    m_InnerRects.emplace_back(m_ZOrderCounter, rect, bg_color, tess_level);
 }
 
 void OpenglRender::DrawRectangle(const XL_RectF& rect, const XL_ColorF& border_color, float border_width)

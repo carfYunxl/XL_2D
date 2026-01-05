@@ -21,7 +21,7 @@
     <ClCompile Include="src\XL_FrameBuffer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\Platform\XL_OpenglRender.cpp">
+    <ClCompile Include="src\platform\XL_OpenglRender.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="src\XL_IndexBuffer.cpp">
@@ -48,10 +48,10 @@
     <ClCompile Include="src\XL_2D.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\XL_Entity.cpp">
+    <ClCompile Include="src\ecs\XL_Entity.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="src\ECS\XL_Scene.cpp">
+    <ClCompile Include="src\ecs\XL_Scene.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -62,7 +62,7 @@
     <ClInclude Include="src\XL_FrameBuffer.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\Platform\XL_OpenglRender.hpp">
+    <ClInclude Include="src\platform\XL_OpenglRender.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\XL_IndexBuffer.hpp">
@@ -965,13 +965,13 @@
     <ClInclude Include="src\XL_BufferLayout.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\XL_Components.hpp">
+    <ClInclude Include="src\ecs\XL_Components.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\XL_Entity.hpp">
+    <ClInclude Include="src\ecs\XL_Entity.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="src\ECS\XL_Scene.hpp">
+    <ClInclude Include="src\ecs\XL_Scene.hpp">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="src\entt\entt.hpp">

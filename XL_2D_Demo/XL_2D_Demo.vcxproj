@@ -205,6 +205,8 @@
   <ItemGroup>
     <ClInclude Include="ChildView.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="ShapeGenerator.h" />
+    <ClInclude Include="XL_CtrlLayout.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
@@ -213,6 +215,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ChildView.cpp" />
+    <ClCompile Include="ShapeGenerator.cpp" />
+    <ClCompile Include="XL_CtrlLayout.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -230,6 +234,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\Toolbar.bmp" />
+    <Image Include="res\toolbar1.bmp" />
     <Image Include="res\XL_2D_Demo.ico" />
   </ItemGroup>
   <ItemGroup>

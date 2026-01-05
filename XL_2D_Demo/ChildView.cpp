@@ -4,6 +4,8 @@
 #include "ChildView.h"
 #include <chrono>
 #include "XL_2D.hpp"
+#include "ShapeGenerator.h"
+#include "MainFrm.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -27,6 +29,10 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_MOUSEMOVE()
 	ON_WM_ERASEBKGND()
 	ON_COMMAND(ID_DRAW_FOLLOW_HEART, &CChildView::OnDrawFollowHeart)
+	ON_WM_LBUTTONDOWN()
+	ON_WM_LBUTTONUP()
+	ON_COMMAND(ID_BUTTON_RECTANGLE, &CChildView::OnButtonRectangle)
+	ON_UPDATE_COMMAND_UI(ID_BUTTON_RECTANGLE, &CChildView::OnUpdateButtonRectangle)
 END_MESSAGE_MAP()
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
@@ -47,6 +53,12 @@ void CChildView::OnPaint()
 	CPaintDC dc(this);
 	//m_Renderer->OnPaint();
 	XL_2D_OnPaint();
+
+	auto frame = (CMainFrame*)theApp.m_pMainWnd;
+	CString strFps;
+	strFps.Format(L"FPS: %d", XL_2D_GetFrameRate());
+	if (frame->m_wndStatusBar.m_hWnd != NULL)
+		frame->m_wndStatusBar.SetPaneText(0, strFps);
 }
 
 int CChildView::OnCreate(LPCREATESTRUCT lpCreateStruct)
@@ -70,6 +82,12 @@ void CChildView::OnSize(UINT nType, int cx, int cy)
 	/*if (m_Renderer)
 		m_Renderer->OnSize(cx,cy);*/
 	XL_2D_OnSize(cx, cy);
+
+	auto frame = (CMainFrame*)theApp.m_pMainWnd;
+	CString strFps;
+	strFps.Format(L"FPS: %d", XL_2D_GetFrameRate());
+	if(frame->m_wndStatusBar.m_hWnd != NULL)
+		frame->m_wndStatusBar.SetPaneText(0, strFps);
 }
 
 void CChildView::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -99,5 +117,50 @@ BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 
 void CChildView::OnDrawFollowHeart()
 {
-	
+	ShapeGenerator gen;
+	gen.DoModal();
+}
+
+void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	XL_2D_OnLButtonDown(point.x, point.y);
+
+	if (m_bStartDraw)
+	{
+		m_StartPoint = point;	
+	}
+
+	CWnd::OnLButtonDown(nFlags, point);
+}
+
+void CChildView::OnLButtonUp(UINT nFlags, CPoint point)
+{
+	XL_2D_OnLButtonUp(point.x, point.y);
+
+	if (m_bStartDraw)
+	{
+		m_EndPoint = point;
+		XL_RectF rect{ 
+			(float)m_StartPoint.x,
+			(float)m_StartPoint.y,
+			(float)m_EndPoint.x,
+			(float)m_EndPoint.y
+		};
+
+		XL_ColorF bg_color{ 0.0f, 1.0f, 0.0f, 1.0f };
+		XL_2D_FillRectangle(&rect, &bg_color, 3);
+		Invalidate();
+	}
+
+	CWnd::OnLButtonUp(nFlags, point);
+}
+
+void CChildView::OnButtonRectangle()
+{
+	m_bStartDraw = !m_bStartDraw;
+}
+
+void CChildView::OnUpdateButtonRectangle(CCmdUI* pCmdUI)
+{
+	pCmdUI->SetCheck(m_bStartDraw);
 }
