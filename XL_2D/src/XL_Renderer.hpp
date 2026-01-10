@@ -49,7 +49,18 @@ public:
     void OnMouseMove(int xOffset, int yOffset);
 
     void DrawTriangle( DrawPlane plane, float x0, float y0, float x1, float y1, float x2, float y2, const glm::vec4& color );
-    void DrawRectangle( DrawPlane plane, float l, float t, float r, float b, float z_near, const glm::vec4& color, float tess_level = 3.0f );
+    void DrawRectangle(
+        DrawPlane plane, 
+        float l, 
+        float t, 
+        float r, 
+        float b, 
+        float z_near, 
+        const glm::vec4& color, 
+        float tess_level,
+        float thickness_x,
+        float thickness_y
+    );
     void DrawCube( const glm::vec4& color );
 
     void DrawLine(

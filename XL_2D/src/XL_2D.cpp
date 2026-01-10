@@ -45,7 +45,7 @@ void XL_2D_OnSize(int width, int height)
 	renderer->OnSize(width, height);
 }
 
-void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float tess_level)
+void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float tess_level, float border_width)
 {
 	if (!rect)
 		return;
@@ -57,7 +57,7 @@ void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float 
 		return;
 
 	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
-	renderer->FillRectangle(*rect, *bg_color, tess_level);
+	renderer->FillRectangle(*rect, *bg_color, tess_level, border_width, border_width);
 }
 
 void XL_2D_OnLButtonDown(int x, int y)

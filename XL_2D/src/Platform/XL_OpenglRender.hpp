@@ -17,6 +17,8 @@ struct INNER_RectF
 {
 	uint32_t    id{ 0 };
 	float       z_near{ 0.0f };
+    float       thickness_x;
+    float       thickness_y;
 	XL_RectF    rect;
     XL_ColorF   background_color;
 	float       tess_level;
@@ -35,7 +37,7 @@ public:
     bool Init();
     void OnPaint();
 
-	void FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color, float tess_level);
+	void FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color, float tess_level, float thicknessX, float thicknessY);
 	void DrawRectangle(const XL_RectF& rect, const XL_ColorF& border_color, float border_width);
     void FillTriangle(const XL_TriangleF& triangle, const XL_ColorF& bg_color);
 
@@ -76,6 +78,8 @@ private:
     float                               m_fZnear{0.0f};
     uint32_t                            m_id{ 0 };
     uint32_t                            m_ActiveId{ 0xFFFF };
+    float                               m_QuadBorderWidth_X{ 0.0f };
+    float                               m_QuadBorderWidth_Y{ 0.0f };
 };
 
 #endif // XL_OPENGL_RENDERER_HPP_

@@ -48,7 +48,7 @@ extern "C" {
 	void XL_2D_ReleaseRenderer();
 
     // Draw Calls
-	void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float tess_level);
+	void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float tess_level, float border_width);
 
 	// Event Handlers
 	void XL_2D_OnPaint();

@@ -40,11 +40,13 @@ layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec4 aColor;
 layout(location = 2) in vec2 aLocal;
 layout(location = 3) in float aTessLevel;
+layout(location = 4) in vec2 aBorderThickness;
 
 out vec4 vColor;
 out vec2 vLocal;
 out vec3 vPos;
 out float vTessLevel;
+out vec2 vBorderThickness;
 
 void main()
 {
@@ -52,6 +54,7 @@ void main()
     vLocal = aLocal;
     vPos = aPos;
     vTessLevel = aTessLevel;
+    vBorderThickness = aBorderThickness;
     gl_Position = vec4(aPos, 1.0);
 }
 
@@ -63,11 +66,13 @@ in vec4 vColor[];
 in vec2 vLocal[];
 in vec3 vPos[];
 in float vTessLevel[];
+in vec2 vBorderThickness[];
 
 out vec4 tcColor[];
 out vec2 tcLocal[];
 out vec3 tcPos[];
 out float tcTessLevel[];
+out vec2 tcBorderThickness[];
 
 void main()
 {
@@ -76,6 +81,7 @@ void main()
     tcLocal[gl_InvocationID] = vLocal[gl_InvocationID];
     tcPos[gl_InvocationID] = vPos[gl_InvocationID];
     tcTessLevel[gl_InvocationID] = vTessLevel[gl_InvocationID];
+    tcBorderThickness[gl_InvocationID] = vBorderThickness[gl_InvocationID];
 
     // 仅第一个 invocation 设置 tess level
     if (gl_InvocationID == 0)
@@ -100,11 +106,13 @@ in vec4 tcColor[];
 in vec2 tcLocal[];
 in vec3 tcPos[];
 in float tcTessLevel[];
+in vec2 tcBorderThickness[];
 
 out vec4 teColor;
 out vec2 teLocal;
 out vec2 teUV;
 out float teLevel;
+out vec2 teBorderThickness;
 
 void main()
 {
@@ -125,6 +133,7 @@ void main()
     vec4 colorBottom = mix(tcColor[3], tcColor[2], uv.x);
     //teColor = mix(colorTop, colorBottom, uv.y);
     teColor = tcColor[0];
+    teBorderThickness = tcBorderThickness[0];
 
     // 传递 uv 与 level 到片段着色器
     teUV = uv;
@@ -139,10 +148,9 @@ in vec4 teColor;
 in vec2 teLocal;
 in vec2 teUV;
 in float teLevel;
+in vec2 teBorderThickness;
 
-uniform float u_BorderThickness = 0.04; // 边框厚度：cell UV 单位（0..0.5）
 uniform vec4  u_BorderColor = vec4(0.0, 0.0, 0.0, 1.0); // 边框颜色
-uniform float u_BorderAA = 0.01; // 抗锯齿宽度（smoothstep）
 
 layout(location = 0) out vec4 FragColor;
 
@@ -158,17 +166,28 @@ void main()
     float distToEdge = min(distToEdgeX, distToEdgeY);
 
     // thickness 表示边框宽度，以 cell 单位：例如 0.04 表示 cell 宽度的 4%
-    float thickness = clamp(u_BorderThickness, 0.0, 0.5);
+    //float thicknessX = clamp(teBorderThickness.x, 0.0, 0.5);
+    //float thicknessY = clamp(teBorderThickness.y, 0.0, 0.5);
 
-    vec3 base = teColor.rgb;
+    float thicknessX = teBorderThickness.x;
+    float thicknessY = teBorderThickness.y;
 
-    // bottom-left
-    vec2 bl = step(vec2(thickness),cellUV);
-    vec2 tr = step(vec2(thickness),1.0-cellUV);
+    if(teUV.x < thicknessX || teUV.x > (1 - thicknessX)) {
+        thicknessX = thicknessX;
+    } else {
+        thicknessX = thicknessX * 0.5;
+    }
 
-    vec3 color = vec3( bl.x * bl.y * tr.x * tr.y ) * base;
-    if(cellUV.x < thickness || cellUV.y < thickness || (1.0 - cellUV.x) < thickness || (1.0 - cellUV.y) < thickness)
-        color += u_BorderColor.rgb;
+    if(teUV.y < thicknessY || teUV.y > (1 - thicknessY)) {
+        thicknessY = thicknessY;
+    } else {
+        thicknessY = thicknessY * 0.5;
+    }
+
+    vec3 color = teColor.rgb;
+    if( distToEdgeX < thicknessX || distToEdgeY < thicknessY)
+        color = u_BorderColor.rgb;
+
     FragColor = vec4(color,1.0f);
 }
 )glsl";

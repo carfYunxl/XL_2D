@@ -181,6 +181,10 @@ void OpenglRender::UpdateRect(XL_PointF rb)
     auto& rect = m_InnerRects.back();
     rect.rect.r = rb.x;
     rect.rect.b = rb.y;
+
+    rect.thickness_x = m_QuadBorderWidth_X / (rect.rect.r - rect.rect.l);
+    rect.thickness_y = m_QuadBorderWidth_Y / (rect.rect.b - rect.rect.t);
+
 }
 
 void OpenglRender::ModifyRect(XL_PointF offset)
@@ -275,7 +279,18 @@ void OpenglRender::OnPaint()
         auto lt = ScreenToWorld(XL_PointF{ inner_rect.rect.l, inner_rect.rect.t });
         auto br = ScreenToWorld(XL_PointF{ inner_rect.rect.r, inner_rect.rect.b });
 
-        m_Renderer->DrawRectangle(XL::DrawPlane::XY, lt.x, lt.y, br.x, br.y, inner_rect.z_near, ToColorF(inner_rect.background_color), inner_rect.tess_level);
+        m_Renderer->DrawRectangle(
+            XL::DrawPlane::XY,
+            lt.x,
+            lt.y,
+            br.x,
+            br.y,
+            inner_rect.z_near,
+            ToColorF(inner_rect.background_color),
+            inner_rect.tess_level,
+            inner_rect.thickness_x,
+            inner_rect.thickness_y
+        );
     }
 
     ///////////////////////////////////////////
@@ -290,9 +305,21 @@ void OpenglRender::OnPaint()
     x++;
 }
 
-void OpenglRender::FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color, float tess_level)
+void OpenglRender::FillRectangle(
+    const XL_RectF& rect, 
+    const XL_ColorF& bg_color, 
+    float tess_level, 
+    float thicknessX, 
+    float thicknessY)
 {
-    m_InnerRects.emplace_back(m_id, m_fZnear, rect, bg_color, tess_level);
+    m_QuadBorderWidth_X = thicknessX;
+    m_QuadBorderWidth_Y = thicknessY;
+    if(rect.r - rect.l > 0.0f)
+        m_QuadBorderWidth_X = thicknessX / (rect.r - rect.l);
+
+    if(rect.b - rect.t > 0.0f)
+        m_QuadBorderWidth_Y = thicknessY / (rect.b - rect.t);
+    m_InnerRects.emplace_back(m_id, m_fZnear, m_QuadBorderWidth_X, m_QuadBorderWidth_Y, rect, bg_color, tess_level);
     m_fZnear -= 0.000001f;
     m_id++;
 }

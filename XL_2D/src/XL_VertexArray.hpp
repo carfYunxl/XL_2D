@@ -13,6 +13,7 @@ struct RenderVertexQuad
     glm::vec4 color;
     glm::vec2 local; // 新增：局部坐标（用于象限/细分判断）
     float tessLevel; // 新增：细分等级
+    glm::vec2 thickness;//边框宽度
 
     size_t GetVertexSize() const{
         return sizeof(RenderVertexQuad);
@@ -37,6 +38,10 @@ struct RenderVertexQuad
         offset += sizeof(glm::vec2);
 		glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, size, (void*)offset);
         glEnableVertexAttribArray(3);
+
+        offset += sizeof(float);
+        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, size, (void*)offset);
+        glEnableVertexAttribArray(4);
 	}
 };
 

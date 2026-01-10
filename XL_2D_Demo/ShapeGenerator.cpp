@@ -44,7 +44,8 @@ void ShapeGenerator::OnBnClickedButtonGererator()
 	XL_2D_FillRectangle(
 		&rec,
 		&color,
-		(float)nMesh
+		(float)nMesh,
+		10.0f
 	);
 	XL_2D_OnPaint();
 }

@@ -159,7 +159,7 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 		};
 
 		XL_ColorF bg_color{ 0.0f, 0.0f, 1.0f, 1.0f };
-		XL_2D_FillRectangle(&rect, &bg_color, 3);
+		XL_2D_FillRectangle(&rect, &bg_color, 3, 10.0f);
 		Invalidate();
 		return;
 	}
