@@ -65,6 +65,9 @@ BOOL CXL2DDemoApp::InitInstance()
 
 	CWinApp::InitInstance();
 
+#ifdef _DEBUG
+	//AllocConsole();
+#endif
 
 	// 初始化 OLE 库
 	if (!AfxOleInit())

@@ -15,11 +15,14 @@ namespace XL
 
 struct INNER_RectF
 {
-    int         z_order{-1};
+	uint32_t    id{ 0 };
+	float       z_near{ 0.0f };
 	XL_RectF    rect;
     XL_ColorF   background_color;
 	float       tess_level;
     XL_ColorF   selected_color{ 1.0,1.0,1.0,1.0 };
+	bool        b_selected{ false };
+	bool        b_clicked{ false };
 };
 
 class OpenglRender
@@ -47,6 +50,10 @@ public:
 	// Event Handlers
 	void OnLButtonDown(int x, int y);
 	void OnLButtonUp(int x, int y);
+	void OnMouseMove(int x, int y, bool bSelect);
+    void UpdateRect(XL_PointF rb);
+	void ModifyRect(XL_PointF offset);
+    void RemoveBackRect();
 private:
     bool        SetupPixelFormat(HDC hdc);
 	XL_PointF   ScreenToWorld(const XL_PointF& screenPos);
@@ -64,9 +71,11 @@ private:
     std::unique_ptr<XL::FrameBuffer>    m_FrameBuffer;
 
     std::vector<INNER_RectF>            m_InnerRects;
-    int                                 m_ZOrderCounter{-1};
 	unsigned char                       m_nXORKey{ 0xFF };
     unsigned long long				    m_nFrameTime{ 0 }; //us
+    float                               m_fZnear{0.0f};
+    uint32_t                            m_id{ 0 };
+    uint32_t                            m_ActiveId{ 0xFFFF };
 };
 
 #endif // XL_OPENGL_RENDERER_HPP_

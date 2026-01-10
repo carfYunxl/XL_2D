@@ -108,12 +108,33 @@ BOOL CChildView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 {
 	CWnd::OnMouseMove(nFlags, point);
+
+	if (!m_bMouseDown)
+		return;
+
+	CPoint offset;
+	offset.x = point.x - m_StartPoint.x;
+	offset.y = point.y - m_StartPoint.y;
+	bool bSelected = true;
+	if (m_bStartDraw)
+	{
+		bSelected = false;
+		offset = point;
+	}
+	else
+	{
+		m_StartPoint = point;
+	}
+
+	XL_2D_OnMouseMove(offset.x, offset.y, bSelected);
+	Invalidate();
 }
 
 BOOL CChildView::OnEraseBkgnd(CDC* pDC)
 {
 	return FALSE;
 }
+
 
 void CChildView::OnDrawFollowHeart()
 {
@@ -123,36 +144,40 @@ void CChildView::OnDrawFollowHeart()
 
 void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	XL_2D_OnLButtonDown(point.x, point.y);
+	CWnd::OnLButtonDown(nFlags, point);
+
+	m_bMouseDown = true;
+	m_StartPoint = point;
 
 	if (m_bStartDraw)
 	{
-		m_StartPoint = point;	
+		XL_RectF rect{
+			(float)m_StartPoint.x,
+			(float)m_StartPoint.y,
+			(float)m_StartPoint.x,
+			(float)m_StartPoint.y
+		};
+
+		XL_ColorF bg_color{ 0.0f, 0.0f, 1.0f, 1.0f };
+		XL_2D_FillRectangle(&rect, &bg_color, 3);
+		Invalidate();
+		return;
 	}
 
-	CWnd::OnLButtonDown(nFlags, point);
+	XL_2D_OnLButtonDown(point.x, point.y);
 }
 
 void CChildView::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	XL_2D_OnLButtonUp(point.x, point.y);
-
+	CWnd::OnLButtonUp(nFlags, point);
+	m_bMouseDown = false;
 	if (m_bStartDraw)
 	{
 		m_EndPoint = point;
-		XL_RectF rect{ 
-			(float)m_StartPoint.x,
-			(float)m_StartPoint.y,
-			(float)m_EndPoint.x,
-			(float)m_EndPoint.y
-		};
-
-		XL_ColorF bg_color{ 0.0f, 1.0f, 0.0f, 1.0f };
-		XL_2D_FillRectangle(&rect, &bg_color, 3);
-		Invalidate();
+		return;
 	}
 
-	CWnd::OnLButtonUp(nFlags, point);
+	XL_2D_OnLButtonUp(point.x, point.y);
 }
 
 void CChildView::OnButtonRectangle()

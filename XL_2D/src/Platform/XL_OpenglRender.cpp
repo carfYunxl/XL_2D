@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <gl/wglext.h>
 #include <gl/gl.h>
+#include <iostream>
 
 #ifndef WGL_CONTEXT_MAJOR_VERSION_ARB
 #define WGL_CONTEXT_MAJOR_VERSION_ARB 0x2091
@@ -127,40 +128,88 @@ void OpenglRender::OnLButtonDown(int x, int y)
         }
     }
 
-    std::sort(hitRects.begin(), hitRects.end(), [](const INNER_RectF* a, const INNER_RectF* b) {
-        return a->z_order < b->z_order;
-    });
-
     if (!hitRects.empty())
     {
-        INNER_RectF& topRect = *hitRects.back();
+        auto itr = std::min_element(hitRects.begin(), hitRects.end(), [](const INNER_RectF* a, const INNER_RectF* b) {
+            return a->z_near < b->z_near;
+            });
+
+        INNER_RectF& topRect = *(*itr);
+		m_ActiveId = topRect.id;
+        topRect.b_clicked = true;
 		topRect.background_color.r = static_cast<float>((static_cast<int>(topRect.background_color.r * 255) ^ m_nXORKey)) / 255.0f;
+		std::cout << "Rect ID: " << topRect.id << " clicked." << std::endl;
 		OnPaint();
 	}
 }
 
 void OpenglRender::OnLButtonUp(int x, int y)
 {
-    std::vector<INNER_RectF*> hitRects;
+    auto itr = std::find_if(m_InnerRects.begin(), m_InnerRects.end(), [=](const INNER_RectF& rect) {
+        return rect.id == m_ActiveId;
+    });
 
-    for (auto& rect : m_InnerRects)
+    if(itr == m_InnerRects.end())
+        return;
+
+	auto& topRect = (*itr);
+    if (!topRect.b_clicked)
+        return;
+
+    topRect.b_clicked = false;
+	std::cout << "Rect ID: " << topRect.id << " released." << std::endl;
+    topRect.background_color.r = static_cast<float>((static_cast<int>(topRect.background_color.r * 255) ^ m_nXORKey)) / 255.0f;
+    OnPaint();
+}
+
+void OpenglRender::OnMouseMove(int x, int y, bool bSelect)
+{
+    if (bSelect)
     {
-        if (PtInRect(XL_PointF{ (float)x,(float)y }, rect.rect))
-        {
-            hitRects.push_back(&rect);
-        }
+        ModifyRect(XL_PointF{ (float)x,(float)y });
     }
+    else
+    {
+        UpdateRect(XL_PointF{ (float)x,(float)y });
+    }
+}
 
-    std::sort(hitRects.begin(), hitRects.end(), [](const INNER_RectF* a, const INNER_RectF* b) {
-        return a->z_order < b->z_order;
+void OpenglRender::UpdateRect(XL_PointF rb)
+{
+    if (m_InnerRects.empty())
+        return;
+    auto& rect = m_InnerRects.back();
+    rect.rect.r = rb.x;
+    rect.rect.b = rb.y;
+}
+
+void OpenglRender::ModifyRect(XL_PointF offset)
+{
+    auto itr = std::find_if(m_InnerRects.begin(), m_InnerRects.end(), [=](const INNER_RectF& rect) {
+        return rect.id == m_ActiveId;
         });
 
-    if (!hitRects.empty())
-    {
-        INNER_RectF& topRect = *hitRects.back();
-        topRect.background_color.r = static_cast<float>((static_cast<int>(topRect.background_color.r * 255) ^ m_nXORKey)) / 255.0f;
-        OnPaint();
-    }
+    if (itr == m_InnerRects.end())
+        return;
+
+    auto& topRect = (*itr);
+    if (!topRect.b_clicked)
+        return;
+
+    std::cout << "[MouseMove]: " << offset.x << "," << offset.y << std::endl;
+
+	topRect.rect.l += offset.x;
+	topRect.rect.r += offset.x;
+	topRect.rect.t += offset.y;
+	topRect.rect.b += offset.y;
+}
+
+void OpenglRender::RemoveBackRect()
+{
+    if (m_InnerRects.empty())
+        return;
+
+    m_InnerRects.erase(m_InnerRects.end());
 }
 
 bool OpenglRender::SetupPixelFormat(HDC hdc)
@@ -220,45 +269,14 @@ void OpenglRender::OnPaint()
     //m_Renderer->UpdateCamera();
     /*  Core Draw Functions Here */
     ///////////////////////////////////////////
-    constexpr float W = 15;
-	constexpr float H = 7;
-	constexpr float G = 2;
-	int nCX = static_cast<int>(m_WindowWidth / (W + G));
-	int nCY = static_cast<int>(m_WindowHeight / (H + G));
-    /*for (float i = 0;i < nCX; i++)
-    {
-        for (float j = 0; j < nCY; j++)
-        {
-            FillRectangle(XL_RectF{ i * (W + G) ,j * (H + G),i * (W + G) + W, j * (H + G) + H }, XL_ColorF{ (int(i * j) % 255) / 255.0f,(int(i + j) % 255) / 255.0f,(int(pow(i, j)) % 255) / 255.0f,1.0f });
-        }
-    }*/
-    //for (float j = 0.; j < 2.0; j+=0.1)
-    //{
-    //    m_Renderer->DrawLine(glm::vec3{ -1.0 + j, -0.8, 0.0 }, glm::vec3{ -1.0 + j, 0.8, 0.0 }, glm::vec4{ 1.0f,0.0f,0.0f,1.0f }, 1.0f);
-    //}
-
-    std::sort(m_InnerRects.begin(), m_InnerRects.end(), [](const INNER_RectF& a, const INNER_RectF& b) {
-        return a.z_order > b.z_order;
-		});
 
     for ( const auto& inner_rect : m_InnerRects)
     {
         auto lt = ScreenToWorld(XL_PointF{ inner_rect.rect.l, inner_rect.rect.t });
         auto br = ScreenToWorld(XL_PointF{ inner_rect.rect.r, inner_rect.rect.b });
 
-        m_Renderer->DrawRectangle(XL::DrawPlane::XY, lt.x, lt.y, br.x, br.y, ToColorF(inner_rect.background_color), inner_rect.tess_level);
+        m_Renderer->DrawRectangle(XL::DrawPlane::XY, lt.x, lt.y, br.x, br.y, inner_rect.z_near, ToColorF(inner_rect.background_color), inner_rect.tess_level);
     }
-
-    /*FillRectangle(XL_RectF{ 100,100,105,105 }, XL_ColorF{ 1.0f,0.0f,0.0f,1.0f });
-    FillRectangle(XL_RectF{ 100,110,300,310 }, XL_ColorF{ 1.0f,0.0f,1.0f,1.0f });
-
-    FillEllipse(XL_PointF{500,500}, 100,200, XL_ColorF{ 1.0f, 0.0f, 1.0f, 1.0f });
-    DrawEllipse(XL_PointF{500,550}, 100,100, XL_ColorF{ 0.3f, 0.0f, 0.0f, 1.0f });
-
-    FillCircle(XL_PointF{ 800,800 }, 5, XL_ColorF{ 1.0f, 0.0f, 1.0f, 1.0f });
-    DrawCircle(XL_PointF{ 900,900 }, 5, XL_ColorF{ 1.0f, 0.0f, 0.0f, 1.0f }, 0.1f);*/
-    //FillRectangle(XL_RectF{ 300,300,400,400 }, XL_ColorF{ 1.0f,0.0f,1.0f,1.0f });
-    //DrawRectangle(XL_RectF{ 500,500,800,600 }, XL_ColorF{ 1.0f,0.0f,1.0f,1.0f }, 5.0f);
 
     ///////////////////////////////////////////
 	m_Renderer->Flush();
@@ -274,12 +292,14 @@ void OpenglRender::OnPaint()
 
 void OpenglRender::FillRectangle(const XL_RectF& rect, const XL_ColorF& bg_color, float tess_level)
 {
-    m_ZOrderCounter++;
-    m_InnerRects.emplace_back(m_ZOrderCounter, rect, bg_color, tess_level);
+    m_InnerRects.emplace_back(m_id, m_fZnear, rect, bg_color, tess_level);
+    m_fZnear -= 0.000001f;
+    m_id++;
 }
 
 void OpenglRender::DrawRectangle(const XL_RectF& rect, const XL_ColorF& border_color, float border_width)
 {
+#if 0
     auto lt = ScreenToWorld(XL_PointF{ rect.l, rect.t });
     auto br = ScreenToWorld(XL_PointF{ rect.r, rect.b });
     // Top
@@ -317,6 +337,7 @@ void OpenglRender::DrawRectangle(const XL_RectF& rect, const XL_ColorF& border_c
         br.y, 
         ToColorF(border_color)
     );
+#endif
 }
 
 void OpenglRender::FillTriangle(const XL_TriangleF& riangle, const XL_ColorF& bg_color)

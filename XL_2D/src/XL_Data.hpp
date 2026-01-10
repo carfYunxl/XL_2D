@@ -43,14 +43,14 @@ layout(location = 3) in float aTessLevel;
 
 out vec4 vColor;
 out vec2 vLocal;
-out vec2 vPos;
+out vec3 vPos;
 out float vTessLevel;
 
 void main()
 {
     vColor = aColor;
     vLocal = aLocal;
-    vPos = aPos.xy;
+    vPos = aPos;
     vTessLevel = aTessLevel;
     gl_Position = vec4(aPos, 1.0);
 }
@@ -61,12 +61,12 @@ layout(vertices = 4) out;
 
 in vec4 vColor[];
 in vec2 vLocal[];
-in vec2 vPos[];
+in vec3 vPos[];
 in float vTessLevel[];
 
 out vec4 tcColor[];
 out vec2 tcLocal[];
-out vec2 tcPos[];
+out vec3 tcPos[];
 out float tcTessLevel[];
 
 void main()
@@ -98,7 +98,7 @@ layout(quads, equal_spacing, ccw) in;
 
 in vec4 tcColor[];
 in vec2 tcLocal[];
-in vec2 tcPos[];
+in vec3 tcPos[];
 in float tcTessLevel[];
 
 out vec4 teColor;
@@ -112,8 +112,8 @@ void main()
     vec2 uv = gl_TessCoord.xy;
 
     // bilinear 插值控制点位置
-    vec2 top = mix(tcPos[0], tcPos[1], uv.x);
-    vec2 bottom = mix(tcPos[3], tcPos[2], uv.x);
+    vec2 top = mix(tcPos[0].xy, tcPos[1].xy, uv.x);
+    vec2 bottom = mix(tcPos[3].xy, tcPos[2].xy, uv.x);
     vec2 pos = mix(top, bottom, uv.y);
 
     // local / color 同样插值
@@ -123,13 +123,14 @@ void main()
 
     vec4 colorTop = mix(tcColor[0], tcColor[1], uv.x);
     vec4 colorBottom = mix(tcColor[3], tcColor[2], uv.x);
-    teColor = mix(colorTop, colorBottom, uv.y);
+    //teColor = mix(colorTop, colorBottom, uv.y);
+    teColor = tcColor[0];
 
     // 传递 uv 与 level 到片段着色器
     teUV = uv;
     teLevel = max(1.0, floor(tcTessLevel[0]));
 
-    gl_Position = vec4(pos, 0.0, 1.0);
+    gl_Position = vec4(pos, tcPos[0].z, 1.0);
 }
 
 #type fragment
@@ -138,9 +139,6 @@ in vec4 teColor;
 in vec2 teLocal;
 in vec2 teUV;
 in float teLevel;
-
-uniform int u_cX = 1;
-uniform int u_cY = 2;
 
 uniform float u_BorderThickness = 0.04; // 边框厚度：cell UV 单位（0..0.5）
 uniform vec4  u_BorderColor = vec4(0.0, 0.0, 0.0, 1.0); // 边框颜色
@@ -162,16 +160,16 @@ void main()
     // thickness 表示边框宽度，以 cell 单位：例如 0.04 表示 cell 宽度的 4%
     float thickness = clamp(u_BorderThickness, 0.0, 0.5);
 
-    // 使用 smoothstep 做软边界（抗锯齿）
-    float edgeFactor = smoothstep(thickness + u_BorderAA, thickness - u_BorderAA, distToEdge);
-    // edgeFactor: 0 -> 在边框区域，1 -> 在内部（非边框）
-
     vec3 base = teColor.rgb;
 
-    // 当在边框区域时用边框颜色覆盖或混合
-    vec3 outRgb = mix(u_BorderColor.rgb, base, edgeFactor);
+    // bottom-left
+    vec2 bl = step(vec2(thickness),cellUV);
+    vec2 tr = step(vec2(thickness),1.0-cellUV);
 
-    FragColor = vec4(outRgb, teColor.a);
+    vec3 color = vec3( bl.x * bl.y * tr.x * tr.y ) * base;
+    if(cellUV.x < thickness || cellUV.y < thickness || (1.0 - cellUV.x) < thickness || (1.0 - cellUV.y) < thickness)
+        color += u_BorderColor.rgb;
+    FragColor = vec4(color,1.0f);
 }
 )glsl";
 }

@@ -78,6 +78,15 @@ void XL_2D_OnLButtonUp(int x, int y)
 	renderer->OnLButtonUp(x, y);
 }
 
+void XL_2D_OnMouseMove(int x, int y, bool bSelect)
+{
+	if (!g_sHandle)
+		return;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	renderer->OnMouseMove(x, y, bSelect);
+}
+
 int XL_2D_GetFrameRate()
 {
 	if (!g_sHandle)

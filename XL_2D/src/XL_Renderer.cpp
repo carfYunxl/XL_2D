@@ -149,7 +149,7 @@ void BatchRenderer::DrawTriangle(
 
 void BatchRenderer::DrawRectangle(
     DrawPlane plane,
-    float l, float t, float r, float b,
+	float l, float t, float r, float b, float z_near,
     const glm::vec4& color,
     float tess_level
 )
@@ -164,7 +164,7 @@ void BatchRenderer::DrawRectangle(
         // left-top
         auto& vert_lt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
 
-        vert_lt.position = glm::vec3(l, t, 0.0f);
+        vert_lt.position = glm::vec3(l, t, z_near);
         vert_lt.color = color;
         vert_lt.local = glm::vec2(-1.0f, 1.0f);
         vert_lt.tessLevel = tess_level;
@@ -172,7 +172,7 @@ void BatchRenderer::DrawRectangle(
 
         // right-top
         auto& vert_rt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_rt.position = glm::vec3(r, t, 0.0f);
+        vert_rt.position = glm::vec3(r, t, z_near);
         vert_rt.color = color;
         vert_rt.local = glm::vec2(1.0f, 1.0f);
         vert_rt.tessLevel = tess_level;
@@ -180,7 +180,7 @@ void BatchRenderer::DrawRectangle(
 
         // right-bottom
         auto& vert_rb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_rb.position = glm::vec3(r, b, 0.0f);
+        vert_rb.position = glm::vec3(r, b, z_near);
         vert_rb.color = color;
         vert_rb.local = glm::vec2(1.0f, -1.0f);
         vert_rb.tessLevel = tess_level;
@@ -188,7 +188,7 @@ void BatchRenderer::DrawRectangle(
 
         // left-bottom
         auto& vert_lb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_lb.position = glm::vec3(l, b, 0.0f);
+        vert_lb.position = glm::vec3(l, b, z_near);
         vert_lb.color = color;
         vert_lb.local = glm::vec2(-1.0f, -1.0f);
         vert_lb.tessLevel = tess_level;
@@ -385,9 +385,9 @@ void BatchRenderer::Flush()
 
         //m_QuadBatch.m_Shader->SetInt("u_cX", 2);
         //m_QuadBatch.m_Shader->SetInt("u_cY", 3);
-        m_QuadBatch.m_Shader->SetFloat("u_BorderThickness", 0.02f);
-        m_QuadBatch.m_Shader->Set4f("u_BorderColor", glm::vec4{ 0.0, 0.0, 0.0, 1.0 });
-        m_QuadBatch.m_Shader->SetFloat("u_BorderAA", 0.01f);
+        m_QuadBatch.m_Shader->SetFloat("u_BorderThickness", 0.05f);
+        m_QuadBatch.m_Shader->Set4f("u_BorderColor", glm::vec4{ 1.0, 0.0, 0.0, 1.0 });
+        m_QuadBatch.m_Shader->SetFloat("u_BorderAA", 0.05f);
 
         // 上传顶点数据到 GPU
         m_QuadBatch.m_Vertex->Bind(m_QuadBatch.m_Vertices, m_QuadBatch.m_VertexCount);

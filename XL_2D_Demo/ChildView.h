@@ -17,6 +17,7 @@ protected:
 	DECLARE_MESSAGE_MAP()
 private:
 	bool m_bStartDraw{ false };
+	bool m_bMouseDown{ false };
 
 	CPoint m_StartPoint;
 	CPoint m_EndPoint;
