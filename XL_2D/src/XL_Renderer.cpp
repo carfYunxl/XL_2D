@@ -147,15 +147,22 @@ void BatchRenderer::DrawTriangle(
 #endif
 }
 
+glm::vec2 BatchRenderer::ScreenToWorld(float x, float y) {
+    return glm::vec2{ (x / static_cast<float>(mViewportWidth)) * 2.0f - 1.0f, 1.0f - (y / static_cast<float>(mViewportHeight)) * 2.0f };
+}
+
 void BatchRenderer::DrawRectangle(
     DrawPlane plane,
-	float l, float t, float r, float b, float z_near,
+    const XL_RectF& rect, float z_near,
     const glm::vec4& color,
     float tess_level,
     float thickness_x,
     float thickness_y
 )
 {
+	glm::vec2 lt = ScreenToWorld(rect.l, rect.t);
+	glm::vec2 rb = ScreenToWorld(rect.r, rect.b);
+
     switch (plane)
     {
     case XL::DrawPlane::XY:
@@ -166,7 +173,7 @@ void BatchRenderer::DrawRectangle(
         // left-top
         auto& vert_lt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
 
-        vert_lt.position = glm::vec3(l, t, z_near);
+        vert_lt.position = glm::vec3(lt, z_near);
         vert_lt.color = color;
         vert_lt.local = glm::vec2(-1.0f, 1.0f);
         vert_lt.tessLevel = tess_level;
@@ -175,7 +182,7 @@ void BatchRenderer::DrawRectangle(
 
         // right-top
         auto& vert_rt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_rt.position = glm::vec3(r, t, z_near);
+        vert_rt.position = glm::vec3(rb.x, lt.y, z_near);
         vert_rt.color = color;
         vert_rt.local = glm::vec2(1.0f, 1.0f);
         vert_rt.tessLevel = tess_level;
@@ -184,7 +191,7 @@ void BatchRenderer::DrawRectangle(
 
         // right-bottom
         auto& vert_rb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_rb.position = glm::vec3(r, b, z_near);
+        vert_rb.position = glm::vec3(rb, z_near);
         vert_rb.color = color;
         vert_rb.local = glm::vec2(1.0f, -1.0f);
         vert_rb.tessLevel = tess_level;
@@ -193,7 +200,7 @@ void BatchRenderer::DrawRectangle(
 
         // left-bottom
         auto& vert_lb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_lb.position = glm::vec3(l, b, z_near);
+        vert_lb.position = glm::vec3(lt.x, rb.y, z_near);
         vert_lb.color = color;
         vert_lb.local = glm::vec2(-1.0f, -1.0f);
         vert_lb.tessLevel = tess_level;
@@ -205,7 +212,7 @@ void BatchRenderer::DrawRectangle(
     {
         // left-top (LT) maps to (l, 0, t)
         auto& vert_lt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_lt.position = glm::vec3(l, 0.0f, t);
+        vert_lt.position = glm::vec3(lt.x, 0.0f, lt.y);
         vert_lt.color = color;
         vert_lt.local = glm::vec2(-1.0f, 1.0f);
         vert_lt.tessLevel = tess_level;
@@ -214,7 +221,7 @@ void BatchRenderer::DrawRectangle(
 
         // right-top
         auto& vert_rt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_rt.position = glm::vec3(r, 0.0f, t);
+        vert_rt.position = glm::vec3(rb.x, 0.0f, lt.y);
         vert_rt.color = color;
         vert_rt.local = glm::vec2(1.0f, 1.0f);
         vert_rt.tessLevel = tess_level;
@@ -223,7 +230,7 @@ void BatchRenderer::DrawRectangle(
 
         // right-bottom
         auto& vert_rb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_rb.position = glm::vec3(r, 0.0f, b);
+        vert_rb.position = glm::vec3(rb.x, 0.0f, rb.y);
         vert_rb.color = color;
         vert_rb.local = glm::vec2(1.0f, -1.0f);
         vert_rb.tessLevel = tess_level;
@@ -232,7 +239,7 @@ void BatchRenderer::DrawRectangle(
 
         // left-bottom
         auto& vert_lb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_lb.position = glm::vec3(l, 0.0f, b);
+        vert_lb.position = glm::vec3(lt.x, 0.0f, rb.y);
         vert_lb.color = color;
         vert_lb.local = glm::vec2(-1.0f, -1.0f);
         vert_lb.tessLevel = tess_level;
@@ -244,7 +251,7 @@ void BatchRenderer::DrawRectangle(
     {
         // left-top -> (0, l, t) 这里 local.x 用于行方向(local.x 对应 second axis)
         auto& vert_lt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_lt.position = glm::vec3(0.0f, l, t);
+        vert_lt.position = glm::vec3(0.0f, lt);
         vert_lt.color = color;
         vert_lt.local = glm::vec2(-1.0f, 1.0f);
         vert_lt.tessLevel = tess_level;
@@ -252,14 +259,14 @@ void BatchRenderer::DrawRectangle(
         m_QuadBatch.m_VertexCount++;
 
         auto& vert_rt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_rt.position = glm::vec3(0.0f, r, t);
+        vert_rt.position = glm::vec3(0.0f, rb.x, lt.y);
         vert_rt.color = color;
         vert_rt.local = glm::vec2(1.0f, 1.0f);
         vert_rt.tessLevel = tess_level;
         m_QuadBatch.m_VertexCount++;
 
         auto& vert_rb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_rb.position = glm::vec3(0.0f, r, b);
+        vert_rb.position = glm::vec3(0.0f, rb);
         vert_rb.color = color;
         vert_rb.local = glm::vec2(1.0f, -1.0f);
         vert_rb.tessLevel = tess_level;
@@ -267,7 +274,7 @@ void BatchRenderer::DrawRectangle(
         m_QuadBatch.m_VertexCount++;
 
         auto& vert_lb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
-        vert_lb.position = glm::vec3(0.0f, l, b);
+        vert_lb.position = glm::vec3(0.0f, lt.x, rb.y);
         vert_lb.color = color;
         vert_lb.local = glm::vec2(-1.0f, -1.0f);
         vert_lb.tessLevel = tess_level;

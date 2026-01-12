@@ -6,6 +6,7 @@
 #include "XL_Data.hpp"
 #include "XL_VertexArray.hpp"
 #include "XL_VertexBuffer.hpp"
+#include "XL_2D.hpp"
 
 _NAMESPACE_BEGIN
 
@@ -51,10 +52,7 @@ public:
     void DrawTriangle( DrawPlane plane, float x0, float y0, float x1, float y1, float x2, float y2, const glm::vec4& color );
     void DrawRectangle(
         DrawPlane plane, 
-        float l, 
-        float t, 
-        float r, 
-        float b, 
+        const XL_RectF& rect, 
         float z_near, 
         const glm::vec4& color, 
         float tess_level,
@@ -84,6 +82,7 @@ public:
 	void ResetDrawCall() { m_DrawCall = -1; }   
 private:
     int  GladLoadWithRetry(pfnGladLoader loader, int maxAttempts, int delayMs);
+	glm::vec2 ScreenToWorld(float x, float y); // screen pixels -> opengl coords
 private:
     std::unique_ptr<Camera>   m_Camera;
     int                       mViewportWidth;

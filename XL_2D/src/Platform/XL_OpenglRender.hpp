@@ -47,7 +47,7 @@ public:
 	void FillCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& fill_color);
 	void DrawCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& border_color, float border_width);
 
-	int  GetFrameTime() const { return m_nFrameTime; }
+	uint64_t  GetFrameTime() const { return m_nFrameTime; }
 public:
 	// Event Handlers
 	void OnLButtonDown(int x, int y);
@@ -74,7 +74,7 @@ private:
 
     std::vector<INNER_RectF>            m_InnerRects;
 	unsigned char                       m_nXORKey{ 0xFF };
-    unsigned long long				    m_nFrameTime{ 0 }; //us
+    uint64_t				            m_nFrameTime{ 0 }; //us
     float                               m_fZnear{0.0f};
     uint32_t                            m_id{ 0 };
     uint32_t                            m_ActiveId{ 0xFFFF };

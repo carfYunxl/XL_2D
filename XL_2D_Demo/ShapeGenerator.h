@@ -17,4 +17,6 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnBnClickedButtonGererator();
+public:
+	virtual BOOL OnInitDialog();
 };

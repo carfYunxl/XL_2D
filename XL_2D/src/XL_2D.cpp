@@ -87,7 +87,7 @@ void XL_2D_OnMouseMove(int x, int y, bool bSelect)
 	renderer->OnMouseMove(x, y, bSelect);
 }
 
-int XL_2D_GetFrameRate()
+uint64_t XL_2D_GetFrameRate()
 {
 	if (!g_sHandle)
 		return -1;
@@ -96,7 +96,7 @@ int XL_2D_GetFrameRate()
 	auto frameTime = renderer->GetFrameTime();
 	if (frameTime != 0)
 	{
-		int nFps = 1000000 / frameTime;
+		uint64_t nFps = 1000000ull / frameTime;
 
 		return nFps;
 	}

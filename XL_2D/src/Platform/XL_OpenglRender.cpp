@@ -276,15 +276,9 @@ void OpenglRender::OnPaint()
 
     for ( const auto& inner_rect : m_InnerRects)
     {
-        auto lt = ScreenToWorld(XL_PointF{ inner_rect.rect.l, inner_rect.rect.t });
-        auto br = ScreenToWorld(XL_PointF{ inner_rect.rect.r, inner_rect.rect.b });
-
         m_Renderer->DrawRectangle(
             XL::DrawPlane::XY,
-            lt.x,
-            lt.y,
-            br.x,
-            br.y,
+            inner_rect.rect,
             inner_rect.z_near,
             ToColorF(inner_rect.background_color),
             inner_rect.tess_level,

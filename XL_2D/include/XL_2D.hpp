@@ -58,7 +58,7 @@ extern "C" {
 	void XL_2D_OnMouseMove(int x, int y, bool bSelect);
 
     // Infomations
-	int  XL_2D_GetFrameRate();
+    uint64_t  XL_2D_GetFrameRate();
 
 #ifdef _cplusplus
 }

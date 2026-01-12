@@ -49,3 +49,22 @@ void ShapeGenerator::OnBnClickedButtonGererator()
 	);
 	XL_2D_OnPaint();
 }
+
+BOOL ShapeGenerator::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	SetDlgItemInt(IDC_EDIT_L, 100);
+	SetDlgItemInt(IDC_EDIT_T, 100);
+	SetDlgItemInt(IDC_EDIT_R, 300);
+	SetDlgItemInt(IDC_EDIT_B, 300);
+
+	SetDlgItemInt(IDC_EDIT_COLOR_R, 255);
+	SetDlgItemInt(IDC_EDIT_COLOR_G, 0);
+	SetDlgItemInt(IDC_EDIT_COLOR_B, 0);
+	SetDlgItemInt(IDC_EDIT_COLOR_A, 255);
+
+	SetDlgItemInt(IDC_EDIT_MESH, 1);
+
+	return TRUE;
+}
