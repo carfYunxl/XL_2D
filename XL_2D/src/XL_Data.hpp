@@ -41,12 +41,14 @@ layout(location = 1) in vec4 aColor;
 layout(location = 2) in vec2 aLocal;
 layout(location = 3) in float aTessLevel;
 layout(location = 4) in vec2 aBorderThickness;
+layout(location = 5) in ivec2 aSelectCell;
 
 out vec4 vColor;
 out vec2 vLocal;
 out vec3 vPos;
 out float vTessLevel;
 out vec2 vBorderThickness;
+flat out ivec2 vSelectCell;
 
 void main()
 {
@@ -55,6 +57,7 @@ void main()
     vPos = aPos;
     vTessLevel = aTessLevel;
     vBorderThickness = aBorderThickness;
+    vSelectCell = aSelectCell;
     gl_Position = vec4(aPos, 1.0);
 }
 
@@ -67,12 +70,14 @@ in vec2 vLocal[];
 in vec3 vPos[];
 in float vTessLevel[];
 in vec2 vBorderThickness[];
+flat in ivec2 vSelectCell[];
 
 out vec4 tcColor[];
 out vec2 tcLocal[];
 out vec3 tcPos[];
 out float tcTessLevel[];
 out vec2 tcBorderThickness[];
+flat out ivec2 tcSelectCell[];
 
 void main()
 {
@@ -82,6 +87,7 @@ void main()
     tcPos[gl_InvocationID] = vPos[gl_InvocationID];
     tcTessLevel[gl_InvocationID] = vTessLevel[gl_InvocationID];
     tcBorderThickness[gl_InvocationID] = vBorderThickness[gl_InvocationID];
+    tcSelectCell[gl_InvocationID] = vSelectCell[gl_InvocationID];
 
     // 仅第一个 invocation 设置 tess level
     if (gl_InvocationID == 0)
@@ -107,12 +113,14 @@ in vec2 tcLocal[];
 in vec3 tcPos[];
 in float tcTessLevel[];
 in vec2 tcBorderThickness[];
+flat in ivec2 tcSelectCell[];
 
 out vec4 teColor;
 out vec2 teLocal;
 out vec2 teUV;
 out float teLevel;
 out vec2 teBorderThickness;
+flat out ivec2 teSelectCell;
 
 void main()
 {
@@ -134,6 +142,7 @@ void main()
     //teColor = mix(colorTop, colorBottom, uv.y);
     teColor = tcColor[0];
     teBorderThickness = tcBorderThickness[0];
+    teSelectCell = tcSelectCell[0];
 
     // 传递 uv 与 level 到片段着色器
     teUV = uv;
@@ -149,6 +158,7 @@ in vec2 teLocal;
 in vec2 teUV;
 in float teLevel;
 in vec2 teBorderThickness;
+flat in ivec2 teSelectCell;
 
 uniform vec4  u_BorderColor = vec4(0.0, 0.0, 0.0, 1.0); // 边框颜色
 
@@ -159,6 +169,8 @@ void main()
     float lvl = max(1.0, teLevel);
     // cell 内局部坐标 0..1
     vec2 cellUV = fract(teUV * lvl);
+    int x = int(floor(teUV.x * lvl));
+    int y = int(floor(teUV.y * lvl));
 
     // 距离最近边界的距离（0 在边界处，0.5 在中心）
     float distToEdgeX = min(cellUV.x, 1.0 - cellUV.x);
@@ -185,6 +197,8 @@ void main()
     }
 
     vec3 color = teColor.rgb;
+    if(ivec2(x,y) == teSelectCell)
+        color = vec3(1.0, 0.0, 0.0); // 中心格子填充红色，便于调试
     if( distToEdgeX < thicknessX || distToEdgeY < thicknessY)
         color = u_BorderColor.rgb;
 

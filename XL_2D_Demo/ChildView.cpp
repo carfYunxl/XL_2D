@@ -33,6 +33,9 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_LBUTTONUP()
 	ON_COMMAND(ID_BUTTON_RECTANGLE, &CChildView::OnButtonRectangle)
 	ON_UPDATE_COMMAND_UI(ID_BUTTON_RECTANGLE, &CChildView::OnUpdateButtonRectangle)
+	ON_WM_CONTEXTMENU()
+	ON_WM_MOUSEHOVER()
+	ON_WM_MOUSELEAVE()
 END_MESSAGE_MAP()
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
@@ -56,7 +59,7 @@ void CChildView::OnPaint()
 
 	auto frame = (CMainFrame*)theApp.m_pMainWnd;
 	CString strFps;
-	strFps.Format(L"FPS: %d", XL_2D_GetFrameRate());
+	strFps.Format(L"FPS: %lld", XL_2D_GetFrameRate());
 	if (frame->m_wndStatusBar.m_hWnd != NULL)
 		frame->m_wndStatusBar.SetPaneText(0, strFps);
 }
@@ -110,7 +113,14 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 	CWnd::OnMouseMove(nFlags, point);
 
 	if (!m_bMouseDown)
+	{
+		if (!m_bStartDraw)
+		{
+			XL_2D_OnMouseMove(point.x, point.y, false, true);
+			Invalidate();
+		}
 		return;
+	}
 
 	CPoint offset;
 	offset.x = point.x - m_StartPoint.x;
@@ -126,7 +136,7 @@ void CChildView::OnMouseMove(UINT nFlags, CPoint point)
 		m_StartPoint = point;
 	}
 
-	XL_2D_OnMouseMove(offset.x, offset.y, bSelected);
+	XL_2D_OnMouseMove(offset.x, offset.y, bSelected, false);
 	Invalidate();
 }
 
@@ -188,4 +198,25 @@ void CChildView::OnButtonRectangle()
 void CChildView::OnUpdateButtonRectangle(CCmdUI* pCmdUI)
 {
 	pCmdUI->SetCheck(m_bStartDraw);
+}
+
+void CChildView::OnContextMenu(CWnd* pWnd, CPoint point)
+{
+	CMenu menu;
+	menu.LoadMenu(IDR_CONTEXT_MENU_RECTANGLE);
+	CMenu* pMenu = menu.GetSubMenu(0);
+	pMenu->EnableMenuItem(ID_PROPERTY_RECTANGLE_DELETE, MF_BYCOMMAND | MF_ENABLED);
+	pMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this);
+	pMenu->Detach();
+	menu.DestroyMenu();
+}
+
+void CChildView::OnMouseHover(UINT nFlags, CPoint point)
+{
+	CWnd::OnMouseHover(nFlags, point);
+}
+
+void CChildView::OnMouseLeave()
+{
+	CWnd::OnMouseLeave();
 }

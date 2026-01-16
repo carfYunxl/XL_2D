@@ -75,7 +75,12 @@ void BatchRenderer::OnMouseWheel(int yOffset)
 
 void BatchRenderer::OnMouseMove(int xOffset, int yOffset)
 {
-   // m_Camera->OnMouseMove(xOffset, yOffset);
+    m_SelectCell = glm::ivec2{ xOffset, yOffset };
+}
+
+void BatchRenderer::OnMouseHover(int xOffset, int yOffset)
+{
+    m_SelectCell = glm::ivec2{xOffset, yOffset};
 }
 
 void BatchRenderer::DrawTriangle(
@@ -156,8 +161,8 @@ void BatchRenderer::DrawRectangle(
     const XL_RectF& rect, float z_near,
     const glm::vec4& color,
     float tess_level,
-    float thickness_x,
-    float thickness_y
+    const glm::vec2& thickness,
+    const glm::ivec2& select_cell
 )
 {
 	glm::vec2 lt = ScreenToWorld(rect.l, rect.t);
@@ -177,7 +182,8 @@ void BatchRenderer::DrawRectangle(
         vert_lt.color = color;
         vert_lt.local = glm::vec2(-1.0f, 1.0f);
         vert_lt.tessLevel = tess_level;
-        vert_lt.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_lt.thickness = thickness;
+		vert_lt.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
 
         // right-top
@@ -186,7 +192,8 @@ void BatchRenderer::DrawRectangle(
         vert_rt.color = color;
         vert_rt.local = glm::vec2(1.0f, 1.0f);
         vert_rt.tessLevel = tess_level;
-        vert_rt.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_rt.thickness = thickness;
+        vert_rt.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
 
         // right-bottom
@@ -195,7 +202,8 @@ void BatchRenderer::DrawRectangle(
         vert_rb.color = color;
         vert_rb.local = glm::vec2(1.0f, -1.0f);
         vert_rb.tessLevel = tess_level;
-        vert_rb.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_rb.thickness = thickness;
+        vert_rb.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
 
         // left-bottom
@@ -204,7 +212,8 @@ void BatchRenderer::DrawRectangle(
         vert_lb.color = color;
         vert_lb.local = glm::vec2(-1.0f, -1.0f);
         vert_lb.tessLevel = tess_level;
-        vert_lb.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_lb.thickness = thickness;
+        vert_lb.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
         break;
     }
@@ -216,7 +225,8 @@ void BatchRenderer::DrawRectangle(
         vert_lt.color = color;
         vert_lt.local = glm::vec2(-1.0f, 1.0f);
         vert_lt.tessLevel = tess_level;
-        vert_lt.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_lt.thickness = thickness;
+        vert_lt.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
 
         // right-top
@@ -225,7 +235,8 @@ void BatchRenderer::DrawRectangle(
         vert_rt.color = color;
         vert_rt.local = glm::vec2(1.0f, 1.0f);
         vert_rt.tessLevel = tess_level;
-        vert_rt.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_rt.thickness = thickness;
+        vert_rt.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
 
         // right-bottom
@@ -234,7 +245,8 @@ void BatchRenderer::DrawRectangle(
         vert_rb.color = color;
         vert_rb.local = glm::vec2(1.0f, -1.0f);
         vert_rb.tessLevel = tess_level;
-        vert_rb.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_rb.thickness = thickness;
+        vert_rb.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
 
         // left-bottom
@@ -243,7 +255,8 @@ void BatchRenderer::DrawRectangle(
         vert_lb.color = color;
         vert_lb.local = glm::vec2(-1.0f, -1.0f);
         vert_lb.tessLevel = tess_level;
-        vert_lb.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_lb.thickness = thickness;
+        vert_lb.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
         break;
     }
@@ -255,7 +268,8 @@ void BatchRenderer::DrawRectangle(
         vert_lt.color = color;
         vert_lt.local = glm::vec2(-1.0f, 1.0f);
         vert_lt.tessLevel = tess_level;
-        vert_lt.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_lt.thickness = thickness;
+        vert_lt.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
 
         auto& vert_rt = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
@@ -263,6 +277,8 @@ void BatchRenderer::DrawRectangle(
         vert_rt.color = color;
         vert_rt.local = glm::vec2(1.0f, 1.0f);
         vert_rt.tessLevel = tess_level;
+        vert_rt.thickness = thickness;
+        vert_rt.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
 
         auto& vert_rb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
@@ -270,7 +286,8 @@ void BatchRenderer::DrawRectangle(
         vert_rb.color = color;
         vert_rb.local = glm::vec2(1.0f, -1.0f);
         vert_rb.tessLevel = tess_level;
-        vert_rb.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_rb.thickness = thickness;
+        vert_rb.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
 
         auto& vert_lb = m_QuadBatch.m_Vertices[m_QuadBatch.m_VertexCount];
@@ -278,7 +295,8 @@ void BatchRenderer::DrawRectangle(
         vert_lb.color = color;
         vert_lb.local = glm::vec2(-1.0f, -1.0f);
         vert_lb.tessLevel = tess_level;
-        vert_lb.thickness = glm::vec2(thickness_x, thickness_y);
+        vert_lb.thickness = thickness;
+        vert_lb.select_cell = select_cell;
         m_QuadBatch.m_VertexCount++;
         break;
     }
@@ -405,7 +423,7 @@ void BatchRenderer::Flush()
 
         //m_QuadBatch.m_Shader->SetInt("u_cX", 2);
         //m_QuadBatch.m_Shader->SetInt("u_cY", 3);
-        m_QuadBatch.m_Shader->Set4f("u_BorderColor", glm::vec4{ 1.0, 0.0, 1.0, 1.0 });
+        m_QuadBatch.m_Shader->Set4f("u_BorderColor", glm::vec4{ 0.5f, 0.5f, 0.5f, 1.0 });
         m_QuadBatch.m_Shader->SetFloat("u_BorderAA", 0.05f);
 
         // 上传顶点数据到 GPU

@@ -55,10 +55,12 @@ extern "C" {
 	void XL_2D_OnSize(int width, int height);
 	void XL_2D_OnLButtonDown(int x, int y);
 	void XL_2D_OnLButtonUp(int x, int y);
-	void XL_2D_OnMouseMove(int x, int y, bool bSelect);
+	void XL_2D_OnMouseMove(int x, int y, bool bSelect, bool bHover);
+	void XL_2D_OnMouseHover(int x, int y);
 
     // Infomations
     uint64_t  XL_2D_GetFrameRate();
+    uint32_t  XL_2D_GetSelectID();
 
 #ifdef _cplusplus
 }

@@ -256,6 +256,24 @@ void Shader::SetInt(const char* name, unsigned int index)
     glUniform1i(nLoc, index);
 }
 
+void Shader::SetInt2(const char* name, const glm::ivec2& cell)
+{
+    int nLoc = glGetUniformLocation(m_nProgramID, name);
+    glUniform2i(nLoc, cell.x, cell.y);
+}
+
+void Shader::SetInt3(const char* name, const glm::ivec3& cell)
+{
+    int nLoc = glGetUniformLocation(m_nProgramID, name);
+    glUniform3i(nLoc, cell.x, cell.y, cell.z);
+}
+
+void Shader::SetInt4(const char* name, const glm::ivec4& cell)
+{
+    int nLoc = glGetUniformLocation(m_nProgramID, name);
+    glUniform4i(nLoc, cell.x, cell.y, cell.z, cell.w);
+}
+
 void Shader::SetMat4(const char* name, const glm::mat4& trans)
 {
     int nLoc = glGetUniformLocation(m_nProgramID, name);

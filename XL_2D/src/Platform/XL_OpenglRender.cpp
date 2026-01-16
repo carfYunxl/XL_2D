@@ -162,8 +162,41 @@ void OpenglRender::OnLButtonUp(int x, int y)
     OnPaint();
 }
 
-void OpenglRender::OnMouseMove(int x, int y, bool bSelect)
+void OpenglRender::OnMouseMove(int x, int y, bool bSelect, bool bHover)
 {
+    if (bHover)
+    {
+        std::vector<INNER_RectF*> hitRects;
+
+        for (auto& rect : m_InnerRects)
+        {
+            if (PtInRect(XL_PointF{ (float)x,(float)y }, rect.rect))
+            {
+                hitRects.push_back(&rect);
+            }
+        }
+
+        if (!hitRects.empty())
+        {
+            auto itr = std::min_element(hitRects.begin(), hitRects.end(), [](const INNER_RectF* a, const INNER_RectF* b) {
+                return a->z_near < b->z_near;
+                });
+
+            INNER_RectF& topRect = *(*itr);
+
+            float xOffset = x - topRect.rect.l;
+            float yOffset = y - topRect.rect.t;
+            float nTess_level = static_cast<int>(topRect.tess_level);
+            int nX = xOffset / ((topRect.rect.r - topRect.rect.l) / nTess_level);
+            int nY = yOffset / ((topRect.rect.b - topRect.rect.t) / nTess_level);
+            std::cout << "Hover Rect ID: " << topRect.id << " Cell[" << nX << "," << nY << "]" << std::endl;
+
+			topRect.select_cell_x = nX;
+			topRect.select_cell_y = nY;
+        }
+        return;
+    }
+
     if (bSelect)
     {
         ModifyRect(XL_PointF{ (float)x,(float)y });
@@ -282,8 +315,8 @@ void OpenglRender::OnPaint()
             inner_rect.z_near,
             ToColorF(inner_rect.background_color),
             inner_rect.tess_level,
-            inner_rect.thickness_x,
-            inner_rect.thickness_y
+            glm::vec2{ inner_rect.thickness_x, inner_rect.thickness_y },
+			glm::ivec2{ inner_rect.select_cell_x, inner_rect.select_cell_y }
         );
     }
 

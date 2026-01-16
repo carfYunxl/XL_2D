@@ -83,5 +83,23 @@
     <Image Include="res\toolbar1.bmp">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\add-circle.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\add-line.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\add-point.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\add-rectangle.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\add-triangle.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\ShapeBar.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

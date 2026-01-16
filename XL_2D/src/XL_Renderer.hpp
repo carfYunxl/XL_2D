@@ -48,6 +48,7 @@ public:
     void OnKeyDown(uint32_t nChar, uint32_t nRepCnt);
     void OnMouseWheel(int yOffset);
     void OnMouseMove(int xOffset, int yOffset);
+    void OnMouseHover(int xOffset, int yOffset);
 
     void DrawTriangle( DrawPlane plane, float x0, float y0, float x1, float y1, float x2, float y2, const glm::vec4& color );
     void DrawRectangle(
@@ -56,8 +57,8 @@ public:
         float z_near, 
         const glm::vec4& color, 
         float tess_level,
-        float thickness_x,
-        float thickness_y
+        const glm::vec2& thickness,
+        const glm::ivec2& select_cell
     );
     void DrawCube( const glm::vec4& color );
 

@@ -30,6 +30,9 @@ public:
     void Set3f(const char* name, const glm::vec3& color);
     void Set2f(const char* name, const glm::vec2& pos);
     void SetInt(const char* name, unsigned int index);
+    void SetInt2(const char* name, const glm::ivec2& cell);
+    void SetInt3(const char* name, const glm::ivec3& cell);
+    void SetInt4(const char* name, const glm::ivec4& cell);
     void SetFloat(const char* name, float val);
     void SetMat4(const char* name, const glm::mat4& trans);
 

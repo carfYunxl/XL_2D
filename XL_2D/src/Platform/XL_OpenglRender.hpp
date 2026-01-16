@@ -25,6 +25,8 @@ struct INNER_RectF
     XL_ColorF   selected_color{ 1.0,1.0,1.0,1.0 };
 	bool        b_selected{ false };
 	bool        b_clicked{ false };
+	int         select_cell_x{ -1 };
+	int         select_cell_y{ -1 };
 };
 
 class OpenglRender
@@ -47,22 +49,22 @@ public:
 	void FillCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& fill_color);
 	void DrawCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& border_color, float border_width);
 
+	// information getters
 	uint64_t  GetFrameTime() const { return m_nFrameTime; }
+    uint32_t  GetSelectID() const { return m_ActiveId; }
 public:
 	// Event Handlers
 	void OnLButtonDown(int x, int y);
 	void OnLButtonUp(int x, int y);
-	void OnMouseMove(int x, int y, bool bSelect);
+	void OnMouseMove(int x, int y, bool bSelect, bool bHover);
+private:
     void UpdateRect(XL_PointF rb);
 	void ModifyRect(XL_PointF offset);
     void RemoveBackRect();
-private:
     bool        SetupPixelFormat(HDC hdc);
 	XL_PointF   ScreenToWorld(const XL_PointF& screenPos);
     glm::vec4   ToColorF(const XL_ColorF& color) { return glm::vec4{color.r, color.g, color.b, color.a}; }
-    bool        PtInRect(const XL_PointF& pt, const XL_RectF& rect) {
-        return pt.x >= rect.l && pt.x <= rect.r && pt.y >= rect.t && pt.y <= rect.b;
-	}
+    bool        PtInRect(const XL_PointF& pt, const XL_RectF& rect) { return pt.x >= rect.l && pt.x <= rect.r && pt.y >= rect.t && pt.y <= rect.b; }
 private:
     HWND                                m_hWnd;
     HDC                                 m_hDC;
