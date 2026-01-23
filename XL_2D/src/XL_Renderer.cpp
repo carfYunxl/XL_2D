@@ -75,12 +75,10 @@ void BatchRenderer::OnMouseWheel(int yOffset)
 
 void BatchRenderer::OnMouseMove(int xOffset, int yOffset)
 {
-    m_SelectCell = glm::ivec2{ xOffset, yOffset };
 }
 
 void BatchRenderer::OnMouseHover(int xOffset, int yOffset)
 {
-    m_SelectCell = glm::ivec2{xOffset, yOffset};
 }
 
 void BatchRenderer::DrawTriangle(

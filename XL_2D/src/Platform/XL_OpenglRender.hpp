@@ -13,21 +13,6 @@ namespace XL
     class FrameBuffer;
 }
 
-struct INNER_RectF
-{
-	uint32_t    id{ 0 };
-	float       z_near{ 0.0f };
-    float       thickness_x;
-    float       thickness_y;
-	XL_RectF    rect;
-    XL_ColorF   background_color;
-	float       tess_level;
-    XL_ColorF   selected_color{ 1.0,1.0,1.0,1.0 };
-	bool        b_selected{ false };
-	bool        b_clicked{ false };
-	int         select_cell_x{ -1 };
-	int         select_cell_y{ -1 };
-};
 
 class OpenglRender
 {
@@ -52,6 +37,7 @@ public:
 	// information getters
 	uint64_t  GetFrameTime() const { return m_nFrameTime; }
     uint32_t  GetSelectID() const { return m_ActiveId; }
+	INNER_RectF* GetRect(uint32_t id);
 public:
 	// Event Handlers
 	void OnLButtonDown(int x, int y);

@@ -89,10 +89,6 @@ void XL_2D_OnMouseMove(int x, int y, bool bSelect, bool bHover)
 
 void XL_2D_OnMouseHover(int x, int y)
 {
-	if (!g_sHandle)
-		return;
-	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
-	renderer->OnMouseHover(x, y);
 }
 
 uint64_t XL_2D_GetFrameRate()
@@ -112,11 +108,21 @@ uint64_t XL_2D_GetFrameRate()
 	return 1000;
 }
 
-uint32_t XL_2D_GetSelectID(XL_2D_PRIMITIVE_TYPE type, XL_PointF point)
+uint32_t XL_2D_GetSelectID()
 {
 	if (!g_sHandle)
 		return 0;
 
 	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
 	return renderer->GetSelectID();
+}
+
+INNER_RectF* XL_2D_GetRect(uint32_t id)
+{
+	if (!g_sHandle)
+		return 0;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+
+	return renderer->GetRect(id);
 }

@@ -116,6 +116,18 @@ bool OpenglRender::Init()
     return true;
 }
 
+INNER_RectF* OpenglRender::GetRect(uint32_t id)
+{
+    auto itr = std::find_if(m_InnerRects.begin(), m_InnerRects.end(), [=](const INNER_RectF& rect) {
+        return rect.id == id;
+        });
+
+    if (itr == m_InnerRects.end())
+        return nullptr;
+
+	return &(*itr);
+}
+
 void OpenglRender::OnLButtonDown(int x, int y)
 {
     std::vector<INNER_RectF*> hitRects;
@@ -186,13 +198,13 @@ void OpenglRender::OnMouseMove(int x, int y, bool bSelect, bool bHover)
 
             float xOffset = x - topRect.rect.l;
             float yOffset = y - topRect.rect.t;
-            float nTess_level = static_cast<int>(topRect.tess_level);
-            int nX = xOffset / ((topRect.rect.r - topRect.rect.l) / nTess_level);
-            int nY = yOffset / ((topRect.rect.b - topRect.rect.t) / nTess_level);
+            float nTess_level = topRect.tess_level;
+            float nX = xOffset / ((topRect.rect.r - topRect.rect.l) / nTess_level);
+            float nY = yOffset / ((topRect.rect.b - topRect.rect.t) / nTess_level);
             std::cout << "Hover Rect ID: " << topRect.id << " Cell[" << nX << "," << nY << "]" << std::endl;
 
-			topRect.select_cell_x = nX;
-			topRect.select_cell_y = nY;
+			topRect.select_cell_x = (int)nX;
+			topRect.select_cell_y = (int)nY;
         }
         return;
     }
@@ -215,8 +227,8 @@ void OpenglRender::UpdateRect(XL_PointF rb)
     rect.rect.r = rb.x;
     rect.rect.b = rb.y;
 
-    rect.thickness_x = m_QuadBorderWidth_X / (rect.rect.r - rect.rect.l);
-    rect.thickness_y = m_QuadBorderWidth_Y / (rect.rect.b - rect.rect.t);
+    rect.thickness_x = m_QuadBorderWidth_X/* / (rect.rect.r - rect.rect.l)*/;
+    rect.thickness_y = m_QuadBorderWidth_Y/* / (rect.rect.b - rect.rect.t)*/;
 
 }
 
@@ -307,15 +319,21 @@ void OpenglRender::OnPaint()
     /*  Core Draw Functions Here */
     ///////////////////////////////////////////
 
+	float x = 0.0f;
+	float y = 0.0f;
+
     for ( const auto& inner_rect : m_InnerRects)
     {
+        x = inner_rect.thickness_x * inner_rect.tess_level / (inner_rect.rect.r - inner_rect.rect.l);
+        y = inner_rect.thickness_y * inner_rect.tess_level / (inner_rect.rect.b - inner_rect.rect.t);
+
         m_Renderer->DrawRectangle(
             XL::DrawPlane::XY,
             inner_rect.rect,
             inner_rect.z_near,
             ToColorF(inner_rect.background_color),
             inner_rect.tess_level,
-            glm::vec2{ inner_rect.thickness_x, inner_rect.thickness_y },
+            glm::vec2{ x, y },
 			glm::ivec2{ inner_rect.select_cell_x, inner_rect.select_cell_y }
         );
     }
@@ -327,9 +345,6 @@ void OpenglRender::OnPaint()
     SwapBuffers(m_hDC);
     auto end = std::chrono::system_clock::now();
     m_nFrameTime = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
-
-    int x = 1;
-    x++;
 }
 
 void OpenglRender::FillRectangle(
@@ -341,11 +356,12 @@ void OpenglRender::FillRectangle(
 {
     m_QuadBorderWidth_X = thicknessX;
     m_QuadBorderWidth_Y = thicknessY;
-    if(rect.r - rect.l > 0.0f)
-        m_QuadBorderWidth_X = thicknessX / (rect.r - rect.l);
+    //if(rect.r - rect.l > 0.0f)
+    //    m_QuadBorderWidth_X = thicknessX / (rect.r - rect.l);
 
-    if(rect.b - rect.t > 0.0f)
-        m_QuadBorderWidth_Y = thicknessY / (rect.b - rect.t);
+    //if(rect.b - rect.t > 0.0f)
+    //    m_QuadBorderWidth_Y = thicknessY / (rect.b - rect.t);
+
     m_InnerRects.emplace_back(m_id, m_fZnear, m_QuadBorderWidth_X, m_QuadBorderWidth_Y, rect, bg_color, tess_level);
     m_fZnear -= 0.000001f;
     m_id++;

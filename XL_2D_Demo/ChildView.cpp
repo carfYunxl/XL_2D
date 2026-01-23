@@ -36,6 +36,31 @@ BEGIN_MESSAGE_MAP(CChildView, CWnd)
 	ON_WM_CONTEXTMENU()
 	ON_WM_MOUSEHOVER()
 	ON_WM_MOUSELEAVE()
+	ON_COMMAND(ID_PROPERTY_RECTANGLE_DIVIDE_2, &CChildView::OnPropertyRectangleDivide2)
+	ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DIVIDE_2, &CChildView::OnUpdatePropertyRectangleDivide2)
+	ON_COMMAND(ID_PROPERTY_RECTANGLE_DIVIDE_3, &CChildView::OnPropertyRectangleDivide3)
+	ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DIVIDE_3, &CChildView::OnUpdatePropertyRectangleDivide3)
+	ON_COMMAND(ID_PROPERTY_RECTANGLE_DIVIDE_4, &CChildView::OnPropertyRectangleDivide4)
+	ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DIVIDE_4, &CChildView::OnUpdatePropertyRectangleDivide4)
+	ON_COMMAND(ID_PROPERTY_RECTANGLE_DIVIDE_5, &CChildView::OnPropertyRectangleDivide5)
+	ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DIVIDE_5, &CChildView::OnUpdatePropertyRectangleDivide5)
+	ON_COMMAND(ID_PROPERTY_RECTANGLE_DIVIDE_6, &CChildView::OnPropertyRectangleDivide6)
+	ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DIVIDE_6, &CChildView::OnUpdatePropertyRectangleDivide6)
+	ON_COMMAND(ID_PROPERTY_RECTANGLE_DIVIDE_8, &CChildView::OnPropertyRectangleDivide8)
+	ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DIVIDE_8, &CChildView::OnUpdatePropertyRectangleDivide8)
+	ON_COMMAND(ID_PROPERTY_RECTANGLE_DIVIDE_16, &CChildView::OnPropertyRectangleDivide16)
+	ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DIVIDE_16, &CChildView::OnUpdatePropertyRectangleDivide16)
+	ON_COMMAND(ID_PROPERTY_RECTANGLE_DIVIDE_32, &CChildView::OnPropertyRectangleDivide32)
+	ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DIVIDE_32, &CChildView::OnUpdatePropertyRectangleDivide32)
+	ON_COMMAND(ID_PROPERTY_RECTANGLE_DIVIDE_USER_DEFINE, &CChildView::OnPropertyRectangleDivideUserDefine)
+	ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DIVIDE_USER_DEFINE, &CChildView::OnUpdatePropertyRectangleDivideUserDefine)
+//	ON_COMMAND(ID_PROPERTY_RECTANGLE_DELETE, &CChildView::OnPropertyRectangleDelete)
+ON_COMMAND(ID_PROPERTY_RECTANGLE_DELETE, &CChildView::OnPropertyRectangleDelete)
+ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_DELETE, &CChildView::OnUpdatePropertyRectangleDelete)
+ON_COMMAND(ID_PROPERTY_RECTANGLE_BORDER_WIDTH, &CChildView::OnPropertyRectangleBorderWidth)
+ON_COMMAND(ID_PROPERTY_RECTANGLE_COLOR, &CChildView::OnPropertyRectangleColor)
+ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_BORDER_WIDTH, &CChildView::OnUpdatePropertyRectangleBorderWidth)
+ON_UPDATE_COMMAND_UI(ID_PROPERTY_RECTANGLE_COLOR, &CChildView::OnUpdatePropertyRectangleColor)
 END_MESSAGE_MAP()
 
 BOOL CChildView::PreCreateWindow(CREATESTRUCT& cs) 
@@ -169,7 +194,7 @@ void CChildView::OnLButtonDown(UINT nFlags, CPoint point)
 		};
 
 		XL_ColorF bg_color{ 0.0f, 0.0f, 1.0f, 1.0f };
-		XL_2D_FillRectangle(&rect, &bg_color, 3, 10.0f);
+		XL_2D_FillRectangle(&rect, &bg_color, 5, 6.0f);
 		Invalidate();
 		return;
 	}
@@ -206,7 +231,13 @@ void CChildView::OnContextMenu(CWnd* pWnd, CPoint point)
 	menu.LoadMenu(IDR_CONTEXT_MENU_RECTANGLE);
 	CMenu* pMenu = menu.GetSubMenu(0);
 	pMenu->EnableMenuItem(ID_PROPERTY_RECTANGLE_DELETE, MF_BYCOMMAND | MF_ENABLED);
-	pMenu->TrackPopupMenu(TPM_LEFTALIGN | TPM_RIGHTBUTTON, point.x, point.y, this);
+
+	HMENU hMenu = pMenu->GetSafeHmenu();
+	UINT flags = TPM_LEFTALIGN | TPM_RIGHTBUTTON;
+	HWND hOwner = AfxGetMainWnd() ? AfxGetMainWnd()->GetSafeHwnd() : m_hWnd;
+
+	// TrackPopupMenuEx 会把 WM_INITMENUPOPUP 发送到 hOwner，从而触发菜单更新（ON_UPDATE_COMMAND_UI）
+	::TrackPopupMenuEx(hMenu, flags, point.x, point.y, hOwner, nullptr);
 	pMenu->Detach();
 	menu.DestroyMenu();
 }
@@ -219,4 +250,166 @@ void CChildView::OnMouseHover(UINT nFlags, CPoint point)
 void CChildView::OnMouseLeave()
 {
 	CWnd::OnMouseLeave();
+}
+
+void CChildView::OnPropertyRectangleDivide2()
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	m_tessLevel = 2.0f;
+	rect->tess_level = m_tessLevel;
+	Invalidate();
+}
+
+void CChildView::OnUpdatePropertyRectangleDivide2(CCmdUI* pCmdUI)
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	pCmdUI->SetCheck(abs(rect->tess_level-m_tessLevel) < 0.01f);
+}
+void CChildView::OnPropertyRectangleDivide3()
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	m_tessLevel = 3.0f;
+	rect->tess_level = m_tessLevel;
+
+	Invalidate();
+}
+
+void CChildView::OnUpdatePropertyRectangleDivide3(CCmdUI* pCmdUI)
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	pCmdUI->SetCheck(abs(rect->tess_level - m_tessLevel) < 0.01f);
+}
+
+void CChildView::OnPropertyRectangleDivide4()
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	m_tessLevel = 4.0f;
+	rect->tess_level = m_tessLevel;
+
+	Invalidate();
+}
+
+void CChildView::OnUpdatePropertyRectangleDivide4(CCmdUI* pCmdUI)
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	pCmdUI->SetCheck(abs(rect->tess_level - m_tessLevel) < 0.01f);
+}
+
+void CChildView::OnPropertyRectangleDivide5()
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	m_tessLevel = 5.0f;
+	rect->tess_level = m_tessLevel;
+
+	Invalidate();
+}
+
+void CChildView::OnUpdatePropertyRectangleDivide5(CCmdUI* pCmdUI)
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	pCmdUI->SetCheck(abs(rect->tess_level - m_tessLevel) < 0.01f);
+}
+
+void CChildView::OnPropertyRectangleDivide6()
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	m_tessLevel = 6.0f;
+	rect->tess_level = m_tessLevel;
+	Invalidate();
+}
+
+void CChildView::OnUpdatePropertyRectangleDivide6(CCmdUI* pCmdUI)
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	pCmdUI->SetCheck(abs(rect->tess_level - m_tessLevel) < 0.01f);
+}
+
+void CChildView::OnPropertyRectangleDivide8()
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	m_tessLevel = 8.0f;
+	rect->tess_level = m_tessLevel;
+
+	Invalidate();
+}
+
+void CChildView::OnUpdatePropertyRectangleDivide8(CCmdUI* pCmdUI)
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	pCmdUI->SetCheck(abs(rect->tess_level - m_tessLevel) < 0.01f);
+}
+
+void CChildView::OnPropertyRectangleDivide16()
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	m_tessLevel = 16.0f;
+	rect->tess_level = m_tessLevel;
+
+	Invalidate();
+}
+
+void CChildView::OnUpdatePropertyRectangleDivide16(CCmdUI* pCmdUI)
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	pCmdUI->SetCheck(abs(rect->tess_level - m_tessLevel) < 0.01f);
+}
+
+void CChildView::OnPropertyRectangleDivide32()
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	m_tessLevel = 32.0f;
+	rect->tess_level = m_tessLevel;
+
+	Invalidate();
+}
+
+void CChildView::OnUpdatePropertyRectangleDivide32(CCmdUI* pCmdUI)
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	pCmdUI->SetCheck(abs(rect->tess_level - m_tessLevel) < 0.01f);
+}
+
+void CChildView::OnPropertyRectangleDivideUserDefine()
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	rect->tess_level = 0.0f;
+
+	Invalidate();
+}
+
+void CChildView::OnUpdatePropertyRectangleDivideUserDefine(CCmdUI* pCmdUI)
+{
+	auto rect = XL_2D_GetRect(m_RectangleID);
+	pCmdUI->SetCheck(abs(rect->tess_level - m_tessLevel) < 0.01f);
+}
+
+void CChildView::OnPropertyRectangleDelete()
+{
+	int x = 1;
+	x++;
+}
+
+void CChildView::OnUpdatePropertyRectangleDelete(CCmdUI* pCmdUI)
+{
+	// TODO: 在此添加命令更新用户界面处理程序代码
+}
+
+void CChildView::OnPropertyRectangleBorderWidth()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+void CChildView::OnPropertyRectangleColor()
+{
+	// TODO: 在此添加命令处理程序代码
+}
+
+void CChildView::OnUpdatePropertyRectangleBorderWidth(CCmdUI* pCmdUI)
+{
+	// TODO: 在此添加命令更新用户界面处理程序代码
+}
+
+void CChildView::OnUpdatePropertyRectangleColor(CCmdUI* pCmdUI)
+{
+	// TODO: 在此添加命令更新用户界面处理程序代码
 }
