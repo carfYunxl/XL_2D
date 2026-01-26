@@ -128,6 +128,14 @@ INNER_RectF* OpenglRender::GetRect(uint32_t id)
 	return &(*itr);
 }
 
+INNER_RectF* OpenglRender::GetCurrentRect()
+{
+    if (m_InnerRects.empty() || m_ActiveId >= m_InnerRects.size())
+        return nullptr;
+
+    return &m_InnerRects[m_ActiveId];
+}
+
 void OpenglRender::OnLButtonDown(int x, int y)
 {
     std::vector<INNER_RectF*> hitRects;
@@ -284,9 +292,7 @@ XL_PointF OpenglRender::ScreenToWorld(const XL_PointF& screenPos)
 	float width = static_cast<float>(m_WindowWidth);
 	float height = static_cast<float>(m_WindowHeight);
 
-	XL_PointF worldPos;
-	worldPos.x = (screenPos.x / width) * 2.0f - 1.0f;
-	worldPos.y = 1.0f - (screenPos.y / height) * 2.0f;
+    XL_PointF worldPos{ (screenPos.x / width) * 2.0f - 1.0f , 1.0f - (screenPos.y / height) * 2.0f };
 	return worldPos;
 }
 

@@ -3,3 +3,5 @@ tmp/
 bin/
 Test/
 Debug/
+XL_2D_Demo/Debug/
+XL_2D_Demo/Release/

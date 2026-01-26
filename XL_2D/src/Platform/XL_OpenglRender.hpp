@@ -38,6 +38,7 @@ public:
 	uint64_t  GetFrameTime() const { return m_nFrameTime; }
     uint32_t  GetSelectID() const { return m_ActiveId; }
 	INNER_RectF* GetRect(uint32_t id);
+	INNER_RectF* GetCurrentRect();
 public:
 	// Event Handlers
 	void OnLButtonDown(int x, int y);

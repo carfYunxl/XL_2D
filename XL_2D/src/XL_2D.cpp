@@ -126,3 +126,13 @@ INNER_RectF* XL_2D_GetRect(uint32_t id)
 
 	return renderer->GetRect(id);
 }
+
+INNER_RectF* XL_2D_Current_GetRect()
+{
+	if (!g_sHandle)
+		return 0;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+
+	return renderer->GetCurrentRect();
+}

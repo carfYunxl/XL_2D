@@ -47,7 +47,7 @@ typedef struct _INNER_RectF
     float       thickness_y;
     XL_RectF    rect;
     XL_ColorF   background_color;
-    float       tess_level;
+    int         tess_level;
     XL_ColorF   selected_color{ 1.0,1.0,1.0,1.0 };
     bool        b_selected{ false };
     bool        b_clicked{ false };
@@ -78,6 +78,7 @@ extern "C" {
     uint64_t  XL_2D_GetFrameRate();
     uint32_t  XL_2D_GetSelectID();
 	INNER_RectF* XL_2D_GetRect(uint32_t id);
+	INNER_RectF* XL_2D_Current_GetRect();
 
 #ifdef _cplusplus
 }
