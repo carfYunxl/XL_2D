@@ -15,65 +15,68 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="XL_CAD_App.h">
+    <ClInclude Include="framework\XL_CAD_App.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="framework.h">
+    <ClInclude Include="framework\framework.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="framework\targetver.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_CAD_Frame.h">
+    <ClInclude Include="framework\XL_CAD_Frame.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_CAD_View.h">
+    <ClInclude Include="framework\XL_CAD_View.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="Resource.h">
+    <ClInclude Include="framework\Resource.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="XL_PCH.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_CtrlLayout.h">
+    <ClInclude Include="framework\XL_CtrlLayout.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_ShapeGenerator.h">
+    <ClInclude Include="framework\XL_ShapeGenerator.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_PropertyWnd.h">
+    <ClInclude Include="framework\XL_PropertyWnd.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="XL_CAD_Def.h">
+    <ClInclude Include="framework\XL_CAD_Def.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="utils\XL_FuncHelper.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="XL_CAD_App.cpp">
+    <ClCompile Include="framework\XL_CAD_App.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XL_CAD_Frame.cpp">
+    <ClCompile Include="framework\XL_CAD_Frame.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XL_CAD_View.cpp">
+    <ClCompile Include="framework\XL_CAD_View.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="XL_PCH.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XL_CtrlLayout.cpp">
+    <ClCompile Include="framework\XL_CtrlLayout.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XL_ShapeGenerator.cpp">
+    <ClCompile Include="framework\XL_ShapeGenerator.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="XL_PropertyWnd.cpp">
+    <ClCompile Include="framework\XL_PropertyWnd.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="XL_CAD.rc">
+    <ResourceCompile Include="framework\XL_CAD.rc">
       <Filter>资源文件</Filter>
     </ResourceCompile>
   </ItemGroup>

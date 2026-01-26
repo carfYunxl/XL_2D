@@ -102,7 +102,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>XL_PCH.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)XL_2D\include;$(SolutionDir)$(ProjectName)\framework;$(SolutionDir)$(ProjectName)\utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -130,7 +130,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>XL_PCH.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)XL_2D\include;$(SolutionDir)$(ProjectName)\framework;$(SolutionDir)$(ProjectName)\utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -160,7 +160,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>XL_PCH.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)XL_2D\include;$(SolutionDir)$(ProjectName)\framework;$(SolutionDir)$(ProjectName)\utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -192,7 +192,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>XL_PCH.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)\XL_2D\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)XL_2D\include;$(SolutionDir)$(ProjectName)\framework;$(SolutionDir)$(ProjectName)\utils;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -216,34 +216,35 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="XL_CAD_Def.h" />
-    <ClInclude Include="XL_CAD_View.h" />
-    <ClInclude Include="framework.h" />
-    <ClInclude Include="XL_ShapeGenerator.h" />
-    <ClInclude Include="XL_CtrlLayout.h" />
-    <ClInclude Include="XL_CAD_Frame.h" />
+    <ClInclude Include="framework\XL_CAD_Def.h" />
+    <ClInclude Include="framework\XL_CAD_View.h" />
+    <ClInclude Include="framework\framework.h" />
+    <ClInclude Include="framework\XL_ShapeGenerator.h" />
+    <ClInclude Include="framework\XL_CtrlLayout.h" />
+    <ClInclude Include="framework\XL_CAD_Frame.h" />
+    <ClInclude Include="utils\XL_FuncHelper.h" />
     <ClInclude Include="XL_PCH.h" />
-    <ClInclude Include="Resource.h" />
-    <ClInclude Include="targetver.h" />
-    <ClInclude Include="XL_CAD_App.h" />
-    <ClInclude Include="XL_PropertyWnd.h" />
+    <ClInclude Include="framework\Resource.h" />
+    <ClInclude Include="framework\targetver.h" />
+    <ClInclude Include="framework\XL_CAD_App.h" />
+    <ClInclude Include="framework\XL_PropertyWnd.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="XL_CAD_View.cpp" />
-    <ClCompile Include="XL_ShapeGenerator.cpp" />
-    <ClCompile Include="XL_CtrlLayout.cpp" />
-    <ClCompile Include="XL_CAD_Frame.cpp" />
+    <ClCompile Include="framework\XL_CAD_View.cpp" />
+    <ClCompile Include="framework\XL_ShapeGenerator.cpp" />
+    <ClCompile Include="framework\XL_CtrlLayout.cpp" />
+    <ClCompile Include="framework\XL_CAD_Frame.cpp" />
     <ClCompile Include="XL_PCH.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="XL_CAD_App.cpp" />
-    <ClCompile Include="XL_PropertyWnd.cpp" />
+    <ClCompile Include="framework\XL_CAD_App.cpp" />
+    <ClCompile Include="framework\XL_PropertyWnd.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="XL_CAD.rc" />
+    <ResourceCompile Include="framework\XL_CAD.rc" />
   </ItemGroup>
   <ItemGroup>
     <None Include="res\XL_CAD.rc2" />

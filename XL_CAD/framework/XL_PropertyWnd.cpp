@@ -3,6 +3,7 @@
 #include "XL_CAD_Frame.h"
 #include "XL_CAD_View.h"
 #include "XL_CAD_Def.h"
+#include "XL_FuncHelper.h"
 
 #ifdef _DEBUG
 #undef THIS_FILE
@@ -175,6 +176,50 @@ void XL_PropertiesWnd::SetPropListFont()
 
 	m_wndPropList.SetFont(&m_fntPropList);
 	//m_wndObjectCombo.SetFont(&m_fntPropList);
+}
+
+void XL_PropertiesWnd::SetPropertyValue(int id, COleVariant value)
+{
+	auto pRect = XL_2D_GetRect(m_nCurrRectID);
+
+	auto type = static_cast<XL::PROPERTY_ID>(id);
+	switch (type)
+	{
+	case XL::PROPERTY_ID::RECT_Z_ORDER:
+		pRect->z_near = value.fltVal;
+		break;
+	case XL::PROPERTY_ID::RECT_LEFT:
+		pRect->rect.l = value.fltVal;
+		break;
+	case XL::PROPERTY_ID::RECT_TOP:
+		pRect->rect.t = value.fltVal;
+		break;
+	case XL::PROPERTY_ID::RECT_RIGHT:
+		pRect->rect.r = value.fltVal;
+		break;
+	case XL::PROPERTY_ID::RECT_BOTTOM:
+		pRect->rect.b = value.fltVal;
+		break;
+	case XL::PROPERTY_ID::RECT_BG_COLOR:
+		pRect->background_color.r = float((value.lVal) & 0xFF) / (float)255;
+		pRect->background_color.g = float((value.lVal >> 8) & 0x00FF) / (float)255;
+		pRect->background_color.b = float((value.lVal >> 16) & 0x0000FF) / (float)255;
+		pRect->background_color.a = 1.0f;
+		break;
+	case XL::PROPERTY_ID::RECT_TESS_LEVEL:
+		pRect->tess_level = value.lVal;
+		break;
+	case XL::PROPERTY_ID::RECT_BORDER_WIDTH_X:
+		pRect->thickness_x = value.fltVal;
+		break;
+	case XL::PROPERTY_ID::RECT_BORDER_WIDTH_Y:
+		pRect->thickness_y = value.fltVal;
+		break;
+	default:
+		break;
+	}
+
+	XL::FuncHelper::GetView().Invalidate();
 }
 
 void XL_PropertiesWnd::AddComponentsProperty(XL::SHAPE_TYPE type)
@@ -427,6 +472,8 @@ void XL_PropertiesWnd::AddLineProperty()
 
 void XL_PropertiesWnd::AddRectangleProperty(const INNER_RectF& InnerRect)
 {
+	m_nCurrRectID = InnerRect.id;
+
 	auto cnt = m_wndPropList.GetPropertyCount();
 	auto pGroup = m_wndPropList.GetProperty(static_cast<int>(XL::PROPERTY_ID::SHAPE));
 	int nCnt = pGroup->GetSubItemsCount();
@@ -599,10 +646,10 @@ LRESULT XL_PropertiesWnd::OnWmPropertyChanged(WPARAM wparam, LPARAM lparam)
 	}
 
 	/*CString strWndTypeName = pProp->GetParent()->GetName();
-	auto [WndType, nSubType] = GetWndTypeAndSubTypeByName(strWndTypeName);
+	auto [WndType, nSubType] = GetWndTypeAndSubTypeByName(strWndTypeName);*/
 
 	int pID = (int)(pProp->GetData());
-	((HF_MainFrame*)theApp.m_pMainWnd)->m_wndView.SetPropertyValue(pID, i, WndType, nSubType);*/
+	SetPropertyValue(pID, i);
 
 	return 0;
 }

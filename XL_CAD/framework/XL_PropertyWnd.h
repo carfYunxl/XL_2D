@@ -4,6 +4,7 @@
 #include "afxdockablepane.h"
 #include "XL_CAD_Def.h"
 #include "XL_2D.hpp"
+#include <utility>
 class XL_PropertiesToolBar : public CMFCToolBar
 {
 public:
@@ -28,6 +29,8 @@ private:
 	}
 	void InitPropList();
 	void SetPropListFont();
+	//std::pair<WND_TYPE, int> GetWndTypeAndSubTypeByName(const CString& name);
+	void SetPropertyValue(int id, COleVariant value);
 protected:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
@@ -66,6 +69,8 @@ public:
 private:
 	CFont					m_fntPropList;
 	XL_PropertiesToolBar	m_wndToolBar;
+
+	uint32_t				m_nCurrRectID{ 0 };
 };
 
 #endif //XL_PROPERTIES_WND_H__
