@@ -182,7 +182,7 @@ void OpenglRender::OnLButtonUp(int x, int y)
     OnPaint();
 }
 
-void OpenglRender::OnMouseMove(int x, int y, bool bSelect, bool bHover)
+void OpenglRender::OnMouseMove(int x, int y, ShapeType shape, bool bSelect, bool bHover)
 {
     if (bHover)
     {
@@ -223,7 +223,23 @@ void OpenglRender::OnMouseMove(int x, int y, bool bSelect, bool bHover)
     }
     else
     {
-        UpdateRect(XL_PointF{ (float)x,(float)y });
+        switch (shape)
+        {
+        case Shape_None:
+            break;
+        case Shape_Point:
+            break;
+        case Shape_Line:
+            break;
+        case Shape_Rectangle:
+            UpdateRect(XL_PointF{ (float)x,(float)y });
+            break;
+        case Shape_Triangle:
+            break;
+        case Shape_Circle:
+            UpdateCircle(XL_PointF{ (float)x,(float)y });
+            break;
+        }
     }
 }
 
@@ -267,6 +283,17 @@ void OpenglRender::RemoveBackRect()
         return;
 
     m_InnerRects.erase(m_InnerRects.end());
+}
+
+void OpenglRender::UpdateCircle(XL_PointF pt_on_circle)
+{
+    if (m_InnerCircles.empty())
+        return;
+
+	auto& circle = m_InnerCircles.back();
+    float dx = pt_on_circle.x - circle.pt_center.x;
+    float dy = pt_on_circle.y - circle.pt_center.y;
+	circle.f_radius = sqrtf(dx * dx + dy * dy);
 }
 
 bool OpenglRender::SetupPixelFormat(HDC hdc)
@@ -342,6 +369,18 @@ void OpenglRender::OnPaint()
             glm::vec2{ x, y },
 			glm::ivec2{ inner_rect.select_cell_x, inner_rect.select_cell_y }
         );
+    }
+
+    for ( const auto& circle : m_InnerCircles )
+    {
+        auto pCenter = ScreenToWorld(circle.pt_center);
+
+        float radiusX = circle.f_radius * 2.0f / m_WindowWidth;
+        float radiusY = circle.f_radius * 2.0f / m_WindowHeight;
+
+		float f_border_width = circle.f_border_width / (circle.f_radius * 2.0f);
+
+        m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, circle.f_z_near, radiusX, radiusY, ToColorF(circle.c_border_color), f_border_width/*circle.f_border_width*/, circle.f_fade);
     }
 
     ///////////////////////////////////////////
@@ -440,7 +479,7 @@ void OpenglRender::FillEllipse(const XL_PointF& center, float pixelX, float pixe
     float radiusX = pixelX * 2.0f / m_WindowWidth;
     float radiusY = pixelY * 2.0f / m_WindowHeight;
 
-    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(fill_color), 1.0f, 0.01f);
+    //m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(fill_color), 1.0f, 0.01f);
 }
 
 void OpenglRender::DrawEllipse(const XL_PointF& center, float pixelX, float pixelY, const XL_ColorF& border_color)
@@ -450,7 +489,7 @@ void OpenglRender::DrawEllipse(const XL_PointF& center, float pixelX, float pixe
     float radiusX = pixelX * 2.0f / m_WindowWidth;
     float radiusY = pixelY * 2.0f / m_WindowHeight;
 
-    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(border_color), 0.1f, 0.01f);
+    //m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(border_color), 0.1f, 0.01f);
 }
 
 void OpenglRender::FillCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& fill_color)
@@ -460,16 +499,24 @@ void OpenglRender::FillCircle(const XL_PointF& center, float pixel_radius, const
     float radiusX = pixel_radius * 2.0f / m_WindowWidth;
     float radiusY = pixel_radius * 2.0f / m_WindowHeight;
 
-    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(fill_color), 1.0f, 0.01f);
-    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(XL_ColorF{0.0f, 0.0f, 0.0f, 1.0f}), 0.01f, 0.01f);
+    //m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(fill_color), 1.0f, 0.01f);
+    //m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(XL_ColorF{0.0f, 0.0f, 0.0f, 1.0f}), 0.01f, 0.01f);
 }
 
 void OpenglRender::DrawCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& border_color, float border_width)
 {
-    auto pCenter = ScreenToWorld(center);
+    INNER_CircleF circle;
+	circle.u_id = m_id;
+    m_id++;
 
-    float radiusX = pixel_radius * 2.0f / m_WindowWidth;
-    float radiusY = pixel_radius * 2.0f / m_WindowHeight;
+	circle.f_z_near = m_fZnear;
+    m_fZnear -= 0.000001f;
 
-    m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, radiusX, radiusY, ToColorF(border_color), 1.0f, 0.01f);
+	circle.pt_center = center;
+	circle.c_border_color = border_color;
+	circle.f_radius = pixel_radius;
+    circle.f_thickness = 0.1f;
+	circle.f_border_width = border_width;
+    circle.f_fade = 0.005f;
+	m_InnerCircles.push_back(circle);
 }

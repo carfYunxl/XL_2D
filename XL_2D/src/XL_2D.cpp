@@ -60,6 +60,21 @@ void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float 
 	renderer->FillRectangle(*rect, *bg_color, tess_level, border_width, border_width);
 }
 
+void XL_2D_DrawCircle(const XL_PointF* center, const XL_ColorF* border_color, float radius, float border_width)
+{
+	if (!center)
+		return;
+
+	if (!border_color)
+		return;
+
+	if (!g_sHandle)
+		return;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	renderer->DrawCircle(*center, radius, *border_color, border_width);
+}
+
 void XL_2D_OnLButtonDown(int x, int y)
 {
 	if (!g_sHandle)
@@ -78,13 +93,13 @@ void XL_2D_OnLButtonUp(int x, int y)
 	renderer->OnLButtonUp(x, y);
 }
 
-void XL_2D_OnMouseMove(int x, int y, bool bSelect, bool bHover)
+void XL_2D_OnMouseMove(int x, int y, ShapeType shape, bool bSelect, bool bHover)
 {
 	if (!g_sHandle)
 		return;
 
 	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
-	renderer->OnMouseMove(x, y, bSelect, bHover);
+	renderer->OnMouseMove(x, y, shape, bSelect, bHover);
 }
 
 void XL_2D_OnMouseHover(int x, int y)

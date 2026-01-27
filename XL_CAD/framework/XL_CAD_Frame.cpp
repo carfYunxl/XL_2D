@@ -51,6 +51,11 @@ int XL_CAD_Frame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	InitStatusBar();
 	InitUserDockPanel();
 
+	//  隐藏TitleBar  
+	//ModifyStyle(WS_CAPTION, 0, SWP_FRAMECHANGED);
+	//  显示TitleBar  
+	//ModifyStyle(0, WS_CAPTION, SWP_FRAMECHANGED);
+
 	return 0;
 }
 

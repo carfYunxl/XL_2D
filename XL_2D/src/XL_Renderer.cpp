@@ -352,6 +352,7 @@ void BatchRenderer::DrawCircle(
     DrawPlane plane,
     float x,
     float y,
+    float z_near,
     float radiusX,
     float radiusY,
     const glm::vec4& color, 
@@ -365,14 +366,14 @@ void BatchRenderer::DrawCircle(
     float r = x + radiusX;
     float b = y - radiusY;
 
-    glm::vec3 center = glm::vec3(x, y, 0.0f);
+    glm::vec3 center = glm::vec3(x, y, z_near);
 
     // 四角世界坐标
     const glm::vec3 worldPts[4] = {
-        glm::vec3(l, t, 0.0f),
-        glm::vec3(r, t, 0.0f),
-        glm::vec3(r, b, 0.0f),
-        glm::vec3(l, b, 0.0f)
+        glm::vec3(l, t, z_near),
+        glm::vec3(r, t, z_near),
+        glm::vec3(r, b, z_near),
+        glm::vec3(l, b, z_near)
     };
 
     // 对应的归一化局部坐标 (相对于中心、按 radiusX/radiusY 缩放)
@@ -381,7 +382,7 @@ void BatchRenderer::DrawCircle(
         glm::vec3 local;
         local.x = (worldPts[i].x - center.x) / radiusX; // -1..1
         local.y = (worldPts[i].y - center.y) / radiusY; // -1..1
-        local.z = 0.0f;
+        local.z = z_near;
 
         auto& v = m_CircleBatch.m_Vertices[m_CircleBatch.m_VertexCount];
         v.worldPosition = worldPts[i];

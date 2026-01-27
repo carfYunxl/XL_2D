@@ -73,6 +73,7 @@ public:
         DrawPlane plane,
         float x,
         float y,
+        float z_near,
         float radiusX,
         float radiusY,
         const glm::vec4& color, 

@@ -43,11 +43,14 @@ public:
 	// Event Handlers
 	void OnLButtonDown(int x, int y);
 	void OnLButtonUp(int x, int y);
-	void OnMouseMove(int x, int y, bool bSelect, bool bHover);
+	void OnMouseMove(int x, int y, ShapeType shape, bool bSelect, bool bHover);
 private:
     void UpdateRect(XL_PointF rb);
 	void ModifyRect(XL_PointF offset);
     void RemoveBackRect();
+
+    void UpdateCircle(XL_PointF pt_on_circle);
+
     bool        SetupPixelFormat(HDC hdc);
 	XL_PointF   ScreenToWorld(const XL_PointF& screenPos);
     glm::vec4   ToColorF(const XL_ColorF& color) { return glm::vec4{color.r, color.g, color.b, color.a}; }
@@ -62,6 +65,7 @@ private:
     std::unique_ptr<XL::FrameBuffer>    m_FrameBuffer;
 
     std::vector<INNER_RectF>            m_InnerRects;
+    std::vector<INNER_CircleF>          m_InnerCircles;
 	unsigned char                       m_nXORKey{ 0xFF };
     uint64_t				            m_nFrameTime{ 0 }; //us
     float                               m_fZnear{0.0f};

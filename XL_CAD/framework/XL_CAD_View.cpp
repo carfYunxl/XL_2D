@@ -47,6 +47,7 @@ BEGIN_MESSAGE_MAP(XL_CAD_View, CWnd)
 	ON_COMMAND(ID_EDIT_PASTE, &XL_CAD_View::OnEditPaste)
 	ON_UPDATE_COMMAND_UI(IDR_SHAPE_TRIANGLE, &XL_CAD_View::OnUpdateIdrShapeTriangle)
 	ON_UPDATE_COMMAND_UI(IDR_SHAPE_RECT, &XL_CAD_View::OnUpdateIdrShapeRect)
+	ON_UPDATE_COMMAND_UI(IDR_SHAPE_CIRCLE, &XL_CAD_View::OnUpdateIdrShapeCircle)
 END_MESSAGE_MAP()
 
 BOOL XL_CAD_View::PreCreateWindow(CREATESTRUCT& cs) 
@@ -119,9 +120,9 @@ void XL_CAD_View::OnMouseMove(UINT nFlags, CPoint point)
 
 	if (!m_bMouseDown)
 	{
-		if (!m_bStartDraw)
+		if (m_DrawShapeType == ShapeType::Shape_None)
 		{
-			XL_2D_OnMouseMove(point.x, point.y, false, true);
+			XL_2D_OnMouseMove(point.x, point.y, m_DrawShapeType, false, true);
 			Invalidate();
 		}
 		return;
@@ -131,17 +132,23 @@ void XL_CAD_View::OnMouseMove(UINT nFlags, CPoint point)
 	offset.x = point.x - m_StartPoint.x;
 	offset.y = point.y - m_StartPoint.y;
 	bool bSelected = true;
-	if (m_bStartDraw)
+
+	switch (m_DrawShapeType)
 	{
+	case ShapeType::Shape_None:
+		m_StartPoint = point;
+		break;
+	case ShapeType::Shape_Point:
+	case ShapeType::Shape_Line:
+	case ShapeType::Shape_Rectangle:
+	case ShapeType::Shape_Triangle:
+	case ShapeType::Shape_Circle:
 		bSelected = false;
 		offset = point;
-	}
-	else
-	{
-		m_StartPoint = point;
+		break;
 	}
 
-	XL_2D_OnMouseMove(offset.x, offset.y, bSelected, false);
+	XL_2D_OnMouseMove(offset.x, offset.y, m_DrawShapeType, bSelected, false);
 	Invalidate();
 }
 
@@ -157,17 +164,30 @@ void XL_CAD_View::OnLButtonDown(UINT nFlags, CPoint point)
 	m_bMouseDown = true;
 	m_StartPoint = point;
 
-	if (m_bStartDraw)
+	if (m_DrawShapeType != ShapeType::Shape_None)
 	{
-		XL_RectF rect{
-			(float)m_StartPoint.x,
-			(float)m_StartPoint.y,
-			(float)m_StartPoint.x,
-			(float)m_StartPoint.y
-		};
+		if (m_DrawShapeType == ShapeType::Shape_Rectangle)
+		{
+			XL_RectF rect{
+				(float)m_StartPoint.x,
+				(float)m_StartPoint.y,
+				(float)m_StartPoint.x,
+				(float)m_StartPoint.y
+			};
 
-		XL_ColorF bg_color{ 0.0f, 0.0f, 1.0f, 1.0f };
-		XL_2D_FillRectangle(&rect, &bg_color, 5, 6.0f);
+			XL_ColorF bg_color{ 0.0f, 0.0f, 1.0f, 1.0f };
+			XL_2D_FillRectangle(&rect, &bg_color, 5, 6.0f);
+		}
+		else if (m_DrawShapeType == ShapeType::Shape_Circle)
+		{
+			XL_PointF center{
+				(float)m_StartPoint.x,
+				(float)m_StartPoint.y
+			};
+
+			XL_ColorF border_color{ 1.0f, 0.0f, 0.0f, 1.0f };
+			XL_2D_DrawCircle(&center, &border_color, 0.0f, 2.0f);
+		}
 		Invalidate();
 		return;
 	}
@@ -188,7 +208,7 @@ void XL_CAD_View::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	CWnd::OnLButtonUp(nFlags, point);
 	m_bMouseDown = false;
-	if (m_bStartDraw)
+	if (m_DrawShapeType != Shape_None)
 	{
 		m_EndPoint = point;
 		return;
@@ -219,7 +239,10 @@ void XL_CAD_View::OnIdrShapeLine()
 
 void XL_CAD_View::OnIdrShapeRect()
 {
-	m_bStartDraw = !m_bStartDraw;
+	if(m_DrawShapeType == ShapeType::Shape_None)
+		m_DrawShapeType = ShapeType::Shape_Rectangle;
+	else
+		m_DrawShapeType = ShapeType::Shape_None;
 }
 
 void XL_CAD_View::OnIdrShapeTriangle()
@@ -229,7 +252,10 @@ void XL_CAD_View::OnIdrShapeTriangle()
 
 void XL_CAD_View::OnIdrShapeCircle()
 {
-	
+	if (m_DrawShapeType == ShapeType::Shape_None)
+		m_DrawShapeType = ShapeType::Shape_Circle;
+	else
+		m_DrawShapeType = ShapeType::Shape_None;
 }
 
 void XL_CAD_View::OnUpdateIdrShapePoint(CCmdUI* pCmdUI)
@@ -278,10 +304,15 @@ void XL_CAD_View::OnEditPaste()
 
 void XL_CAD_View::OnUpdateIdrShapeTriangle(CCmdUI* pCmdUI)
 {
-	
+	pCmdUI->SetCheck(m_DrawShapeType == ShapeType::Shape_Triangle);
 }
 
 void XL_CAD_View::OnUpdateIdrShapeRect(CCmdUI* pCmdUI)
 {
-	pCmdUI->SetCheck(m_bStartDraw);
+	pCmdUI->SetCheck(m_DrawShapeType == ShapeType::Shape_Rectangle);
+}
+
+void XL_CAD_View::OnUpdateIdrShapeCircle(CCmdUI* pCmdUI)
+{
+	pCmdUI->SetCheck(m_DrawShapeType == ShapeType::Shape_Circle);
 }

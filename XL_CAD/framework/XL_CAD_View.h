@@ -1,5 +1,7 @@
 ﻿#pragma once
 
+#include "XL_2D.hpp"
+
 class XL_CAD_View : public CWnd
 {
 public:
@@ -13,8 +15,9 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	DECLARE_MESSAGE_MAP()
 private:
-	bool m_bStartDraw{ false };
 	bool m_bMouseDown{ false };
+
+	ShapeType m_DrawShapeType{ ShapeType::Shape_None };
 
 	CPoint m_StartPoint;
 	CPoint m_EndPoint;
@@ -48,5 +51,6 @@ public:
 	afx_msg void OnEditPaste();
 	afx_msg void OnUpdateIdrShapeTriangle(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateIdrShapeRect(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateIdrShapeCircle(CCmdUI* pCmdUI);
 };
 

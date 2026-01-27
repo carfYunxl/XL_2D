@@ -10,6 +10,16 @@
 #include <windows.h>
 #endif
 
+enum ShapeType : uint8_t
+{
+    Shape_None = 0,
+    Shape_Point,
+    Shape_Line,
+    Shape_Rectangle,
+    Shape_Triangle,
+    Shape_Circle
+};
+
 typedef struct _XL_RectF
 {
     float l;
@@ -55,6 +65,20 @@ typedef struct _INNER_RectF
     int         select_cell_y{ -1 };
 }INNER_RectF;
 
+typedef struct _Inner_CircleF
+{
+    uint32_t    u_id{ 0 };
+    float       f_z_near{ 0.0f };
+    float       f_thickness{ 0.0f };
+    float       f_fade{ 0.0f };
+    XL_PointF   pt_center{ 0.0f, 0.0f };
+    float       f_radius{ 0.0f };
+    XL_ColorF   c_border_color{ 0.0f, 0.0f, 0.0f, 0.0f };
+	float       f_border_width{ 0.0f };
+    bool        b_selected{ false };
+    bool        b_clicked{ false };
+}INNER_CircleF;
+
 #ifdef _cplusplus
 extern "C" {
 #endif
@@ -65,13 +89,13 @@ extern "C" {
 
     // Draw Calls
 	void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float tess_level, float border_width);
-
+    void XL_2D_DrawCircle(const XL_PointF* center, const XL_ColorF* border_color, float radius, float border_width);
 	// Event Handlers
 	void XL_2D_OnPaint();
 	void XL_2D_OnSize(int width, int height);
 	void XL_2D_OnLButtonDown(int x, int y);
 	void XL_2D_OnLButtonUp(int x, int y);
-	void XL_2D_OnMouseMove(int x, int y, bool bSelect, bool bHover);
+	void XL_2D_OnMouseMove(int x, int y, ShapeType shape, bool bSelect, bool bHover);
 	void XL_2D_OnMouseHover(int x, int y);
 
     // Infomations
