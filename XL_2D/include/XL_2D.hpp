@@ -69,10 +69,11 @@ typedef struct _Inner_CircleF
 {
     uint32_t    u_id{ 0 };
     float       f_z_near{ 0.0f };
-    float       f_thickness{ 0.0f };
-    float       f_fade{ 0.0f };
+    //float       f_thickness{ 0.0f };
+    //float       f_fade{ 0.0f };
     XL_PointF   pt_center{ 0.0f, 0.0f };
-    float       f_radius{ 0.0f };
+    float       f_radiusX{ 0.0f };
+    float       f_radiusY{ 0.0f };
     XL_ColorF   c_border_color{ 0.0f, 0.0f, 0.0f, 0.0f };
 	float       f_border_width{ 0.0f };
     bool        b_selected{ false };
@@ -89,7 +90,12 @@ extern "C" {
 
     // Draw Calls
 	void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float tess_level, float border_width);
+
     void XL_2D_DrawCircle(const XL_PointF* center, const XL_ColorF* border_color, float radius, float border_width);
+    void XL_2D_FillCircle(const XL_PointF* center, const XL_ColorF* border_color, float radius);
+
+	void XL_2D_DrawEllipse(const XL_PointF* center, float pixel_radius_x, float pixel_radius_y, const XL_ColorF* border_color, float border_width);
+	void XL_2D_FillEllipse(const XL_PointF* center, float pixel_radius_x, float pixel_radius_y, const XL_ColorF* border_color);
 	// Event Handlers
 	void XL_2D_OnPaint();
 	void XL_2D_OnSize(int width, int height);

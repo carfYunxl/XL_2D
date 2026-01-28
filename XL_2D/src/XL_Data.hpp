@@ -253,15 +253,40 @@ namespace CIRCLE_DATA {
 
     void main()
     {
-        // Calculate distance and fill circle with white
-        float distance = 1.0 - length(Input.LocalPosition);
-        float circle = smoothstep(0.0, Input.Fade, distance);
-        circle *= smoothstep(Input.Thickness + Input.Fade, Input.Thickness, distance);
+        // 1. 计算到中心的距离 (0为中心, 1为边界)
+        float d = length(Input.LocalPosition);
+    
+        // 2. 利用 fwidth 获取 LocalPosition 在当前像素下的变化率
+        // 这代表了 1.0 个屏幕像素在 Local 坐标系下的长度
+        float px = fwidth(d); 
+    
+        // 3. 定义目标边框宽度（像素）
+        float targetPx = Input.Thickness; 
+    
+        // 4. 计算外边缘：在 1.0 处进行 1 像素平滑（抗锯齿）
+        float outer = smoothstep(1.0, 1.0 - px, d);
+        float circle;
+        if(targetPx > 5000)
+        {
+            circle = outer;
+        }
+        else
+        {
+            // 5. 计算内边缘：半径减去 (targetPx * px) 即为内环起始点
+            // 同样给予 1 像素平滑以防锯齿
+            float innerThreshold = 1.0 - (targetPx * px);
 
-        // Set output color
-        //o_Color = Input.Color;
-	    //o_Color.a *= circle;
-        o_Color = vec4( Input.Color.rgb, Input.Color.a * circle );
+            if (innerThreshold <= px * 0.8) {
+                // 情况 A：半径太小，2 像素边框已经填满了整个圆
+                circle = outer; 
+            } else {
+                // 情况 B：正常圆环，计算内部镂空，并保持 1 像素抗锯齿
+                float inner = smoothstep(innerThreshold - px, innerThreshold, d);
+                circle = outer * inner;
+            }
+        }
+
+        o_Color = vec4(Input.Color.rgb, Input.Color.a * circle);
     }
     )glsl";
 }

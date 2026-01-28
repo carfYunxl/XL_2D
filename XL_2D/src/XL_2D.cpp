@@ -75,6 +75,51 @@ void XL_2D_DrawCircle(const XL_PointF* center, const XL_ColorF* border_color, fl
 	renderer->DrawCircle(*center, radius, *border_color, border_width);
 }
 
+void XL_2D_FillCircle(const XL_PointF* center, const XL_ColorF* border_color, float radius)
+{
+	if (!center)
+		return;
+
+	if (!border_color)
+		return;
+
+	if (!g_sHandle)
+		return;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	renderer->FillCircle(*center, radius, *border_color);
+}
+
+void XL_2D_DrawEllipse(const XL_PointF* center, float pixel_radius_x, float pixel_radius_y, const XL_ColorF* border_color, float border_width)
+{
+	if (!center)
+		return;
+
+	if (!border_color)
+		return;
+
+	if (!g_sHandle)
+		return;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	renderer->DrawEllipse(*center, pixel_radius_x, pixel_radius_y, *border_color, border_width);
+}
+
+void XL_2D_FillEllipse(const XL_PointF* center, float pixel_radius_x, float pixel_radius_y, const XL_ColorF* border_color)
+{
+	if (!center)
+		return;
+
+	if (!border_color)
+		return;
+
+	if (!g_sHandle)
+		return;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	renderer->FillEllipse(*center, pixel_radius_x, pixel_radius_y, *border_color);
+}
+
 void XL_2D_OnLButtonDown(int x, int y)
 {
 	if (!g_sHandle)

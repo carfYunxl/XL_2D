@@ -420,10 +420,7 @@ void BatchRenderer::Flush()
     {
         m_QuadBatch.m_Shader->Bind();
 
-        //m_QuadBatch.m_Shader->SetInt("u_cX", 2);
-        //m_QuadBatch.m_Shader->SetInt("u_cY", 3);
         m_QuadBatch.m_Shader->Set4f("u_BorderColor", glm::vec4{ 0.5f, 0.5f, 0.5f, 1.0 });
-        m_QuadBatch.m_Shader->SetFloat("u_BorderAA", 0.05f);
 
         // 上传顶点数据到 GPU
         m_QuadBatch.m_Vertex->Bind(m_QuadBatch.m_Vertices, m_QuadBatch.m_VertexCount);

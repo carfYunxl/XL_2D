@@ -28,10 +28,10 @@ public:
 	void DrawRectangle(const XL_RectF& rect, const XL_ColorF& border_color, float border_width);
     void FillTriangle(const XL_TriangleF& triangle, const XL_ColorF& bg_color);
 
-	void FillEllipse(const XL_PointF& center, float pixelX, float pixelY, const XL_ColorF& fill_color);
-	void DrawEllipse(const XL_PointF& center, float pixelX, float pixelY, const XL_ColorF& border_color);
+	void FillEllipse(const XL_PointF& center, float pixel_radius_x, float pixel_radius_y, const XL_ColorF& border_color);
+	void DrawEllipse(const XL_PointF& center, float pixel_radius_x, float pixel_radius_y, const XL_ColorF& border_color, float border_width);
 
-	void FillCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& fill_color);
+	void FillCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& border_color);
 	void DrawCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& border_color, float border_width);
 
 	// information getters

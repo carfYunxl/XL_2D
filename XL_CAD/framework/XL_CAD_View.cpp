@@ -6,6 +6,7 @@
 #include "XL_2D.hpp"
 #include "XL_ShapeGenerator.h"
 #include "XL_CAD_Frame.h"
+#include <iostream>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -186,7 +187,9 @@ void XL_CAD_View::OnLButtonDown(UINT nFlags, CPoint point)
 			};
 
 			XL_ColorF border_color{ 1.0f, 0.0f, 0.0f, 1.0f };
-			XL_2D_DrawCircle(&center, &border_color, 0.0f, 2.0f);
+			//XL_2D_DrawCircle(&center, &border_color, 0.0f, 1.0f);
+			XL_2D_DrawEllipse(&center, 0.0f, 0.0f, &border_color, 1.0f);
+			XL_2D_FillEllipse(&center, 0.0f, 0.0f, &border_color);
 		}
 		Invalidate();
 		return;
