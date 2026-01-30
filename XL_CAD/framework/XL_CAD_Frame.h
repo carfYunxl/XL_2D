@@ -17,6 +17,7 @@ public:
 #endif
 
 public:
+	CMFCMenuBar		  m_wndMenuBar;
 	CMFCToolBar		  m_wndToolBar;
 	CMFCToolBarImages	m_UserImages;
 
@@ -36,6 +37,7 @@ protected:
 	afx_msg void OnIdrShapeEdit();
 	afx_msg void OnIdrShapeMenu();
 	afx_msg void OnCbnSelchangeCombo();
+	afx_msg void OnCbnSelchangeShowMode();
 	afx_msg void OnEnChangeEdit();
 	DECLARE_MESSAGE_MAP()
 private:
@@ -45,12 +47,14 @@ private:
 	void InitUserDockPanel();
 private:
 	CMFCToolBarComboBoxButton*	m_ToolBarComboBoxButton{ nullptr };
+	CMFCToolBarComboBoxButton*	m_ToolBarComboBoxShowMode{ nullptr };
 	CMFCToolBarEditBoxButton*	m_ToolBarEditBoxButton{ nullptr };
 	CMFCToolBarMenuButton*		m_ToolBarMenuButton{ nullptr };
 
 public:
 	afx_msg void OnMenubutton1();
 	afx_msg void OnMenubutton2();
+	afx_msg void OnIdrShapeShowMode();
 };
 
 

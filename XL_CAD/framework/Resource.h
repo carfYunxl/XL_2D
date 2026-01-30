@@ -33,13 +33,16 @@
 #define ID_EDIT_SAVE                    32816
 #define ID_32817                        32817
 #define ID_32818                        32818
+#define IDR_SHAPE_ELLIPSE               32819
+#define IDR_SHAPE_POLYGON               32820
+#define IDR_SHAPE_SHOW_MODE             32821
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        331
-#define _APS_NEXT_COMMAND_VALUE         32819
+#define _APS_NEXT_COMMAND_VALUE         32822
 #define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           310
 #endif

@@ -27,6 +27,25 @@ void XL_2D_ReleaseRenderer()
 	delete renderer;
 }
 
+void XL_2D_SetPolygonMode(PolygonMode mode)
+{
+	if (!g_sHandle)
+		return;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	switch (mode)
+	{
+	case PolygonMode_Fill:
+		renderer->SetPolygonModeFill();
+		break;
+	case PolygonMode_Line:
+		renderer->SetPolygonModeLine();
+		break;
+	default:
+		break;
+	}
+}
+
 void XL_2D_OnPaint()
 {
 	if(!g_sHandle)
@@ -187,6 +206,25 @@ INNER_RectF* XL_2D_GetRect(uint32_t id)
 	return renderer->GetRect(id);
 }
 
+INNER_CircleF* XL_2D_GetCircle(uint32_t id)
+{
+	if (!g_sHandle)
+		return 0;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+
+	return renderer->GetCircle(id);
+}
+
+ShapeType XL_2D_GetCurrentShapeType()
+{
+	if (!g_sHandle)
+		return ShapeType::Shape_None;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	return renderer->GetCurrentShapeType();
+}
+
 INNER_RectF* XL_2D_Current_GetRect()
 {
 	if (!g_sHandle)
@@ -195,4 +233,13 @@ INNER_RectF* XL_2D_Current_GetRect()
 	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
 
 	return renderer->GetCurrentRect();
+}
+
+INNER_CircleF* XL_2D_Current_GetCicle()
+{
+	if (!g_sHandle)
+		return 0;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	return renderer->GetCurrentCircle();
 }

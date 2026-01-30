@@ -45,6 +45,9 @@ public:
     void ClearScene() { glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); }
     bool Init(pfnGladLoader loader);
 
+	void SetPolygonModeFill() { glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); }
+    void SetPolygonModeLine() { glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); }
+
     void OnKeyDown(uint32_t nChar, uint32_t nRepCnt);
     void OnMouseWheel(int yOffset);
     void OnMouseMove(int xOffset, int yOffset);

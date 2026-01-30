@@ -25,8 +25,6 @@ private:
 	float	m_RectangleDivid{ 2 };
 	int		m_RectangleID{ 0 };
 	float   m_tessLevel{ 2.0f };
-
-	bool	m_bStartDrawPoint{ false };
 public:
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
@@ -52,5 +50,10 @@ public:
 	afx_msg void OnUpdateIdrShapeTriangle(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateIdrShapeRect(CCmdUI* pCmdUI);
 	afx_msg void OnUpdateIdrShapeCircle(CCmdUI* pCmdUI);
+	afx_msg void OnIdrShapeEllipse();
+	afx_msg void OnUpdateIdrShapeEllipse(CCmdUI* pCmdUI);
+	afx_msg void OnIdrShapePolygon();
+	afx_msg void OnUpdateIdrShapePolygon(CCmdUI* pCmdUI);
+	afx_msg void OnUpdateIdrShapeLine(CCmdUI* pCmdUI);
 };
 

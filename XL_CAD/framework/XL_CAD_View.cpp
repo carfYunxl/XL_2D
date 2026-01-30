@@ -7,6 +7,7 @@
 #include "XL_ShapeGenerator.h"
 #include "XL_CAD_Frame.h"
 #include <iostream>
+#include "XL_FuncHelper.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -49,6 +50,11 @@ BEGIN_MESSAGE_MAP(XL_CAD_View, CWnd)
 	ON_UPDATE_COMMAND_UI(IDR_SHAPE_TRIANGLE, &XL_CAD_View::OnUpdateIdrShapeTriangle)
 	ON_UPDATE_COMMAND_UI(IDR_SHAPE_RECT, &XL_CAD_View::OnUpdateIdrShapeRect)
 	ON_UPDATE_COMMAND_UI(IDR_SHAPE_CIRCLE, &XL_CAD_View::OnUpdateIdrShapeCircle)
+	ON_COMMAND(IDR_SHAPE_ELLIPSE, &XL_CAD_View::OnIdrShapeEllipse)
+	ON_UPDATE_COMMAND_UI(IDR_SHAPE_ELLIPSE, &XL_CAD_View::OnUpdateIdrShapeEllipse)
+	ON_COMMAND(IDR_SHAPE_POLYGON, &XL_CAD_View::OnIdrShapePolygon)
+	ON_UPDATE_COMMAND_UI(IDR_SHAPE_POLYGON, &XL_CAD_View::OnUpdateIdrShapePolygon)
+	ON_UPDATE_COMMAND_UI(IDR_SHAPE_LINE, &XL_CAD_View::OnUpdateIdrShapeLine)
 END_MESSAGE_MAP()
 
 BOOL XL_CAD_View::PreCreateWindow(CREATESTRUCT& cs) 
@@ -144,6 +150,8 @@ void XL_CAD_View::OnMouseMove(UINT nFlags, CPoint point)
 	case ShapeType::Shape_Rectangle:
 	case ShapeType::Shape_Triangle:
 	case ShapeType::Shape_Circle:
+	case ShapeType::Shape_Ellipse:
+	case ShapeType::Shape_Polygon:
 		bSelected = false;
 		offset = point;
 		break;
@@ -167,8 +175,14 @@ void XL_CAD_View::OnLButtonDown(UINT nFlags, CPoint point)
 
 	if (m_DrawShapeType != ShapeType::Shape_None)
 	{
-		if (m_DrawShapeType == ShapeType::Shape_Rectangle)
+		switch (m_DrawShapeType)
 		{
+			break;
+		case Shape_Point:
+			break;
+		case Shape_Line:
+			break;
+		case Shape_Rectangle: {
 			XL_RectF rect{
 				(float)m_StartPoint.x,
 				(float)m_StartPoint.y,
@@ -178,18 +192,32 @@ void XL_CAD_View::OnLButtonDown(UINT nFlags, CPoint point)
 
 			XL_ColorF bg_color{ 0.0f, 0.0f, 1.0f, 1.0f };
 			XL_2D_FillRectangle(&rect, &bg_color, 5, 6.0f);
+			break;
 		}
-		else if (m_DrawShapeType == ShapeType::Shape_Circle)
-		{
+		case Shape_Triangle:
+			break;
+		case Shape_Circle: {
 			XL_PointF center{
 				(float)m_StartPoint.x,
 				(float)m_StartPoint.y
 			};
 
 			XL_ColorF border_color{ 1.0f, 0.0f, 0.0f, 1.0f };
-			//XL_2D_DrawCircle(&center, &border_color, 0.0f, 1.0f);
-			XL_2D_DrawEllipse(&center, 0.0f, 0.0f, &border_color, 1.0f);
+			XL_2D_FillCircle(&center, &border_color, 0.0f);
+			break;
+		}
+		case Shape_Ellipse: {
+			XL_PointF center{
+					(float)m_StartPoint.x,
+					(float)m_StartPoint.y
+			};
+
+			XL_ColorF border_color{ 1.0f, 0.0f, 0.0f, 1.0f };
 			XL_2D_FillEllipse(&center, 0.0f, 0.0f, &border_color);
+			break;
+		}
+		case Shape_Polygon:
+			break;
 		}
 		Invalidate();
 		return;
@@ -197,13 +225,31 @@ void XL_CAD_View::OnLButtonDown(UINT nFlags, CPoint point)
 
 	XL_2D_OnLButtonDown(point.x, point.y);
 
-	auto pRect = XL_2D_Current_GetRect();
-
-	if (pRect)
+	auto current_shape_type = XL_2D_GetCurrentShapeType();
+	switch (current_shape_type)
 	{
-		auto frame = (XL_CAD_Frame*)theApp.m_pMainWnd;
-		if (frame->m_wndStatusBar.m_hWnd != NULL)
-			frame->m_wndProperty.AddRectangleProperty(*pRect);
+	case ShapeType::Shape_Rectangle: {
+		auto pRect = XL_2D_Current_GetRect();
+
+		if (pRect)
+		{
+			auto& frame = XL::FuncHelper::GetFrame();
+			if (frame.m_wndStatusBar.m_hWnd != NULL)
+				frame.m_wndProperty.AddRectangleProperty(*pRect);
+		}
+		break;
+	}
+	case ShapeType::Shape_Ellipse:
+	case ShapeType::Shape_Circle: {
+		auto pCircle = XL_2D_Current_GetCicle();
+		if (pCircle)
+		{
+			auto& frame = XL::FuncHelper::GetFrame();
+			if (frame.m_wndStatusBar.m_hWnd != NULL)
+				frame.m_wndProperty.AddCircleProperty(*pCircle);
+		}
+		break;
+	}
 	}
 }
 
@@ -232,17 +278,23 @@ void XL_CAD_View::OnMouseLeave()
 
 void XL_CAD_View::OnIdrShapePoint()
 {
-	m_bStartDrawPoint = !m_bStartDrawPoint;
+	if (m_DrawShapeType != ShapeType::Shape_Point)
+		m_DrawShapeType = ShapeType::Shape_Point;
+	else
+		m_DrawShapeType = ShapeType::Shape_None;
 }
 
 void XL_CAD_View::OnIdrShapeLine()
 {
-	// TODO: 在此添加命令处理程序代码
+	if (m_DrawShapeType != ShapeType::Shape_Line)
+		m_DrawShapeType = ShapeType::Shape_Line;
+	else
+		m_DrawShapeType = ShapeType::Shape_None;
 }
 
 void XL_CAD_View::OnIdrShapeRect()
 {
-	if(m_DrawShapeType == ShapeType::Shape_None)
+	if(m_DrawShapeType != ShapeType::Shape_Rectangle)
 		m_DrawShapeType = ShapeType::Shape_Rectangle;
 	else
 		m_DrawShapeType = ShapeType::Shape_None;
@@ -250,12 +302,15 @@ void XL_CAD_View::OnIdrShapeRect()
 
 void XL_CAD_View::OnIdrShapeTriangle()
 {
-	// TODO: 在此添加命令处理程序代码
+	if (m_DrawShapeType != ShapeType::Shape_Triangle)
+		m_DrawShapeType = ShapeType::Shape_Triangle;
+	else
+		m_DrawShapeType = ShapeType::Shape_None;
 }
 
 void XL_CAD_View::OnIdrShapeCircle()
 {
-	if (m_DrawShapeType == ShapeType::Shape_None)
+	if (m_DrawShapeType != ShapeType::Shape_Circle)
 		m_DrawShapeType = ShapeType::Shape_Circle;
 	else
 		m_DrawShapeType = ShapeType::Shape_None;
@@ -263,20 +318,12 @@ void XL_CAD_View::OnIdrShapeCircle()
 
 void XL_CAD_View::OnUpdateIdrShapePoint(CCmdUI* pCmdUI)
 {
-	pCmdUI->SetCheck(m_bStartDrawPoint);
+	pCmdUI->SetCheck(m_DrawShapeType == ShapeType::Shape_Point);
 }
 
 HBRUSH XL_CAD_View::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
 	HBRUSH hbr = CWnd::OnCtlColor(pDC, pWnd, nCtlColor);
-
-	if (pWnd->GetDlgCtrlID() == IDR_SHAPE_POINT && m_bStartDrawPoint)
-	{
-		static CBrush brBrush(RGB(0, 255, 0));
-		pDC->SetBkColor(RGB(255, 0, 0));
-		pDC->SetTextColor(RGB(255, 0, 0));
-		return brBrush;
-	}
 	return hbr;
 }
 
@@ -318,4 +365,34 @@ void XL_CAD_View::OnUpdateIdrShapeRect(CCmdUI* pCmdUI)
 void XL_CAD_View::OnUpdateIdrShapeCircle(CCmdUI* pCmdUI)
 {
 	pCmdUI->SetCheck(m_DrawShapeType == ShapeType::Shape_Circle);
+}
+
+void XL_CAD_View::OnIdrShapeEllipse()
+{
+	if (m_DrawShapeType != ShapeType::Shape_Ellipse)
+		m_DrawShapeType = ShapeType::Shape_Ellipse;
+	else
+		m_DrawShapeType = ShapeType::Shape_None;
+}
+
+void XL_CAD_View::OnUpdateIdrShapeEllipse(CCmdUI* pCmdUI)
+{
+	pCmdUI->SetCheck(m_DrawShapeType == ShapeType::Shape_Ellipse);
+}
+
+void XL_CAD_View::OnIdrShapePolygon()
+{
+	if (m_DrawShapeType != ShapeType::Shape_Polygon)
+		m_DrawShapeType = ShapeType::Shape_Polygon;
+	else
+		m_DrawShapeType = ShapeType::Shape_None;
+}
+
+void XL_CAD_View::OnUpdateIdrShapePolygon(CCmdUI* pCmdUI)
+{
+	pCmdUI->SetCheck(m_DrawShapeType == ShapeType::Shape_Polygon);
+}
+void XL_CAD_View::OnUpdateIdrShapeLine(CCmdUI* pCmdUI)
+{
+	pCmdUI->SetCheck(m_DrawShapeType == ShapeType::Shape_Line);
 }

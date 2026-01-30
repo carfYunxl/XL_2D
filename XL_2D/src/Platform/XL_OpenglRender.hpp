@@ -20,6 +20,9 @@ public:
     OpenglRender(HWND hWnd, uint32_t Width, uint32_t Height);
     ~OpenglRender();
 
+    void SetPolygonModeFill();
+    void SetPolygonModeLine();
+
     void OnSize(int cx, int cy);
     bool Init();
     void OnPaint();
@@ -38,23 +41,33 @@ public:
 	uint64_t  GetFrameTime() const { return m_nFrameTime; }
     uint32_t  GetSelectID() const { return m_ActiveId; }
 	INNER_RectF* GetRect(uint32_t id);
+	INNER_CircleF* GetCircle(uint32_t id);
+
 	INNER_RectF* GetCurrentRect();
+    INNER_CircleF* GetCurrentCircle();
+	ShapeType   GetCurrentShapeType();
 public:
 	// Event Handlers
 	void OnLButtonDown(int x, int y);
 	void OnLButtonUp(int x, int y);
 	void OnMouseMove(int x, int y, ShapeType shape, bool bSelect, bool bHover);
 private:
-    void UpdateRect(XL_PointF rb);
-	void ModifyRect(XL_PointF offset);
+    void UpdateRect(const XL_PointF& rb);
+	void ModifyRect(const XL_PointF& offset);
     void RemoveBackRect();
 
-    void UpdateCircle(XL_PointF pt_on_circle);
+    void UpdateCircle(const XL_PointF& pt_on_circle);
+	void ModifyCircle(const XL_PointF& offset);
+
+    void UpdateEllipse(const XL_PointF& pt_on_ellipse);
+	void ModifyEllipse(const XL_PointF& offset);
 
     bool        SetupPixelFormat(HDC hdc);
 	XL_PointF   ScreenToWorld(const XL_PointF& screenPos);
     glm::vec4   ToColorF(const XL_ColorF& color) { return glm::vec4{color.r, color.g, color.b, color.a}; }
     bool        PtInRect(const XL_PointF& pt, const XL_RectF& rect) { return pt.x >= rect.l && pt.x <= rect.r && pt.y >= rect.t && pt.y <= rect.b; }
+    bool        PtInCircle(const XL_PointF& pt, const XL_PointF& center, float radius);
+    bool        PtInEllipse(const XL_PointF& pt, const XL_PointF& center, float radius_x, float radius_y);
 private:
     HWND                                m_hWnd;
     HDC                                 m_hDC;
@@ -73,6 +86,8 @@ private:
     uint32_t                            m_ActiveId{ 0xFFFF };
     float                               m_QuadBorderWidth_X{ 0.0f };
     float                               m_QuadBorderWidth_Y{ 0.0f };
+
+	ShapeType                           m_emCurrentShape{ Shape_None };
 };
 
 #endif // XL_OPENGL_RENDERER_HPP_

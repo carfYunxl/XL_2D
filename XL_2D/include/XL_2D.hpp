@@ -17,29 +17,37 @@ enum ShapeType : uint8_t
     Shape_Line,
     Shape_Rectangle,
     Shape_Triangle,
-    Shape_Circle
+    Shape_Circle,
+	Shape_Ellipse,
+	Shape_Polygon
+};
+
+enum PolygonMode : uint8_t
+{
+    PolygonMode_Fill = 0,
+    PolygonMode_Line
 };
 
 typedef struct _XL_RectF
 {
-    float l;
-    float t;
-    float r;
-    float b;
+    float l{0.0f};
+    float t{0.0f};
+    float r{0.0f};
+    float b{0.0f};
 }XL_RectF;
 
 typedef struct _XL_ColorF
 {
-    float r;
-    float g;
-    float b;
-    float a;
+    float r{0.0f};
+    float g{0.0f};
+    float b{0.0f};
+    float a{1.0f};
 }XL_ColorF;
 
 typedef struct _XL_PointF
 {
-    float x;
-    float y;
+    float x{0.0f};
+    float y{0.0f};
 }XL_PointF;
 
 typedef struct _XL_TriangleF
@@ -88,6 +96,8 @@ extern "C" {
 	int XL_2D_CreateRenderer(HWND hWnd, uint32_t width, uint32_t height);
 	void XL_2D_ReleaseRenderer();
 
+	void XL_2D_SetPolygonMode(PolygonMode mode);
+
     // Draw Calls
 	void XL_2D_FillRectangle(const XL_RectF* rect, const XL_ColorF* bg_color, float tess_level, float border_width);
 
@@ -107,8 +117,13 @@ extern "C" {
     // Infomations
     uint64_t  XL_2D_GetFrameRate();
     uint32_t  XL_2D_GetSelectID();
+
 	INNER_RectF* XL_2D_GetRect(uint32_t id);
+    INNER_CircleF* XL_2D_GetCircle(uint32_t id);
+
+	ShapeType XL_2D_GetCurrentShapeType();
 	INNER_RectF* XL_2D_Current_GetRect();
+	INNER_CircleF* XL_2D_Current_GetCicle();
 
 #ifdef _cplusplus
 }

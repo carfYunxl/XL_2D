@@ -57,7 +57,7 @@ public:
 	void AddPointProperty();		// 随机点
 	void AddLineProperty();			// 直线
 	void AddRectangleProperty(const INNER_RectF& InnerRect);	// 矩形
-	void AddCircleProperty();		// 圆形
+	void AddCircleProperty(const INNER_CircleF& InnerCircle);		// 圆形
 
 	void UpdateValueByData(DWORD id, float value);
 	void UpdateValueByData(DWORD id, DWORD value);
@@ -70,7 +70,8 @@ private:
 	CFont					m_fntPropList;
 	XL_PropertiesToolBar	m_wndToolBar;
 
-	uint32_t				m_nCurrRectID{ 0 };
+	uint32_t				m_nCurrID{ 0 };
+	ShapeType				m_nCurrShapeType{ ShapeType::Shape_None };
 };
 
 #endif //XL_PROPERTIES_WND_H__

@@ -180,40 +180,92 @@ void XL_PropertiesWnd::SetPropListFont()
 
 void XL_PropertiesWnd::SetPropertyValue(int id, COleVariant value)
 {
-	auto pRect = XL_2D_GetRect(m_nCurrRectID);
-
-	auto type = static_cast<XL::PROPERTY_ID>(id);
-	switch (type)
+	switch (m_nCurrShapeType)
 	{
-	case XL::PROPERTY_ID::RECT_Z_ORDER:
-		pRect->z_near = value.fltVal;
+	case Shape_Point:
 		break;
-	case XL::PROPERTY_ID::RECT_LEFT:
-		pRect->rect.l = value.fltVal;
+	case Shape_Line:
 		break;
-	case XL::PROPERTY_ID::RECT_TOP:
-		pRect->rect.t = value.fltVal;
+	case Shape_Rectangle: {
+		auto pRect = XL_2D_GetRect(m_nCurrID);
+
+		auto type = static_cast<XL::PROPERTY_ID>(id);
+		switch (type)
+		{
+		case XL::PROPERTY_ID::RECT_Z_ORDER:
+			pRect->z_near = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::RECT_LEFT:
+			pRect->rect.l = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::RECT_TOP:
+			pRect->rect.t = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::RECT_RIGHT:
+			pRect->rect.r = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::RECT_BOTTOM:
+			pRect->rect.b = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::RECT_BG_COLOR:
+			pRect->background_color.r = float((value.lVal) & 0xFF) / (float)255;
+			pRect->background_color.g = float((value.lVal >> 8) & 0x00FF) / (float)255;
+			pRect->background_color.b = float((value.lVal >> 16) & 0x0000FF) / (float)255;
+			pRect->background_color.a = 1.0f;
+			break;
+		case XL::PROPERTY_ID::RECT_TESS_LEVEL:
+			pRect->tess_level = value.lVal;
+			break;
+		case XL::PROPERTY_ID::RECT_BORDER_WIDTH_X:
+			pRect->thickness_x = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::RECT_BORDER_WIDTH_Y:
+			pRect->thickness_y = value.fltVal;
+			break;
+		default:
+			break;
+		}
 		break;
-	case XL::PROPERTY_ID::RECT_RIGHT:
-		pRect->rect.r = value.fltVal;
+	}
+	case Shape_Triangle:
 		break;
-	case XL::PROPERTY_ID::RECT_BOTTOM:
-		pRect->rect.b = value.fltVal;
+	case Shape_Circle: {
+		auto pCircle = XL_2D_GetCircle(m_nCurrID);
+		auto type = static_cast<XL::PROPERTY_ID>(id);
+		switch (type)
+		{
+		case XL::PROPERTY_ID::CIRCLE_Z_ORDER:
+			pCircle->f_z_near = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::CIRCLE_RADIUS_X:
+			pCircle->f_radiusX = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::CIRCLE_RADIUS_Y:
+			pCircle->f_radiusY = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::CIRCLE_CENTER_X:
+			pCircle->pt_center.x = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::CIRCLE_CENTER_Y:
+			pCircle->pt_center.y = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::CIRCLE_BORDER_WIDTH:
+			pCircle->f_border_width = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::CIRCLE_BORDER_COLOR:
+			pCircle->c_border_color.r = float((value.lVal) & 0xFF) / (float)255;
+			pCircle->c_border_color.g = float((value.lVal >> 8) & 0x00FF) / (float)255;
+			pCircle->c_border_color.b = float((value.lVal >> 16) & 0x0000FF) / (float)255;
+			pCircle->c_border_color.a = 1.0f;
+			break;
+		default:
+			break;
+		}
 		break;
-	case XL::PROPERTY_ID::RECT_BG_COLOR:
-		pRect->background_color.r = float((value.lVal) & 0xFF) / (float)255;
-		pRect->background_color.g = float((value.lVal >> 8) & 0x00FF) / (float)255;
-		pRect->background_color.b = float((value.lVal >> 16) & 0x0000FF) / (float)255;
-		pRect->background_color.a = 1.0f;
+	}
+	case Shape_Ellipse:
 		break;
-	case XL::PROPERTY_ID::RECT_TESS_LEVEL:
-		pRect->tess_level = value.lVal;
-		break;
-	case XL::PROPERTY_ID::RECT_BORDER_WIDTH_X:
-		pRect->thickness_x = value.fltVal;
-		break;
-	case XL::PROPERTY_ID::RECT_BORDER_WIDTH_Y:
-		pRect->thickness_y = value.fltVal;
+	case Shape_Polygon:
 		break;
 	default:
 		break;
@@ -244,7 +296,8 @@ void XL_PropertiesWnd::AddComponentsProperty(XL::SHAPE_TYPE type)
 		}
 		case XL::SHAPE_TYPE::CIRCLE:
 		{
-			AddCircleProperty();
+			INNER_CircleF circle_F;
+			AddCircleProperty(circle_F);
 			break;
 		}
 		default:
@@ -472,7 +525,8 @@ void XL_PropertiesWnd::AddLineProperty()
 
 void XL_PropertiesWnd::AddRectangleProperty(const INNER_RectF& InnerRect)
 {
-	m_nCurrRectID = InnerRect.id;
+	m_nCurrID = InnerRect.id;
+	m_nCurrShapeType = Shape_Rectangle;
 
 	auto cnt = m_wndPropList.GetPropertyCount();
 	auto pGroup = m_wndPropList.GetProperty(static_cast<int>(XL::PROPERTY_ID::SHAPE));
@@ -547,10 +601,13 @@ void XL_PropertiesWnd::AddRectangleProperty(const INNER_RectF& InnerRect)
 	m_wndPropList.ExpandAll(TRUE);
 }
 
-void XL_PropertiesWnd::AddCircleProperty()
+void XL_PropertiesWnd::AddCircleProperty(const INNER_CircleF& InnerCircle)
 {
-#if 0
-	auto pGroup = m_wndPropList.GetProperty(static_cast<int>(GRAPH_ID::GRAPH));
+	m_nCurrID = InnerCircle.u_id;
+	m_nCurrShapeType = Shape_Circle;
+
+	auto cnt = m_wndPropList.GetPropertyCount();
+	auto pGroup = m_wndPropList.GetProperty(static_cast<int>(XL::PROPERTY_ID::SHAPE));
 	int nCnt = pGroup->GetSubItemsCount();
 	if (nCnt != 0)
 	{
@@ -561,50 +618,41 @@ void XL_PropertiesWnd::AddCircleProperty()
 		}
 	}
 
-	auto entity = ((HF_MainFrame*)(theApp.m_pMainWnd))->m_wndView.GetEntity(WND_TYPE::GRAPH);
-	if (!entity.isValid())
-		return;
-	if (!HFST::HasComponent<CircleComponent>(entity.GetScene(), entity.GetHandleID()))
-		return;
+	auto pID = new CMFCPropertyGridProperty(_T("ID"), (_variant_t)InnerCircle.u_id, _T("ID"), static_cast<int>(XL::PROPERTY_ID::CIRCLE_ID));
+	pID->Enable(FALSE);
+	pGroup->AddSubItem(pID);
 
-	auto& Circle = HFST::GetComponent<CircleComponent>(entity.GetScene(), entity.GetHandleID());
+	auto pZOrder = new CMFCPropertyGridProperty(_T("Z_Order"), (_variant_t)InnerCircle.f_z_near, _T("Z_Order"), static_cast<int>(XL::PROPERTY_ID::CIRCLE_Z_ORDER));
+	pGroup->AddSubItem(pZOrder);
 
-	auto p1 = new CMFCPropertyGridProperty(_T("总数"), (_variant_t)Circle.m_nCount, _T("圆的总数量"), static_cast<int>(GRAPH_ID::CIRCLE_TOTAL_COUNT));
-	p1->EnableSpinControl(TRUE, 1, 100);
-	pGroup->AddSubItem(p1);
-
-	auto p2 = new CMFCPropertyGridProperty(_T("当前"), (_variant_t)Circle.m_nIndex, _T("当前圆形的索引"), static_cast<int>(GRAPH_ID::CIRCLE_CURRENT_INDEX));
-	p2->EnableSpinControl(TRUE, 0, Circle.m_nCount - 1);
-	pGroup->AddSubItem(p2);
-
-	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("X"), (_variant_t)Circle.m_Circles[Circle.m_nIndex].m_Center.x, _T("圆心 X 坐标"), static_cast<int>(GRAPH_ID::CIRCLE_CENTER_X)));
-	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("Y"), (_variant_t)Circle.m_Circles[Circle.m_nIndex].m_Center.y, _T("圆心 Y 坐标"), static_cast<int>(GRAPH_ID::CIRCLE_CENTER_Y)));
-	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("半径"), (_variant_t)Circle.m_Circles[Circle.m_nIndex].m_Radius, _T("半径"), static_cast<int>(GRAPH_ID::CIRCLE_RADIUS)));
+	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("Center X"), (_variant_t)InnerCircle.pt_center.x, _T("X"), static_cast<int>(XL::PROPERTY_ID::CIRCLE_CENTER_X)));
+	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("Center Y"), (_variant_t)InnerCircle.pt_center.y, _T("Y"), static_cast<int>(XL::PROPERTY_ID::CIRCLE_CENTER_Y)));
+	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("Radius X"), (_variant_t)InnerCircle.f_radiusX, _T("X"), static_cast<int>(XL::PROPERTY_ID::CIRCLE_RADIUS_X)));
+	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("Radius Y"), (_variant_t)InnerCircle.f_radiusY, _T("Y"), static_cast<int>(XL::PROPERTY_ID::CIRCLE_RADIUS_Y)));
 
 	pGroup->AddSubItem(
 		new CMFCPropertyGridProperty(
-			_T("线宽(pixel)"),
-			(_variant_t)Circle.m_LineWidth,
-			_T("当前直线的宽度"),
-			static_cast<int>(GRAPH_ID::CIRCLE_BORDER_WIDTH)
+			_T("BorderWidth"),
+			(_variant_t)InnerCircle.f_border_width,
+			_T("Border Width"),
+			static_cast<int>(XL::PROPERTY_ID::CIRCLE_BORDER_WIDTH)
 		)
 	);
-	CMFCPropertyGridColorProperty* pColorProp = new CMFCPropertyGridColorProperty(
-		_T("边线的颜色"),
-		RGB(Circle.m_LineColor.r * 255, Circle.m_LineColor.g * 255, Circle.m_LineColor.b * 255),
+
+	CMFCPropertyGridColorProperty* pBgColorProp = new CMFCPropertyGridColorProperty(
+		_T("Border Color"),
+		RGB(InnerCircle.c_border_color.r * 255, InnerCircle.c_border_color.g * 255, InnerCircle.c_border_color.b * 255),
 		nullptr,
-		_T("指定默认的边线颜色"),
-		static_cast<int>(GRAPH_ID::CIRCLE_BORDER_COLOR)
+		_T("Border Color"),
+		static_cast<int>(XL::PROPERTY_ID::CIRCLE_BORDER_COLOR)
 	);
-	pColorProp->EnableOtherButton(_T("其他..."));
-	pColorProp->EnableAutomaticButton(_T("默认"), ::GetSysColor(COLOR_3DFACE));
-	pGroup->AddSubItem(pColorProp);
+	pBgColorProp->EnableOtherButton(_T("其他..."));
+	pBgColorProp->EnableAutomaticButton(_T("默认"), ::GetSysColor(COLOR_3DFACE));
+	pGroup->AddSubItem(pBgColorProp);
 
-
-	pGroup->SetName(NAME_CIRCLE);
+	pGroup->SetName(NAME_SHAPE_PROPERTY);
 	m_wndPropList.ExpandAll(FALSE);
 	m_wndPropList.ExpandAll(TRUE);
-#endif
 }
 
 LRESULT XL_PropertiesWnd::OnWmPropertyChanged(WPARAM wparam, LPARAM lparam)
