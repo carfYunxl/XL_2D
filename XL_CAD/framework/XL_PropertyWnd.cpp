@@ -184,8 +184,43 @@ void XL_PropertiesWnd::SetPropertyValue(int id, COleVariant value)
 	{
 	case Shape_Point:
 		break;
-	case Shape_Line:
+	case Shape_Line: {
+		auto pLine = XL_2D_GetLine(m_nCurrID);
+		auto type = static_cast<XL::PROPERTY_ID>(id);
+		switch (type)
+		{
+		case XL::PROPERTY_ID::LINE_ID:
+			pLine->u_id = value.intVal;
+			break;
+		case XL::PROPERTY_ID::LINE_Z_ORDER:
+			pLine->f_z_near = value.fltVal;
+			break;
+		case XL::PROPERTY_ID::LINE_START_X:
+			pLine->pt_start.x= value.intVal;
+			break;
+		case XL::PROPERTY_ID::LINE_START_Y:
+			pLine->pt_start.y = value.intVal;
+			break;
+		case XL::PROPERTY_ID::LINE_END_X:
+			pLine->pt_end.x = value.intVal;
+			break;
+		case XL::PROPERTY_ID::LINE_END_Y:
+			pLine->pt_end.y = value.intVal;
+			break;
+		case XL::PROPERTY_ID::LINE_WIDTH:
+			pLine->f_line_width = value.intVal;
+			break;
+		case XL::PROPERTY_ID::RECT_BG_COLOR:
+			pLine->c_color.r = float((value.lVal) & 0xFF) / (float)255;
+			pLine->c_color.g = float((value.lVal >> 8) & 0x00FF) / (float)255;
+			pLine->c_color.b = float((value.lVal >> 16) & 0x0000FF) / (float)255;
+			pLine->c_color.a = 1.0f;
+			break;
+		default:
+			break;
+		}
 		break;
+	}
 	case Shape_Rectangle: {
 		auto pRect = XL_2D_GetRect(m_nCurrID);
 
@@ -285,7 +320,8 @@ void XL_PropertiesWnd::AddComponentsProperty(XL::SHAPE_TYPE type)
 		}
 		case XL::SHAPE_TYPE::LINE:
 		{
-			AddLineProperty();
+			INNER_LineF line_F;
+			AddLineProperty(line_F);
 			break;
 		}
 		case XL::SHAPE_TYPE::RECTANGLE:
@@ -430,10 +466,13 @@ void XL_PropertiesWnd::AddPointProperty()
 #endif
 }
 
-void XL_PropertiesWnd::AddLineProperty()
+void XL_PropertiesWnd::AddLineProperty(const INNER_LineF& InnerLine)
 {
-#if 0
-	auto pGroup = m_wndPropList.GetProperty(static_cast<int>(GRAPH_ID::GRAPH));
+	m_nCurrID = InnerLine.u_id;
+	m_nCurrShapeType = Shape_Line;
+
+	auto cnt = m_wndPropList.GetPropertyCount();
+	auto pGroup = m_wndPropList.GetProperty(static_cast<int>(XL::PROPERTY_ID::SHAPE));
 	int nCnt = pGroup->GetSubItemsCount();
 	if (nCnt != 0)
 	{
@@ -444,83 +483,33 @@ void XL_PropertiesWnd::AddLineProperty()
 		}
 	}
 
-	auto entity = ((HF_MainFrame*)(theApp.m_pMainWnd))->m_wndView.GetEntity(WND_TYPE::GRAPH);
-	if (!entity.isValid())
-		return;
-	if (!HFST::HasComponent<LineComponent>(entity.GetScene(), entity.GetHandleID()))
-		return;
+	auto pID = new CMFCPropertyGridProperty(_T("ID"), (_variant_t)InnerLine.u_id, _T("ID"), static_cast<int>(XL::PROPERTY_ID::LINE_ID));
+	pID->Enable(FALSE);
+	pGroup->AddSubItem(pID);
 
-	auto& Line = HFST::GetComponent<LineComponent>(entity.GetScene(), entity.GetHandleID());
+	auto pZOrder = new CMFCPropertyGridProperty(_T("Z_Order"), (_variant_t)InnerLine.f_z_near, _T("Z_Ooder"), static_cast<int>(XL::PROPERTY_ID::LINE_Z_ORDER));
+	pGroup->AddSubItem(pZOrder);
 
-	auto p1 = new CMFCPropertyGridProperty(_T("直线总数"), (_variant_t)Line.m_LinesCount, _T("一共有多少条直线"), static_cast<int>(GRAPH_ID::LINE_TOTAL_COUNT));
-	p1->EnableSpinControl(TRUE, 1, 100);
-	pGroup->AddSubItem(p1);
+	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("Left"), (_variant_t)InnerLine.pt_start.x, _T("X"), static_cast<int>(XL::PROPERTY_ID::LINE_START_X)));
+	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("Top"), (_variant_t)InnerLine.pt_start.y, _T("Y"), static_cast<int>(XL::PROPERTY_ID::LINE_START_Y)));
+	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("Right"), (_variant_t)InnerLine.pt_end.x, _T("X"), static_cast<int>(XL::PROPERTY_ID::LINE_END_X)));
+	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("Bottom"), (_variant_t)InnerLine.pt_end.y, _T("Y"), static_cast<int>(XL::PROPERTY_ID::LINE_END_Y)));
+	pGroup->AddSubItem(new CMFCPropertyGridProperty(_T("LineWidth"), (_variant_t)InnerLine.f_line_width, _T("Line Width"), static_cast<int>(XL::PROPERTY_ID::LINE_WIDTH)));
 
-	auto p2 = new CMFCPropertyGridProperty(_T("当前直线"), (_variant_t)Line.m_LineCurrentIndex, _T("当前直线的序号"), static_cast<int>(GRAPH_ID::LINE_CURRENT_INDEX));
-	p2->EnableSpinControl(TRUE, 0, (int)(Line.m_LinesCount - 1u));
-	pGroup->AddSubItem(p2);
-
-	CMFCPropertyGridProperty* pProp2 = new CMFCPropertyGridProperty(_T("方向"), _T("水平"), _T("水平 或者 竖直"), static_cast<int>(GRAPH_ID::LINE_DIR));
-	pProp2->AddOption(_T("水平"));
-	pProp2->AddOption(_T("竖直"));
-	pProp2->AllowEdit(FALSE);
-	pGroup->AddSubItem(pProp2);
-
-	pGroup->AddSubItem(
-		new CMFCPropertyGridProperty(
-			_T("X0"),
-			(_variant_t)Line.m_Lines[Line.m_LineCurrentIndex].m_Start.x,
-			_T("当前直线的起点 X 坐标"),
-			static_cast<int>(GRAPH_ID::LINE_START_X)
-		)
-	);
-	pGroup->AddSubItem(
-		new CMFCPropertyGridProperty(
-			_T("Y0"),
-			(_variant_t)Line.m_Lines[Line.m_LineCurrentIndex].m_Start.y,
-			_T("当前直线的起点 Y 坐标"),
-			static_cast<int>(GRAPH_ID::LINE_START_Y)
-		)
-	);
-	pGroup->AddSubItem(
-		new CMFCPropertyGridProperty(
-			_T("X1"),
-			(_variant_t)Line.m_Lines[Line.m_LineCurrentIndex].m_End.x,
-			_T("当前直线的终点 X 坐标"),
-			static_cast<int>(GRAPH_ID::LINE_END_X)
-		)
-	);
-	pGroup->AddSubItem(
-		new CMFCPropertyGridProperty(
-			_T("Y1"),
-			(_variant_t)Line.m_Lines[Line.m_LineCurrentIndex].m_End.y,
-			_T("当前直线的终点 Y 坐标"),
-			static_cast<int>(GRAPH_ID::LINE_END_Y)
-		)
-	);
-	pGroup->AddSubItem(
-		new CMFCPropertyGridProperty(
-			_T("线宽(pixel)"),
-			(_variant_t)Line.m_LineWidth,
-			_T("当前直线的宽度"),
-			static_cast<int>(GRAPH_ID::LINE_WIDTH)
-		)
-	);
-	CMFCPropertyGridColorProperty* pColorProp = new CMFCPropertyGridColorProperty(
-		_T("窗口颜色"),
-		RGB(Line.m_LineColor.r * 255, Line.m_LineColor.g * 255, Line.m_LineColor.b * 255),
+	CMFCPropertyGridColorProperty* pBgColorProp = new CMFCPropertyGridColorProperty(
+		_T("Line Color"),
+		RGB(InnerLine.c_color.r * 255, InnerLine.c_color.g * 255, InnerLine.c_color.b * 255),
 		nullptr,
-		_T("指定默认的窗口颜色"),
-		static_cast<int>(GRAPH_ID::LINE_COLOR)
+		_T("Line Color"),
+		static_cast<int>(XL::PROPERTY_ID::LINE_COLOR)
 	);
-	pColorProp->EnableOtherButton(_T("其他..."));
-	pColorProp->EnableAutomaticButton(_T("默认"), ::GetSysColor(COLOR_3DFACE));
-	pGroup->AddSubItem(pColorProp);
+	pBgColorProp->EnableOtherButton(_T("其他..."));
+	pBgColorProp->EnableAutomaticButton(_T("默认"), ::GetSysColor(COLOR_3DFACE));
+	pGroup->AddSubItem(pBgColorProp);
 
-	pGroup->SetName(NAME_LINE);
+	pGroup->SetName(NAME_SHAPE_PROPERTY);
 	m_wndPropList.ExpandAll(FALSE);
 	m_wndPropList.ExpandAll(TRUE);
-#endif
 }
 
 void XL_PropertiesWnd::AddRectangleProperty(const INNER_RectF& InnerRect)

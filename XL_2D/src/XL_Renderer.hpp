@@ -66,9 +66,10 @@ public:
     void DrawCube( const glm::vec4& color );
 
     void DrawLine(
-        const glm::vec3& start,
-        const glm::vec3& end,
+        const XL_PointF& pt_start,
+        const XL_PointF& pt_end,
         const glm::vec4& color, 
+        float z_near,
 		float line_width /*= 1.0f*/
     );
 

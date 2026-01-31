@@ -73,7 +73,7 @@ typedef struct _INNER_RectF
     int         select_cell_y{ -1 };
 }INNER_RectF;
 
-typedef struct _Inner_CircleF
+typedef struct _INNER_CircleF
 {
     uint32_t    u_id{ 0 };
     float       f_z_near{ 0.0f };
@@ -87,6 +87,18 @@ typedef struct _Inner_CircleF
     bool        b_selected{ false };
     bool        b_clicked{ false };
 }INNER_CircleF;
+
+typedef struct _INNER_LineF
+{
+    uint32_t    u_id{ 0 };
+    float       f_z_near{ 0.0f };
+    XL_PointF   pt_start{ 0.0f, 0.0f };
+    XL_PointF   pt_end{ 0.0f, 0.0f };
+    XL_ColorF   c_color{ 0.0f, 0.0f, 0.0f, 0.0f };
+    float       f_line_width{ 1.0f };
+    bool        b_selected{ false };
+    bool        b_clicked{ false };
+}INNER_LineF;
 
 #ifdef _cplusplus
 extern "C" {
@@ -106,6 +118,8 @@ extern "C" {
 
 	void XL_2D_DrawEllipse(const XL_PointF* center, float pixel_radius_x, float pixel_radius_y, const XL_ColorF* border_color, float border_width);
 	void XL_2D_FillEllipse(const XL_PointF* center, float pixel_radius_x, float pixel_radius_y, const XL_ColorF* border_color);
+
+    void XL_2D_DrawLine(const XL_PointF* pt_start, const XL_PointF* pt_end, const XL_ColorF* color, float line_width);
 	// Event Handlers
 	void XL_2D_OnPaint();
 	void XL_2D_OnSize(int width, int height);
@@ -120,10 +134,13 @@ extern "C" {
 
 	INNER_RectF* XL_2D_GetRect(uint32_t id);
     INNER_CircleF* XL_2D_GetCircle(uint32_t id);
+	INNER_LineF* XL_2D_GetLine(uint32_t id);
 
-	ShapeType XL_2D_GetCurrentShapeType();
 	INNER_RectF* XL_2D_Current_GetRect();
 	INNER_CircleF* XL_2D_Current_GetCicle();
+	INNER_LineF* XL_2D_Current_GetLine();
+
+	ShapeType XL_2D_GetCurrentShapeType();
 
 #ifdef _cplusplus
 }

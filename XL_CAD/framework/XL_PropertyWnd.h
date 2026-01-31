@@ -55,7 +55,7 @@ public:
 
 	// GRAPH
 	void AddPointProperty();		// 随机点
-	void AddLineProperty();			// 直线
+	void AddLineProperty(const INNER_LineF& InnerLine);			// 直线
 	void AddRectangleProperty(const INNER_RectF& InnerRect);	// 矩形
 	void AddCircleProperty(const INNER_CircleF& InnerCircle);		// 圆形
 

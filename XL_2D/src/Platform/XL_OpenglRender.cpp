@@ -143,34 +143,31 @@ INNER_CircleF* OpenglRender::GetCircle(uint32_t id)
     return &(*itr);
 }
 
-INNER_RectF* OpenglRender::GetCurrentRect()
+INNER_LineF* OpenglRender::GetLine(uint32_t id)
 {
-    if (m_InnerRects.empty())
-        return nullptr;
-
-    auto itr = std::find_if(m_InnerRects.begin(), m_InnerRects.end(), [=](const INNER_RectF& rect) {
-        return rect.id == m_ActiveId;
+    auto itr = std::find_if(m_InnerLines.begin(), m_InnerLines.end(), [=](const INNER_LineF& line) {
+        return line.u_id == id;
         });
 
-    if (itr != m_InnerRects.end())
-        return &(*itr);
+    if (itr == m_InnerLines.end())
+        return nullptr;
 
-	return nullptr;
+    return &(*itr);
+}
+
+INNER_RectF* OpenglRender::GetCurrentRect()
+{
+    return GetRect(m_ActiveId);
 }
 
 INNER_CircleF* OpenglRender::GetCurrentCircle()
 {
-    if (m_InnerCircles.empty())
-        return nullptr;
+	return GetCircle(m_ActiveId);
+}
 
-    auto itr = std::find_if(m_InnerCircles.begin(), m_InnerCircles.end(), [=](const INNER_CircleF& rect) {
-        return rect.u_id == m_ActiveId;
-        });
-
-    if(itr != m_InnerCircles.end())
-		return &(*itr);
-
-    return nullptr;
+INNER_LineF* OpenglRender::GetCurrentLine()
+{
+	return GetLine(m_ActiveId);
 }
 
 ShapeType OpenglRender::GetCurrentShapeType()
@@ -201,6 +198,16 @@ ShapeType OpenglRender::GetCurrentShapeType()
         return ShapeType::Shape_Circle;
     }
 
+    auto itr_line = std::find_if(m_InnerLines.begin(), m_InnerLines.end(), [=](const INNER_LineF& line) {
+        return line.u_id == m_ActiveId;
+        });
+
+    if (itr_line != m_InnerLines.end())
+    {
+        m_emCurrentShape = ShapeType::Shape_Line;
+        return ShapeType::Shape_Line;
+    }
+
     m_emCurrentShape = ShapeType::Shape_None;
     return ShapeType::Shape_None;
 }
@@ -208,6 +215,8 @@ ShapeType OpenglRender::GetCurrentShapeType()
 void OpenglRender::OnLButtonDown(int x, int y)
 {
     std::vector<INNER_RectF*> hitRects;
+
+    float f_current_z = 0.0f;
 
     for ( auto& rect : m_InnerRects)
     {
@@ -228,6 +237,8 @@ void OpenglRender::OnLButtonDown(int x, int y)
         topRect.b_clicked = true;
 		topRect.background_color.r = static_cast<float>((static_cast<int>(topRect.background_color.r * 255) ^ m_nXORKey)) / 255.0f;
 		std::cout << "Rect ID: " << topRect.id << " clicked." << std::endl;
+        f_current_z = topRect.z_near;
+
 		OnPaint();
 	}
 
@@ -247,12 +258,46 @@ void OpenglRender::OnLButtonDown(int x, int y)
             return a->f_z_near < b->f_z_near;
             });
         INNER_CircleF& topCircle = *(*itr);
-		
-		m_ActiveId = topCircle.u_id;
-        topCircle.b_clicked = true;
-        topCircle.c_border_color.r = static_cast<float>((static_cast<int>(topCircle.c_border_color.r * 255) ^ m_nXORKey)) / 255.0f;
-        std::cout << "Circle ID: " << topCircle.u_id << " clicked." << std::endl;
-        OnPaint();
+
+        if (topCircle.f_z_near < f_current_z)
+        {
+            m_ActiveId = topCircle.u_id;
+            topCircle.b_clicked = true;
+            topCircle.c_border_color.r = static_cast<float>((static_cast<int>(topCircle.c_border_color.r * 255) ^ m_nXORKey)) / 255.0f;
+            std::cout << "Circle ID: " << topCircle.u_id << " clicked." << std::endl;
+            f_current_z = topCircle.f_z_near;
+
+            OnPaint();
+        }
+    }
+
+	std::vector<INNER_LineF*> hitLines;
+    for ( auto& line : m_InnerLines )
+    {
+		bool bHit = PtInLine(line.pt_start, line.pt_end, XL_PointF{ (float)x,(float)y });
+        if (bHit)
+        {
+            hitLines.push_back(&line);
+        }
+    }
+
+    if (!hitLines.empty())
+    {
+        auto itr = std::min_element(hitLines.begin(), hitLines.end(), [](const INNER_LineF* a, const INNER_LineF* b) {
+            return a->f_z_near < b->f_z_near;
+            });
+        INNER_LineF& topLine = *(*itr);
+
+        if (topLine.f_z_near < f_current_z)
+        {
+            m_ActiveId = topLine.u_id;
+            topLine.b_clicked = true;
+            topLine.c_color.r = static_cast<float>((static_cast<int>(topLine.c_color.r * 255) ^ m_nXORKey)) / 255.0f;
+            std::cout << "Line ID: " << topLine.u_id << " clicked." << std::endl;
+            f_current_z = topLine.f_z_near;
+
+            OnPaint();
+        }
     }
 }
 
@@ -288,6 +333,23 @@ void OpenglRender::OnLButtonUp(int x, int y)
         topCircle.b_clicked = false;
         std::cout << "Circle ID: " << topCircle.u_id << " released." << std::endl;
         topCircle.c_border_color.r = static_cast<float>((static_cast<int>(topCircle.c_border_color.r * 255) ^ m_nXORKey)) / 255.0f;
+        OnPaint();
+        return;
+    }
+
+    auto itr_line = std::find_if(m_InnerLines.begin(), m_InnerLines.end(), [=](const INNER_LineF& line) {
+        return line.u_id == m_ActiveId;
+        });
+
+    if (itr_line != m_InnerLines.end())
+    {
+        auto& topLine = (*itr_line);
+        if (!topLine.b_clicked)
+            return;
+
+        topLine.b_clicked = false;
+        std::cout << "Line ID: " << topLine.u_id << " released." << std::endl;
+        topLine.c_color.r = static_cast<float>((static_cast<int>(topLine.c_color.r * 255) ^ m_nXORKey)) / 255.0f;
         OnPaint();
         return;
     }
@@ -336,8 +398,10 @@ void OpenglRender::OnMouseMove(int x, int y, ShapeType shape, bool bSelect, bool
             break;
         case Shape_Point:
             break;
-        case Shape_Line:
+        case Shape_Line: {
+            UpdateLine(XL_PointF{ (float)x,(float)y });
             break;
+        }
         case Shape_Rectangle:
             UpdateRect(XL_PointF{ (float)x,(float)y });
             break;
@@ -362,8 +426,10 @@ void OpenglRender::OnMouseMove(int x, int y, ShapeType shape, bool bSelect, bool
         break;
     case Shape_Point:
         break;
-    case Shape_Line:
+    case Shape_Line: {
+		ModifyLine(XL_PointF{ (float)x,(float)y });
         break;
+    }
     case Shape_Rectangle:
         ModifyRect(XL_PointF{ (float)x,(float)y });
         break;
@@ -470,6 +536,36 @@ void OpenglRender::ModifyEllipse(const XL_PointF& offset)
     ModifyCircle(offset);
 }
 
+void OpenglRender::UpdateLine(const XL_PointF& pt_end)
+{
+    if (m_InnerLines.empty())
+        return;
+
+    auto& line = m_InnerLines.back();
+    line.pt_end = pt_end;
+}
+
+void OpenglRender::ModifyLine(const XL_PointF& offset)
+{
+    auto itr = std::find_if(m_InnerLines.begin(), m_InnerLines.end(), [=](const INNER_LineF& line) {
+        return line.u_id == m_ActiveId;
+    });
+
+    if (itr == m_InnerLines.end())
+        return;
+
+    auto& topLine = (*itr);
+    if (!topLine.b_clicked)
+        return;
+
+    std::cout << "[MouseMove]: " << offset.x << "," << offset.y << std::endl;
+
+    topLine.pt_start.x += offset.x;
+    topLine.pt_start.y += offset.y;
+    topLine.pt_end.x += offset.x;
+    topLine.pt_end.y += offset.y;
+}
+
 bool OpenglRender::SetupPixelFormat(HDC hdc)
 {
     PIXELFORMATDESCRIPTOR pfd = { sizeof(PIXELFORMATDESCRIPTOR), 1 };
@@ -538,6 +634,16 @@ bool OpenglRender::PtInEllipse(const XL_PointF& pt, const XL_PointF& center, flo
     return true;
 }
 
+bool OpenglRender::PtInLine(const XL_PointF& start, const XL_PointF& end, const XL_PointF& pt)
+{
+    float lineLength = std::hypotf(end.x - start.x, end.y - start.y);
+    float d1 = std::hypotf(pt.x - start.x, pt.y - start.y);
+    float d2 = std::hypotf(pt.x - end.x, pt.y - end.y);
+    float buffer = 1.0f; // Allowable distance from the line
+
+    return (d1 + d2 >= lineLength - buffer && d1 + d2 <= lineLength + buffer);
+}
+
 void OpenglRender::OnSize(int cx, int cy)
 {
     if (m_hRC) {
@@ -594,6 +700,17 @@ void OpenglRender::OnPaint()
         float radiusY = circle.f_radiusY * 2.0f / m_WindowHeight;
 
         m_Renderer->DrawCircle(XL::DrawPlane::XY, pCenter.x, pCenter.y, circle.f_z_near, radiusX, radiusY, ToColorF(circle.c_border_color), circle.f_border_width, 0.01f);
+    }
+
+    for ( const auto& line : m_InnerLines )
+    {
+        m_Renderer->DrawLine(
+            line.pt_start,
+            line.pt_end,
+            ToColorF(line.c_color),
+            line.f_z_near,
+            line.f_line_width
+        );
     }
 
     ///////////////////////////////////////////
@@ -671,4 +788,21 @@ void OpenglRender::FillCircle(const XL_PointF& center, float pixel_radius, const
 void OpenglRender::DrawCircle(const XL_PointF& center, float pixel_radius, const XL_ColorF& border_color, float border_width)
 {
     DrawEllipse(center, pixel_radius, pixel_radius, border_color, border_width);
+}
+
+void OpenglRender::DrawLine(const XL_PointF& start, const XL_PointF& end, const XL_ColorF& color, float line_width)
+{
+	INNER_LineF line;
+    line.u_id = m_id;
+    m_id++;
+
+    line.f_z_near = m_fZnear;
+    m_fZnear -= 0.000001f;
+
+	line.pt_start = start;
+    line.pt_end = end;
+    line.c_color = color;
+	line.f_line_width = line_width;
+
+	m_InnerLines.push_back(line);
 }

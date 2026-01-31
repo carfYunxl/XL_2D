@@ -139,6 +139,24 @@ void XL_2D_FillEllipse(const XL_PointF* center, float pixel_radius_x, float pixe
 	renderer->FillEllipse(*center, pixel_radius_x, pixel_radius_y, *border_color);
 }
 
+void XL_2D_DrawLine(const XL_PointF* pt_start, const XL_PointF* pt_end, const XL_ColorF* color, float line_width)
+{
+	if (!pt_start)
+		return;
+
+	if (!pt_end)
+		return;
+
+	if (!color)
+		return;
+
+	if (!g_sHandle)
+		return;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	renderer->DrawLine(*pt_start, *pt_end, *color, line_width);
+}
+
 void XL_2D_OnLButtonDown(int x, int y)
 {
 	if (!g_sHandle)
@@ -216,6 +234,16 @@ INNER_CircleF* XL_2D_GetCircle(uint32_t id)
 	return renderer->GetCircle(id);
 }
 
+INNER_LineF* XL_2D_GetLine(uint32_t id)
+{
+	if (!g_sHandle)
+		return 0;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+
+	return renderer->GetLine(id);
+}
+
 ShapeType XL_2D_GetCurrentShapeType()
 {
 	if (!g_sHandle)
@@ -242,4 +270,13 @@ INNER_CircleF* XL_2D_Current_GetCicle()
 
 	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
 	return renderer->GetCurrentCircle();
+}
+
+INNER_LineF* XL_2D_Current_GetLine()
+{
+	if (!g_sHandle)
+		return 0;
+
+	auto* renderer = static_cast<OpenglRender*>(g_sHandle);
+	return renderer->GetCurrentLine();
 }

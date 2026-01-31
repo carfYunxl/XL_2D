@@ -34,6 +34,7 @@ bool BatchRenderer::Init(pfnGladLoader loader)
     glBlendEquation(GL_FUNC_ADD);
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glLineWidth(2.0);
 
     //  π”√∏¥∫œ tessellation shader
     m_QuadBatch.m_Shader = std::make_unique<Shader>();
@@ -328,12 +329,16 @@ void BatchRenderer::DrawCube(const glm::vec4& color)
 }
 
 void BatchRenderer::DrawLine(
-    const glm::vec3& start,
-    const glm::vec3& end,
+    const XL_PointF& pt_start,
+    const XL_PointF& pt_end,
     const glm::vec4& color,
+    float z_near,
     float line_width /*= 1.0f*/
 )
 {
+    glm::vec3 start = glm::vec3{ ScreenToWorld(pt_start.x, pt_start.y), z_near };
+    glm::vec3 end = glm::vec3{ ScreenToWorld(pt_end.x, pt_end.y), z_near };
+
 	auto& vert_start = m_LineBatch.m_Vertices[m_LineBatch.m_VertexCount];
     vert_start.position = start;
     vert_start.color = color;

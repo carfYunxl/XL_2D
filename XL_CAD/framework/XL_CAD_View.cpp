@@ -180,8 +180,19 @@ void XL_CAD_View::OnLButtonDown(UINT nFlags, CPoint point)
 			break;
 		case Shape_Point:
 			break;
-		case Shape_Line:
+		case Shape_Line: {
+			XL_PointF start{
+				(float)m_StartPoint.x,
+				(float)m_StartPoint.y
+			};
+			XL_PointF end{
+				(float)m_StartPoint.x,
+				(float)m_StartPoint.y
+			};
+			XL_ColorF color{ 0.0f, 0.0f, 1.0f, 1.0f };
+			XL_2D_DrawLine(&start, &end, &color, 1.0f);
 			break;
+		}
 		case Shape_Rectangle: {
 			XL_RectF rect{
 				(float)m_StartPoint.x,
@@ -228,28 +239,40 @@ void XL_CAD_View::OnLButtonDown(UINT nFlags, CPoint point)
 	auto current_shape_type = XL_2D_GetCurrentShapeType();
 	switch (current_shape_type)
 	{
-	case ShapeType::Shape_Rectangle: {
-		auto pRect = XL_2D_Current_GetRect();
+		case ShapeType::Shape_Rectangle: {
+			auto pRect = XL_2D_Current_GetRect();
 
-		if (pRect)
-		{
-			auto& frame = XL::FuncHelper::GetFrame();
-			if (frame.m_wndStatusBar.m_hWnd != NULL)
-				frame.m_wndProperty.AddRectangleProperty(*pRect);
+			if (pRect)
+			{
+				auto& frame = XL::FuncHelper::GetFrame();
+				if (frame.m_wndStatusBar.m_hWnd != NULL)
+					frame.m_wndProperty.AddRectangleProperty(*pRect);
+			}
+			break;
 		}
-		break;
-	}
-	case ShapeType::Shape_Ellipse:
-	case ShapeType::Shape_Circle: {
-		auto pCircle = XL_2D_Current_GetCicle();
-		if (pCircle)
-		{
-			auto& frame = XL::FuncHelper::GetFrame();
-			if (frame.m_wndStatusBar.m_hWnd != NULL)
-				frame.m_wndProperty.AddCircleProperty(*pCircle);
+		case ShapeType::Shape_Ellipse:
+		case ShapeType::Shape_Circle: {
+			auto pCircle = XL_2D_Current_GetCicle();
+			if (pCircle)
+			{
+				auto& frame = XL::FuncHelper::GetFrame();
+				if (frame.m_wndStatusBar.m_hWnd != NULL)
+					frame.m_wndProperty.AddCircleProperty(*pCircle);
+			}
+			break;
 		}
-		break;
-	}
+		case ShapeType::Shape_Line: {
+			auto line = XL_2D_Current_GetLine();
+			if (line)
+			{
+				auto& frame = XL::FuncHelper::GetFrame();
+				if (frame.m_wndStatusBar.m_hWnd != NULL)
+					frame.m_wndProperty.AddLineProperty(*line);
+			}
+			break;
+		}
+		default:
+			break;
 	}
 }
 
