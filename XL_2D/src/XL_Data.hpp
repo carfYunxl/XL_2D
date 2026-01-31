@@ -258,15 +258,16 @@ namespace CIRCLE_DATA {
     
         // 2. 利用 fwidth 获取 LocalPosition 在当前像素下的变化率
         // 这代表了 1.0 个屏幕像素在 Local 坐标系下的长度
-        float px = fwidth(d); 
+        float px = fwidth(Input.LocalPosition.x); 
     
         // 3. 定义目标边框宽度（像素）
         float targetPx = Input.Thickness; 
     
         // 4. 计算外边缘：在 1.0 处进行 1 像素平滑（抗锯齿）
         float outer = smoothstep(1.0, 1.0 - px, d);
+        float thickness = targetPx * px;
         float circle;
-        if(targetPx > 5000)
+        if(thickness >= 1.0)
         {
             circle = outer;
         }
@@ -274,9 +275,9 @@ namespace CIRCLE_DATA {
         {
             // 5. 计算内边缘：半径减去 (targetPx * px) 即为内环起始点
             // 同样给予 1 像素平滑以防锯齿
-            float innerThreshold = 1.0 - (targetPx * px);
+            float innerThreshold = 1.0 - thickness;
 
-            if (innerThreshold <= px * 0.8) {
+            if (innerThreshold <= px) {
                 // 情况 A：半径太小，2 像素边框已经填满了整个圆
                 circle = outer; 
             } else {
@@ -285,7 +286,6 @@ namespace CIRCLE_DATA {
                 circle = outer * inner;
             }
         }
-
         o_Color = vec4(Input.Color.rgb, Input.Color.a * circle);
     }
     )glsl";
